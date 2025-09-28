@@ -1,0 +1,42 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Top Section -->
+  <div class="sidebar-header">
+    <div class="admin-info">
+      <div class="admin-icon">
+        <div class="icon-circle"></div>
+      </div>
+      <div class="admin-text" *ngIf="!isCollapsed">
+        <span>ผู้ดูแลระบบนิติบุคคล</span>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <img src="assets/icons/arrow-right.svg" alt="Toggle" class="arrow-icon">
+      </button>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of menuItems" class="nav-item">
+        <a 
+          [routerLink]="item.route" 
+          class="nav-link"
+          [class.active]="item.active"
+          (click)="setActiveItem(item)"
+          [title]="isCollapsed ? item.title : ''"
+        >
+          <img [src]="item.icon" [alt]="item.title" class="nav-icon">
+          <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bottom Section -->
+  <div class="sidebar-footer">
+    <div class="version-info" *ngIf="!isCollapsed">
+      <span>เวอร์ชัน</span>
+      <span class="version-number">0.0</span>
+    </div>
+  </div>
+</div>

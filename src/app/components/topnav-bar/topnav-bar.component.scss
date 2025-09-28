@@ -1,0 +1,340 @@
+.topnav-bar {
+  height: 70px;
+  background: white;
+  border-bottom: 1px solid #e1e5e9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  z-index: 999;
+  transition: left 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &.sidebar-collapsed {
+    left: 70px;
+  }
+}
+
+.topnav-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    color: #666;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+
+    .material-icons {
+      font-size: 24px;
+    }
+  }
+
+  .breadcrumb {
+    .breadcrumb-item {
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+}
+
+.topnav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .search-container {
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        color: #999;
+        font-size: 20px;
+      }
+
+      .search-input {
+        width: 300px;
+        padding: 10px 12px 10px 40px;
+        border: 1px solid #e1e5e9;
+        border-radius: 20px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        &::placeholder {
+          color: #999;
+        }
+      }
+    }
+  }
+
+  .notifications {
+    position: relative;
+
+    .notification-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      color: #666;
+      transition: all 0.3s ease;
+      position: relative;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      .material-icons {
+        font-size: 24px;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+    }
+
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 350px;
+      background: white;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      margin-top: 8px;
+
+      .notification-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e1e5e9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h3 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .mark-all-read {
+          background: none;
+          border: none;
+          color: #667eea;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 500;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .notification-list {
+        max-height: 300px;
+        overflow-y: auto;
+
+        .notification-item {
+          padding: 16px 20px;
+          border-bottom: 1px solid #f8f9fa;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          &:hover {
+            background-color: #f8f9fa;
+          }
+
+          &.unread {
+            background-color: #f0f8ff;
+          }
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .notification-content {
+            flex: 1;
+
+            .notification-message {
+              margin: 0 0 4px 0;
+              font-size: 14px;
+              color: #333;
+              line-height: 1.4;
+            }
+
+            .notification-time {
+              font-size: 12px;
+              color: #999;
+            }
+          }
+
+          .notification-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            margin-left: 12px;
+          }
+        }
+      }
+    }
+  }
+
+  .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #667eea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .avatar-text {
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+      }
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+
+      .user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        line-height: 1.2;
+      }
+
+      .user-role {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  .create-announcement-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+}
+
+// Material Icons fallback
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .topnav-bar {
+    left: 0;
+    padding: 0 16px;
+
+    .search-container .search-box .search-input {
+      width: 200px;
+    }
+
+    .notification-dropdown {
+      width: 300px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .topnav-bar {
+    .search-container {
+      display: none;
+    }
+
+    .user-menu .user-info {
+      display: none;
+    }
+  }
+}

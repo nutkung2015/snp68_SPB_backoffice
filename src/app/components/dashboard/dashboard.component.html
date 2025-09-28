@@ -1,0 +1,70 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p>Welcome back! Here's what's happening with your business today.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div *ngFor="let stat of stats" class="stat-card">
+      <div class="stat-content">
+        <h3 class="stat-value">{{ stat.value }}</h3>
+        <p class="stat-title">{{ stat.title }}</p>
+        <div class="stat-change" [class.positive]="stat.trend === 'up'" [class.negative]="stat.trend === 'down'">
+          <span class="material-icons">{{ stat.trend === 'up' ? 'trending_up' : 'trending_down' }}</span>
+          {{ stat.change }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="content-grid">
+      <div class="content-card">
+        <div class="card-header">
+          <h2>Recent Orders</h2>
+          <button class="view-all-btn">View All</button>
+        </div>
+        <div class="card-content">
+          <div class="order-list">
+            <div *ngFor="let order of recentOrders" class="order-item">
+              <div class="order-info">
+                <span class="order-id">{{ order.id }}</span>
+                <span class="customer-name">{{ order.customer }}</span>
+              </div>
+              <div class="order-details">
+                <span class="order-amount">{{ order.amount }}</span>
+                <span class="order-status" [class]="order.status.toLowerCase()">{{ order.status }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-header">
+          <h2>Quick Actions</h2>
+        </div>
+        <div class="card-content">
+          <div class="quick-actions">
+            <button class="action-btn">
+              <span class="material-icons">person_add</span>
+              Add User
+            </button>
+            <button class="action-btn">
+              <span class="material-icons">inventory</span>
+              Add Product
+            </button>
+            <button class="action-btn">
+              <span class="material-icons">receipt</span>
+              New Order
+            </button>
+            <button class="action-btn">
+              <span class="material-icons">analytics</span>
+              View Reports
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

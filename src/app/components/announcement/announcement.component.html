@@ -1,0 +1,79 @@
+<div class="announcement-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <span class="document-icon">📄</span>
+        <h1>จัดการประกาศและเอกสาร</h1>
+        <p>Announcement & Document Management</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          placeholder="ค้นหาชื่อหัวข้อประกาศ..."
+          class="search-input"
+        >
+        <span class="search-icon">🔍</span>
+      </div>
+      
+      <div class="filter-group">
+        <select [(ngModel)]="selectedRecipient" class="recipient-select">
+          <option *ngFor="let recipient of recipients" [value]="recipient.value">
+            {{ recipient.label }}
+          </option>
+        </select>
+        
+        <button class="reset-btn" (click)="onReset()">รีเซ็ต</button>
+        <button class="search-btn" (click)="onSearch()">ค้นหา</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Announcements Table -->
+  <div class="table-container">
+    <table class="announcements-table">
+      <thead>
+        <tr>
+          <th>ลำดับ</th>
+          <th>หัวข้อประกาศ</th>
+          <th>เนื้อหา</th>
+          <th>ผู้ได้รับ</th>
+          <th>วันที่โพสต์</th>
+          <th>ไฟล์แนบ</th>
+          <th>รายละเอียด</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let announcement of announcements; let i = index">
+          <td class="sequence">{{ i + 1 }}</td>
+          <td class="title">{{ announcement.title }}</td>
+          <td class="content">{{ announcement.content }}</td>
+          <td class="recipient">{{ announcement.recipient }}</td>
+          <td class="date">{{ announcement.postDate }}</td>
+          <td class="attachment">
+            <button 
+              *ngIf="announcement.hasAttachment" 
+              class="view-attachment-btn"
+              (click)="viewAttachment(announcement)"
+            >
+              <span class="attachment-icon">🔍</span>
+              ดู
+            </button>
+          </td>
+          <td class="details">
+            <a href="#" class="details-link" (click)="viewDetails(announcement)">
+              รายละเอียดเพิ่มเติม
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
