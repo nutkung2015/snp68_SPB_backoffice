@@ -18,13 +18,13 @@ export class SidebarComponent implements OnInit {
       title: 'ประกาศ',
       icon: 'assets/icons/announcement.svg',
       route: '/announcement',
-      active: false
+      active: true
     },
     {
       title: 'ปัญหา',
       icon: 'assets/icons/problem.svg',
       route: '/problems',
-      active: true
+      active: false
     },
     {
       title: 'หมู่บ้านและบ้าน',

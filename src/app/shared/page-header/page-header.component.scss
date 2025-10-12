@@ -1,15 +1,8 @@
-body {
-  font-family: "Kanit", sans-serif;
-}
-
 .fa-icon-content {
-  width: 30px;
-  // background-color: #ffffff;
-  // color: #000000;
-  // background-color: #000000;
-  background-color: #0b192e;
+  width: 50px;
+  background-color: #01330d;
   color: #ffffff;
-  padding: 4px;
+  padding: 8px;
   border-radius: 10px;
   font-size: 16px;
   text-align: center;
@@ -17,16 +10,17 @@ body {
   img {
     width: 35px;
     height: 35px;
+    // color: #ffffff;
   }
 }
 
-span.text-toppic {
+.text-toppic {
   font-size: 20px;
   font-weight: bold;
   line-height: 30px;
 }
 
-span.text-sub-toppic {
+.text-sub-toppic {
   font-size: 12px !important;
   line-height: 15px;
   color: #546881;

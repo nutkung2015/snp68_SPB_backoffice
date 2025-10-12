@@ -4,19 +4,19 @@
       <h1>SNP68 SPB Backoffice</h1>
       <p>Please sign in to your account</p>
     </div>
-    
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="email">Email</label>
         <input
-          type="text"
-          id="username"
-          formControlName="username"
-          placeholder="Enter your username"
-          [class.error]="getFieldError('username')"
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [class.error]="getFieldError('email')"
         />
-        <div class="error-message" *ngIf="getFieldError('username')">
-          {{ getFieldError('username') }}
+        <div class="error-message" *ngIf="getFieldError('email')">
+          {{ getFieldError("email") }}
         </div>
       </div>
 
@@ -30,7 +30,7 @@
           [class.error]="getFieldError('password')"
         />
         <div class="error-message" *ngIf="getFieldError('password')">
-          {{ getFieldError('password') }}
+          {{ getFieldError("password") }}
         </div>
       </div>
 
@@ -43,8 +43,8 @@
         <a href="#" class="forgot-password">Forgot password?</a>
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         class="login-button"
         [disabled]="isLoading"
         [class.loading]="isLoading"

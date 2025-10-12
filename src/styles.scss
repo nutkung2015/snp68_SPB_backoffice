@@ -1,1 +1,71 @@
 /* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// Color
+
+.primary {
+  color: #2084fc !important;
+}
+
+.primary-chart {
+  color: #2084fc !important;
+}
+
+.warning {
+  color: #faad14 !important;
+}
+
+.success {
+  color: #22c55e !important;
+}
+
+.error {
+  color: #e64646 !important;
+}
+
+.white {
+  color: #ffffff !important;
+}
+
+.secondary {
+  color: #a6a6ab !important;
+}
+
+.dark {
+  color: #000000 !important;
+}
+
+// Button Color
+
+.bt-primary {
+  background-color: #2084fc;
+  color: #ffffff;
+}
+
+.bt-primary:disabled {
+  background-color: #eef0f2;
+  color: #c1c7cf;
+}
+
+.bt-success {
+  background-color: #22c55e;
+  color: #ffffff;
+}
+
+.bt-error {
+  background-color: #e64646;
+  color: #ffffff;
+}
+
+.bt-white {
+  background-color: #ffffff;
+  color: #000000;
+}

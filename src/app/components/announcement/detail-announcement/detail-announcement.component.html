@@ -1,0 +1,105 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="detail-announcement-container">
+  <!-- Header Section -->
+  <div
+    class="header"
+    fxLayout="column"
+    fxLayoutAlign="start start"
+    fxLayoutGap="8px"
+  >
+    <div class="breadcrumb">
+      <span class="sub-header" style="color: #9fa9b6">ประกาศและเอกสาร / </span>
+      <span class="sub-header" style="color: #171a1e">รายละเอียดประกาศ</span>
+    </div>
+    <div
+      class="title-row"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      fxLayoutGap="16px"
+    >
+      <mat-icon (click)="onBack()">arrow_back</mat-icon>
+      <span class="sub-body">รายละเอียดประกาศ</span>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="form-content" *ngIf="announcement">
+    <mat-card>
+      <div fxLayout="column" fxLayoutGap="24px">
+        <!-- Image Section -->
+        <div class="file-preview" *ngIf="attachmentUrls.length > 0">
+          <mat-label class="field-label">รูปภาพแนบ</mat-label>
+          <div class="image-container">
+            <img [src]="attachmentUrls[0].url" alt="รูปภาพประกาศ" />
+          </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="field-row">
+          <div class="half-width">
+            <mat-label class="field-label">หัวข้อประกาศ</mat-label>
+            <div class="field-value">{{ announcement.title }}</div>
+          </div>
+          <div class="half-width">
+            <mat-label class="field-label">ส่งถึง</mat-label>
+            <div class="field-value">
+              {{ getAudienceLabel(announcement.audience) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="full-width">
+          <mat-label class="field-label">เนื้อหา</mat-label>
+          <div class="field-value content-box">{{ announcement.content }}</div>
+        </div>
+
+        <div class="field-row">
+          <div class="half-width">
+            <mat-label class="field-label">วันที่สร้าง</mat-label>
+            <div class="field-value">
+              {{ announcement.created_at | date : "medium" }}
+            </div>
+          </div>
+          <div class="half-width">
+            <mat-label class="field-label">แก้ไขล่าสุด</mat-label>
+            <div class="field-value">
+              {{ announcement.updated_at | date : "medium" }}
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="half-width">
+            <mat-label class="field-label">สถานะ</mat-label>
+            <div class="field-value">
+              {{ getStatusLabel(announcement.status) }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="full-width"> -->
+      <div class="btn-gruop">
+        <div class="btn-left">
+          <button class="btn-delete" mat-stroked-button (click)="onDelete()">
+            ลบประกาศ
+          </button>
+        </div>
+        <div class="btn-right">
+          <button class="btn-cancel" mat-stroked-button (click)="onBack()">
+            ยกเลิก
+          </button>
+          <button
+            class="btn-edit"
+            mat-flat-button
+            color="primary"
+            (click)="onEdit()"
+          >
+            แก้ไข
+          </button>
+        </div>
+      </div>
+      <!-- </div> -->
+    </mat-card>
+  </div>
+</div>

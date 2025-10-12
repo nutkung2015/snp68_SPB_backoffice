@@ -1,0 +1,165 @@
+.detail-announcement-container {
+  //   padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+  // Header Styles
+  .header {
+    background-color: #ffffff;
+    padding: 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+
+    .sub-header {
+      font-weight: 400;
+      font-size: 14px;
+    }
+
+    .sub-body {
+      font-weight: 600;
+      font-size: 28px;
+      color: #333;
+    }
+
+    .title-row {
+      mat-icon {
+        color: #333;
+      }
+    }
+  }
+
+  // Content Styles
+  .form-content {
+    mat-card {
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: none !important;
+      background-color: white;
+    }
+  }
+
+  // Field Styles
+  .field-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+
+    .half-width {
+      flex: 1;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .field-label {
+    display: block;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .field-value {
+    font-size: 16px;
+    color: #111827;
+    padding: 8px 0;
+  }
+
+  .content-box {
+    background-color: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    min-height: 120px;
+  }
+
+  // Image Styles
+  .file-preview {
+    .image-container {
+      margin-top: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #f9fafb;
+      width: 400px;
+      height: auto;
+      max-height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+    }
+  }
+}
+
+.btn-gruop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+
+  .btn-left {
+    display: flex;
+    gap: 8px;
+    // justify-content: flex-start;
+  }
+
+  .btn-right {
+    display: flex;
+    gap: 8px;
+    // justify-content: flex-end;
+  }
+
+  .btn-delete {
+    min-width: 100px;
+    padding: 10px;
+    border: solid 2px #d14343 !important;
+    background-color: white !important;
+    color: #d14343 !important;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  .btn-cancel {
+    min-width: 100px;
+    padding: 10px;
+    border: solid 2px #205248 !important;
+    background-color: white !important;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  .btn-edit {
+    min-width: 100px;
+    padding: 10px;
+    // border: solid 2px #205248 !important;
+    background-color: #205248 !important;
+    color: white !important;
+    border-radius: 10px;
+    font-size: 16px;
+  }
+}
+
+::ng-deep {
+  .mat-flat-button.mat-primary {
+    background-color: #2084fc !important;
+  }
+}
+
+// Material Override Styles
+::ng-deep {
+  .mat-card {
+    box-shadow: none !important;
+  }
+
+  .mat-icon-button {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+}

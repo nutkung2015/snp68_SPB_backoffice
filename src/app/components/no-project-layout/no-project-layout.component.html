@@ -1,0 +1,14 @@
+<div class="authen-layout">
+  <app-sidebar-no-project
+    [isCollapsed]="sidebarCollapsed"
+    (sidebarToggle)="onSidebarToggle($event)"
+  ></app-sidebar-no-project>
+
+  <div class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
+    <app-topnav-bar [sidebarCollapsed]="sidebarCollapsed"></app-topnav-bar>
+
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

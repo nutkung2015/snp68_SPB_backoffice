@@ -1,79 +1,269 @@
 <div class="announcement-page">
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <div class="title-section">
-        <span class="document-icon">📄</span>
-        <h1>จัดการประกาศและเอกสาร</h1>
-        <p>Announcement & Document Management</p>
-      </div>
-    </div>
+  <!-- เพิ่ม loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading$ | async">
+    <mat-spinner diameter="40"></mat-spinner>
   </div>
+
+  <!-- Page Header -->
+  <app-page-header
+    iconSrc="assets/icons/problem.svg"
+    title="จัดการประกาศและเอกสาร"
+    subtitle="Announcement & Document Management"
+    iconColor="invert(100%)"
+  >
+    <div
+      class="detail-detail"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      fxLayoutGap="10px"
+    >
+      <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
+        <div style="display: flex; align-items: center; gap: 5px">
+          <mat-icon>add</mat-icon>
+          <span>สร้างประกาศ</span>
+        </div>
+      </button>
+    </div>
+  </app-page-header>
 
   <!-- Search and Filter Section -->
   <div class="search-filter-section">
     <div class="search-container">
-      <div class="search-input-group">
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm"
-          placeholder="ค้นหาชื่อหัวข้อประกาศ..."
-          class="search-input"
-        >
-        <span class="search-icon">🔍</span>
-      </div>
-      
-      <div class="filter-group">
-        <select [(ngModel)]="selectedRecipient" class="recipient-select">
-          <option *ngFor="let recipient of recipients" [value]="recipient.value">
-            {{ recipient.label }}
-          </option>
-        </select>
-        
-        <button class="reset-btn" (click)="onReset()">รีเซ็ต</button>
-        <button class="search-btn" (click)="onSearch()">ค้นหา</button>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+        <!-- Search Section -->
+        <div fxFlex fxLayout="row" fxLayoutGap="10px">
+          <!-- <div  fxLayoutAlign="end center">
+          <span>Search</span>
+        </div> -->
+          <div
+            fxLayout="row"
+            fxFlex
+            fxLayoutAlign="start center"
+            fxLayoutGap="0"
+          >
+            <!-- <div fxFlex="150px" class="filter-input left">
+            <mat-select [(ngModel)]="searchType" placeholder="Select">
+              <mat-option value="firstname">Title</mat-option>
+              <mat-option value="lastname">Content</mat-option>
+              <mat-option value="email">Recipient</mat-option>
+            </mat-select>
+          </div> -->
+            <div class="filter-input right" fxFlex="350px">
+              <div
+                fxLayout="row"
+                fxLayoutAlign="start center"
+                fxLayoutGap="5px"
+                style="height: 100%"
+              >
+                <mat-icon class="secondary">search</mat-icon>
+                <input
+                  matInput
+                  type="text"
+                  (keyup)="applyFilter($event)"
+                  placeholder="Search"
+                  style="border: none; width: 100%; height: 100%"
+                />
+              </div>
+            </div>
+            <!-- Status Section -->
+            <div fxLayout="row" fxLayoutGap="10px" style="min-width: 300px">
+              <div fxFlex="50px" fxLayoutAlign="end center">
+                <span>Active</span>
+              </div>
+              <div class="filter-input left" fxFlex style="height: 100%">
+                <mat-select
+                  [(ngModel)]="selectedStatus"
+                  (selectionChange)="filterByStatus($event.value)"
+                >
+                  <mat-option value="all">ทั้งหมด</mat-option>
+                  <mat-option value="published">เผยแพร่</mat-option>
+                  <mat-option value="draft">แบบร่าง</mat-option>
+                  <mat-option value="unpublished">เลิกเผยแพร่</mat-option>
+                </mat-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons Section -->
+        <div fxLayout="row" fxLayoutGap="10px">
+          <button mat-stroked-button class="reset-btn" (click)="onReset()">
+            Reset
+          </button>
+          <button mat-stroked-button class="search-btn" (click)="onSearch()">
+            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
+              <mat-icon style="width: 14px; height: 14px; font-size: 14px"
+                >search</mat-icon
+              >
+              <span>Search</span>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Announcements Table -->
-  <div class="table-container">
-    <table class="announcements-table">
-      <thead>
-        <tr>
-          <th>ลำดับ</th>
-          <th>หัวข้อประกาศ</th>
-          <th>เนื้อหา</th>
-          <th>ผู้ได้รับ</th>
-          <th>วันที่โพสต์</th>
-          <th>ไฟล์แนบ</th>
-          <th>รายละเอียด</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let announcement of announcements; let i = index">
-          <td class="sequence">{{ i + 1 }}</td>
-          <td class="title">{{ announcement.title }}</td>
-          <td class="content">{{ announcement.content }}</td>
-          <td class="recipient">{{ announcement.recipient }}</td>
-          <td class="date">{{ announcement.postDate }}</td>
-          <td class="attachment">
-            <button 
-              *ngIf="announcement.hasAttachment" 
-              class="view-attachment-btn"
-              (click)="viewAttachment(announcement)"
-            >
-              <span class="attachment-icon">🔍</span>
-              ดู
-            </button>
-          </td>
-          <td class="details">
-            <a href="#" class="details-link" (click)="viewDetails(announcement)">
-              รายละเอียดเพิ่มเติม
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Announcements Table Section -->
+  <div
+    id="box-content"
+    style="padding: 10px"
+    ngStyle.gt-sm="padding: 24px"
+    fxLayout="column"
+    fxLayoutAlign="start stretch"
+    fxLayoutGap.gt-sm="20px"
+  >
+    <mat-card
+      fxLayout="column"
+      fxLayoutAlign="start stretch"
+      fxLayoutGap="20px"
+    >
+      <!-- <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="10px">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <span>{{ dataSource.data.length }} รายการ</span>
+        </div>
+        <mat-divider></mat-divider>
+      </div> -->
+
+      <ng-container
+        *ngTemplateOutlet="dataSource.data.length > 0 ? tableContent : noData"
+      >
+      </ng-container>
+
+      <ng-template #tableContent>
+        <div
+          fxLayout="column"
+          fxLayoutAlign="space-between stretch"
+          fxLayoutGap="10px"
+          class="div-table"
+        >
+          <table mat-table [dataSource]="dataSource" matSort>
+            <!-- Sequence Column -->
+            <ng-container matColumnDef="sequence">
+              <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+              <td mat-cell *matCellDef="let element; let i = index">
+                {{ i + 1 }}
+              </td>
+            </ng-container>
+
+            <!-- Title Column -->
+            <ng-container matColumnDef="title">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                หัวข้อประกาศ
+              </th>
+              <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+            </ng-container>
+
+            <!-- Content Column -->
+            <ng-container matColumnDef="content">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>เนื้อหา</th>
+              <td mat-cell *matCellDef="let element">{{ element.content }}</td>
+            </ng-container>
+
+            <!-- Recipient Column -->
+            <ng-container matColumnDef="recipient">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                ผู้ได้รับ
+              </th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.recipient }}
+              </td>
+            </ng-container>
+
+            <!-- Post Date Column -->
+            <ng-container matColumnDef="postDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                วันที่โพสต์
+              </th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.postDate | date : "dd LLL yyyy HH:mm:ss" }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
+              <td mat-cell *matCellDef="let element">
+                <span
+                  [ngClass]="{
+                    'status-published': element.status === 'published',
+                    'status-draft': element.status === 'draft',
+                    'status-unpublished': element.status === 'unpublished'
+                  }"
+                >
+                  {{
+                    element.status === "published"
+                      ? "เผยแพร่"
+                      : element.status === "draft"
+                      ? "แบบร่าง"
+                      : element.status === "unpublished"
+                      ? "ยกเลิกเผยแพร่"
+                      : element.status
+                  }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Attachment Column -->
+            <ng-container matColumnDef="attachment">
+              <th mat-header-cell *matHeaderCellDef>ไฟล์แนบ</th>
+              <td mat-cell *matCellDef="let element">
+                <ng-container
+                  *ngIf="
+                    element.hasAttachment && element.attachmentUrls?.length > 0;
+                    else noAttachment
+                  "
+                >
+                  <button
+                    mat-stroked-button
+                    class="view-attachment-btn"
+                    (click)="viewAttachment(element)"
+                  >
+                    <mat-icon>search</mat-icon>
+                    ดู
+                  </button>
+                </ng-container>
+                <ng-template #noAttachment>
+                  <span class="no-attachment">ไม่มีไฟล์</span>
+                </ng-template>
+              </td>
+            </ng-container>
+
+            <!-- Details Column -->
+            <ng-container matColumnDef="details">
+              <th mat-header-cell *matHeaderCellDef style="padding-left: 24px">
+                รายละเอียด
+              </th>
+              <td mat-cell *matCellDef="let element" style="padding-left: 24px">
+                <a mat-button color="primary" (click)="viewDetails(element)"
+                  >รายละเอียดเพิ่มเติม</a
+                >
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 20]"
+          showFirstLastButtons
+          (page)="handlePageEvent($event)"
+          aria-label="Select page"
+        >
+        </mat-paginator>
+      </ng-template>
+
+      <ng-template #noData>
+        <div
+          fxLayout="column"
+          fxLayoutAlign="center center"
+          style="padding-top: 24px"
+        >
+          <div>
+            <img style="width: 106px" src="assets/image/empty.svg" />
+          </div>
+          <div class="text-nodata">ไม่พบข้อมูล</div>
+        </div>
+      </ng-template>
+    </mat-card>
   </div>
 </div>

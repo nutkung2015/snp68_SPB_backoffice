@@ -1,0 +1,205 @@
+.create-announcement-container {
+  padding: 24px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .header {
+    margin-bottom: 24px;
+    
+    h2 {
+      font-size: 24px;
+      margin: 0;
+      color: #333;
+    }
+  }
+
+  .form-content {
+    margin-bottom: 24px;
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .half-width {
+      width: 50%;
+    }
+  }
+
+  .file-upload {
+    margin-bottom: 24px;
+
+    mat-label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .upload-container {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+
+      .file-name {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+textarea {
+  min-height: 120px;
+}
+
+:host ::ng-deep {
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    background-color: white;
+  }
+}
+
+.header {
+  font-style: normal;
+  background-color: #ffffff;
+  padding: 24px;
+  height: 120px;
+
+  .sub-header {
+    font-weight: 400;
+    font-size: 14px;
+  }
+
+  .sub-body {
+    font-weight: 600;
+    font-size: 28px;
+  }
+}
+
+// Upload Section
+.upload-container {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  min-width: 300px;
+  min-height: 150px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #2196F3;
+    background-color: rgba(33, 150, 243, 0.04);
+  }
+
+  .file-preview {
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+  }
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #757575;
+  }
+}
+
+.upload-hint {
+  color: #666;
+  font-size: 12px;
+  margin-top: 8px;
+}
+// Form Fields
+.field-label {
+  font-size: 14px;
+  color: #171a1e;
+  
+  .required {
+    color: #f5222d;
+    margin-right: 4px;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+// Radio Group
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+// Footer
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+
+  .footer-content {
+    padding: 16px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  button {
+    min-width: 120px;
+  }
+}
+
+// Material Overrides
+::ng-deep {
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    background-color: white;
+  }
+
+  .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+    border-color: #2084FC;
+  }
+
+  .mat-radio-button.mat-accent .mat-radio-inner-circle {
+    background-color: #2084FC;
+  }
+
+  .mat-flat-button.mat-primary {
+    background-color: #2084FC;
+  }
+}
+
+// Utility Classes
+.bt-primary {
+  background-color: #2084FC;
+  color: white;
+}
+
+.bt-error {
+  background-color: #f5222d;
+  color: white;
+}
+

@@ -1,35 +1,32 @@
 <header class="topnav-bar" [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Left side - Page name -->
   <div class="topnav-left">
-    <button class="menu-toggle">
-      <span class="material-icons">menu</span>
-    </button>
-    <div class="breadcrumb">
-      <span class="breadcrumb-item">Dashboard</span>
+    <div class="page-title">
+      <span class="page-name">ผู้ดูแลระบบบุคคล</span>
     </div>
   </div>
 
+  <!-- Right side - Notification and Profile -->
   <div class="topnav-right">
-    <div class="search-container">
-      <div class="search-box">
-        <span class="material-icons search-icon">search</span>
-        <input type="text" placeholder="Search..." class="search-input">
-      </div>
-    </div>
-
+    <!-- Notification Icon -->
     <div class="notifications">
       <button class="notification-btn" (click)="toggleNotifications()">
         <span class="material-icons">notifications</span>
-        <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        <span class="notification-badge" *ngIf="unreadCount > 0">{{
+          unreadCount
+        }}</span>
       </button>
-      
+
       <div class="notification-dropdown" *ngIf="showNotifications">
         <div class="notification-header">
           <h3>Notifications</h3>
-          <button class="mark-all-read" (click)="markAllAsRead()">Mark all as read</button>
+          <button class="mark-all-read" (click)="markAllAsRead()">
+            Mark all as read
+          </button>
         </div>
         <div class="notification-list">
-          <div 
-            *ngFor="let notification of notifications" 
+          <div
+            *ngFor="let notification of notifications"
             class="notification-item"
             [class.unread]="notification.unread"
             (click)="markAsRead(notification.id)"
@@ -44,19 +41,23 @@
       </div>
     </div>
 
-    <div class="user-menu">
+    <!-- User Profile -->
+    <div class="user-menu" (click)="toggleProfileMenu()">
       <div class="user-avatar">
-        <span class="avatar-text">AD</span>
+        <span class="avatar-text">{{
+          userName | slice : 0 : 2 | uppercase
+        }}</span>
       </div>
       <div class="user-info">
-        <span class="user-name">Admin01</span>
-        <span class="user-role">กรรมการหมู่บ้าน</span>
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">{{ userRole }}</span>
+      </div>
+
+      <!-- Profile Dropdown Menu -->
+      <div class="profile-dropdown" *ngIf="showProfileMenu">
+        <div class="dropdown-item">Profile</div>
+        <div class="dropdown-item logout" (click)="logout()">Logout</div>
       </div>
     </div>
-
-    <button class="create-announcement-btn" (click)="onCreateNew()">
-      <span class="material-icons">add</span>
-      <span>สร้างประกาศใหม่</span>
-    </button>
   </div>
 </header>

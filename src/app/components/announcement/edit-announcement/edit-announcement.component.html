@@ -1,0 +1,86 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="edit-announcement-container">
+  <!-- Header Section -->
+  <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+    <div class="breadcrumb">
+      <span class="sub-header" style="color: #9fa9b6">ประกาศและเอกสาร / </span>
+      <span class="sub-header" style="color: #171a1e">แก้ไขประกาศ</span>
+    </div>
+    <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <button mat-icon-button (click)="onCancel()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span class="sub-body">แก้ไขประกาศ</span>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="form-content" *ngIf="announcement">
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+      <mat-card>
+        <div fxLayout="column" fxLayoutGap="24px">
+          <!-- File Upload Section -->
+          <div class="file-upload">
+            <mat-label class="field-label">รูปภาพแนบ</mat-label>
+            <div class="upload-container" (click)="fileInput.click()">
+              <input
+                #fileInput
+                type="file"
+                (change)="onFileSelected($event)"
+                style="display: none"
+                accept="image/*"
+              />
+              <ng-container *ngIf="!previewUrl && !selectedFile">
+                <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                  <mat-icon>cloud_upload</mat-icon>
+                  <span>คลิกเพื่ออัพโหลดรูปภาพ</span>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="previewUrl || selectedFile">
+                <div class="preview-container">
+                  <img [src]="previewUrl" alt="Preview" />
+                  <button mat-icon-button class="remove-button" (click)="removeFile(); $event.stopPropagation()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Form Fields -->
+          <div class="field-row">
+            <mat-form-field class="half-width" appearance="outline">
+              <mat-label>หัวข้อประกาศ</mat-label>
+              <input matInput formControlName="title" required>
+            </mat-form-field>
+
+            <mat-form-field class="half-width" appearance="outline">
+              <mat-label>ส่งถึง</mat-label>
+              <mat-select formControlName="audience" required>
+                <mat-option *ngFor="let option of audienceOptions" [value]="option.value">
+                  {{option.label}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>เนื้อหา</mat-label>
+            <textarea matInput formControlName="content" rows="6" required></textarea>
+          </mat-form-field>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+          <button mat-stroked-button type="button" (click)="onCancel()">
+            ยกเลิก
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="!editForm.valid">
+            บันทึก
+          </button>
+        </div>
+      </mat-card>
+    </form>
+  </div>
+</div>

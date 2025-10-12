@@ -1,0 +1,35 @@
+<!-- <app-page-header
+  iconSrc="assets/icons/problem.svg"
+  title="จัดการประกาศและเอกสาร"
+  subtitle="Announcement & Document Management"
+  iconColor="invert(100%)"
+>
+</app-page-header> -->
+
+<div class="no-project-contain-wrapper">
+  <div class="no-project-container">
+    <div class="no-project-card">
+      <h2 class="card-title">โปรดเข้าร่วมโครงการ</h2>
+      <p class="card-description">
+        เข้าร่วมโครงการด้วยการกรอกรหัสโครงการหรือได้ คำเชิญเข้าร่วม
+        จากผู้ดูแลระบบ
+      </p>
+      <div class="card-image">
+        <img src="assets/images/house-icon.png" alt="House Icon" />
+      </div>
+      <form [formGroup]="joinProjectForm" (ngSubmit)="onSubmit()">
+        <div class="input-group">
+          <input
+            type="text"
+            class="project-code-input"
+            placeholder="กรอกรหัส"
+            formControlName="projectCode"
+          />
+        </div>
+        <button type="submit" class="join-project-button">
+          เข้าร่วมโครงการ
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
