@@ -51,11 +51,13 @@ export class LoginComponent implements OnInit {
           } else {
             console.error('Login failed: Token not received or invalid.', response);
             alert('Login failed: Invalid token received from server.');
+            this.isLoading = false;
           }
         },
         error: (error: HttpErrorResponse) => {
           console.error('Login failed:', error);
           alert('Login failed: ' + (error.error.message || 'Invalid credentials'));
+          this.isLoading = false;
         },
         complete: () => {
           this.isLoading = false;

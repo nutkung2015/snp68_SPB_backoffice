@@ -1,0 +1,111 @@
+.detail-issue-container {
+  padding: 24px;
+  height: 100%;
+  background-color: #f5f7fa;
+
+  .header {
+    margin-bottom: 24px;
+
+    .breadcrumb {
+      margin-bottom: 8px;
+    }
+
+    .title-row {
+      mat-icon {
+        cursor: pointer;
+        color: #171a1e;
+      }
+
+      .sub-body {
+        font-size: 20px;
+        font-weight: 500;
+        color: #171a1e;
+      }
+    }
+  }
+
+  .form-content {
+    mat-card {
+      padding: 24px;
+      border-radius: 8px;
+
+      .file-preview {
+        margin-bottom: 24px;
+
+        .image-container {
+          margin-top: 8px;
+          width: 100%;
+          max-height: 300px;
+          overflow: hidden;
+          border-radius: 4px;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+        }
+      }
+
+      .field-row {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 16px;
+
+        .half-width {
+          flex: 1;
+        }
+
+        .field-label {
+          display: block;
+          font-size: 14px;
+          color: #64748b;
+          margin-bottom: 8px;
+        }
+
+        .field-value {
+          font-size: 16px;
+          color: #171a1e;
+        }
+      }
+
+      .content-box {
+        padding: 16px;
+        background-color: #f8fafc;
+        border-radius: 4px;
+        min-height: 100px;
+      }
+
+      .btn-group {
+        margin-top: 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+
+        button {
+          min-width: 100px;
+          font-weight: 500;
+        }
+
+        .btn-cancel {
+          color: #64748b;
+          border-color: #e2e8f0;
+        }
+      }
+    }
+  }
+}
+
+// Loading Overlay
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}

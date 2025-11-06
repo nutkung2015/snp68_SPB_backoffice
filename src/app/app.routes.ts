@@ -31,6 +31,13 @@ export const routes: Routes = [
     data: { roles: ['juristic', 'admin'] },
     children: [
       {
+        path: 'issue/detail/:id',
+        loadComponent: () =>
+          import(
+            './components/issue/detail-issue-personal/detail-issue-personal.component'
+          ).then((m) => m.DetailIssuePersonalComponent),
+      },
+      {
         path: '',
         redirectTo: '/announcement',
         pathMatch: 'full',
@@ -84,6 +91,39 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'invite-management',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/invite-management/invite-management.component').then(
+                (m) => m.InviteManagementComponent
+              ),
+          },
+          {
+            path: 'create',
+            loadComponent: () =>
+              import(
+                './components/invite-management/create-invite/create-invite.component'
+              ).then((m) => m.CreateInviteComponent),
+          },
+          {
+            path: 'create-unit',
+            loadComponent: () =>
+              import('./components/invite-management/create-unit/create-unit.component').then(
+                (m) => m.CreateUnitComponent
+              ),
+          },
+          // {
+          //   path: 'detail/:id',
+          //   loadComponent: () =>
+          //     import(
+          //       './components/invite-management/detail-invite/detail-invite.component'
+          //     ).then((m) => m.DetailInviteComponent),
+          // },
+        ],
+      },
+      {
         path: 'orders',
         loadComponent: () =>
           import('./components/orders/orders.component').then(
@@ -102,6 +142,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/settings/settings.component').then(
             (m) => m.SettingsComponent
+          ),
+      },
+      {
+        path: 'issue',
+        loadComponent: () =>
+          import('./components/issue/issue.component').then(
+            (m) => m.IssueComponent
           ),
       },
     ],

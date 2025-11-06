@@ -95,6 +95,11 @@ textarea {
   }
 }
 
+.btn-group{
+  gap: 16px;
+  display: flex;
+}
+
 // Upload Section
 .upload-container {
   border: 2px dashed #ccc;

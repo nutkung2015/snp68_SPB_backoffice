@@ -19,7 +19,7 @@
   <div class="form-content" *ngIf="announcement">
     <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
       <mat-card>
-        <div fxLayout="column" fxLayoutGap="24px">
+        <div fxLayout="column" fxLayoutGap="24px" style="max-width: 80% !important;">
           <!-- File Upload Section -->
           <div class="file-upload">
             <mat-label class="field-label">รูปภาพแนบ</mat-label>
@@ -45,6 +45,20 @@
                   </button>
                 </div>
               </ng-container>
+
+              <!-- Progress Bar -->
+              <mat-progress-bar
+                *ngIf="uploadProgress > 0"
+                mode="determinate"
+                [value]="uploadProgress"
+                style="width: 100%; margin-top: 10px"
+              ></mat-progress-bar>
+            </div>
+            <span class="upload-hint">รองรับไฟล์: JPG, PNG, WebP<br>
+              ขนาดแนวนอน: 360x240px (4:3) หรือ 360x202px (16:9)<br>
+              ขนาดไม่เกิน 5MB</span>
+            <div *ngIf="uploadProgress > 0" class="upload-progress">
+              Upload Progress: {{ uploadProgress }}%
             </div>
           </div>
 
@@ -65,6 +79,17 @@
             </mat-form-field>
           </div>
 
+          <div class="field-row">
+            <mat-form-field class="half-width" appearance="outline">
+              <mat-label>สถานะ</mat-label>
+              <mat-select formControlName="status" required>
+                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{option.label}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
           <mat-form-field class="full-width" appearance="outline">
             <mat-label>เนื้อหา</mat-label>
             <textarea matInput formControlName="content" rows="6" required></textarea>
@@ -72,7 +97,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="action-buttons" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+        <div class="action-buttons" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" style="max-width: 80% !important;">
           <button mat-stroked-button type="button" (click)="onCancel()">
             ยกเลิก
           </button>

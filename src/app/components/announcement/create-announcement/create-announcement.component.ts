@@ -25,6 +25,8 @@ import { HttpEventType } from '@angular/common/http'; // เพิ่ม import 
 //   faTrash,
 // } from '@fortawesome/free-solid-svg-icons';
 import { FlexLayoutModule } from '@angular/flex-layout'; // เพิ่ม import
+import { AuthService } from '../../../services/auth.service';
+import { RestService, CreateAnnouncementRequest } from '../../../services/rest.service';
 
 interface Announcement {
   id: string; // เปลี่ยนจาก id?: string เป็น id: string
@@ -78,7 +80,9 @@ export class CreateAnnouncementComponent {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private rest: RestService
   ) {
     this.announcementForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -93,6 +97,13 @@ export class CreateAnnouncementComponent {
     { value: 'all', label: 'ทั้งหมด' },
     { value: 'residents', label: 'กรรมการหมู่บ้าน' },
     { value: 'specific_groups', label: 'รปภ.' },
+  ];
+
+  types = [
+    { value: 'announcement', label: 'ประกาศ' },
+    { value: 'event', label: 'กิจกรรม' },
+    { value: 'maintenance', label: 'การบำรุงรักษา' },
+    { value: 'emergency', label: 'เหตุฉุกเฉิน' }
   ];
 
   statuses = [
@@ -130,64 +141,55 @@ export class CreateAnnouncementComponent {
 
       try {
         const formValue = this.announcementForm.value;
-        const formData = new FormData();
-
-        // เพิ่ม logging
         console.log('Form value:', formValue);
+        
+        // ดึง User ID จาก token (ไม่ใช่ชื่อ เพราะ database ต้องการ foreign key ไปที่ users.id)
+        const userId = this.authService.getUserId();
+        if (!userId) {
+          console.error('User ID not found in token');
+          alert('ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่');
+          this.isLoading.next(false);
+          return;
+        }
+        // Build FormData to match legacy backend logic (single request with files)
+        const generatedId = `annc${Math.floor(Math.random() * 1000)
+          .toString()
+          .padStart(3, '0')}`;
 
-        formData.append(
-          'id',
-          `annc${Math.floor(Math.random() * 1000)
-            .toString()
-            .padStart(3, '0')}`
-        );
+        const formData = new FormData();
+        formData.append('id', generatedId);
         formData.append('title', formValue.title);
         formData.append('content', formValue.content);
         formData.append('type', formValue.type || 'maintenance');
-        formData.append('posted_by', 'user001');
+        formData.append('posted_by', userId);
         formData.append('audience', formValue.recipient);
         formData.append('status', formValue.status);
-
         if (this.selectedFile) {
-          console.log('Appending file:', this.selectedFile.name); // เพิ่ม log
           formData.append('files', this.selectedFile, this.selectedFile.name);
         }
 
-        // เพิ่ม logging สำหรับ FormData
-        formData.forEach((value, key) => {
-          console.log(`FormData: ${key} = ${value}`);
+        // Log formData for debugging
+        formData.forEach((v, k) => console.log(`FormData: ${k} = ${v}`));
+
+        await new Promise<void>((resolve, reject) => {
+          this.rest.createAnnouncementMultipart(formData).subscribe({
+            next: (event: any) => {
+              if (event.type === HttpEventType.UploadProgress) {
+                this.uploadProgress = Math.round((100 * event.loaded) / (event.total || 1));
+              } else if (event.type === HttpEventType.Response) {
+                resolve();
+              }
+            },
+            error: (err) => {
+              console.error('Create announcement error:', err);
+              reject(err);
+            },
+            complete: () => {
+              this.uploadProgress = 0;
+            }
+          });
         });
 
-        const response = await new Promise((resolve, reject) => {
-          this.http
-            .post('http://localhost:5000/api/announcements', formData, {
-              reportProgress: true,
-              observe: 'events',
-            })
-            .subscribe({
-              next: (event: any) => {
-                console.log('Upload event:', event); // เพิ่ม log
-                if (event.type === HttpEventType.UploadProgress) {
-                  this.uploadProgress = Math.round(
-                    (100 * event.loaded) / (event.total || 1)
-                  );
-                  console.log('Upload progress:', this.uploadProgress); // เพิ่ม log
-                } else if (event.type === HttpEventType.Response) {
-                  resolve(event.body);
-                }
-              },
-              error: (error) => {
-                console.error('Upload error:', error); // เพิ่ม log
-                reject(error);
-              },
-              complete: () => {
-                console.log('Upload complete'); // เพิ่ม log
-                this.uploadProgress = 0;
-              },
-            });
-        });
-
-        console.log('Response:', response);
         this.router.navigate(['/announcement']);
       } catch (error) {
         console.error('Error creating announcement:', error);

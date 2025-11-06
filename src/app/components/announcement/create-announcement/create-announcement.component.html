@@ -1,11 +1,6 @@
 <app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
 
-<div
-  ngClass="header"
-  fxLayout="column"
-  fxLayoutAlign="center start"
-  fxLayoutGap="10px"
->
+<div ngClass="header" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="10px">
   <div>
     <span ngClass="sub-header" style="color: #9fa9b6">ประกาศและเอกสาร / </span>
     <span ngClass="sub-header" style="color: #171a1e">สร้างประกาศ</span>
@@ -18,103 +13,57 @@
 
 <div style="padding-top: 24px; padding-bottom: 120px">
   <mat-card>
-    <div
-      fxLayout="column"
-      fxLayoutAlign="center stretch"
-      style="
+    <div fxLayout="column" fxLayoutAlign="center stretch" style="
         padding-top: 16px;
         padding-bottom: 16px;
         padding-left: 24px;
         padding-right: 24px;
-      "
-    >
+      ">
       <form [formGroup]="announcementForm">
         <div class="form-content">
           <div fxLayout="row" fxLayoutGap="60px">
             <!-- ส่วนแรก: รูปภาพ/ไฟล์แนบ -->
             <div class="upload-section">
               <div class="input-banner-img" fxLayout="row">
-                <div
-                  ngClass="detail-detail"
-                  fxLayout="column"
-                  fxLayoutAlign="center stretch"
-                  fxLayoutGap="10px"
-                >
+                <div ngClass="detail-detail" fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="10px">
                   <div fxLayout="row">
-                    <div
-                      class="upload-container"
-                      fxLayout="column"
-                      fxLayoutAlign="center center"
-                    >
+                    <div class="upload-container" fxLayout="column" fxLayoutAlign="center center">
                       <!-- ส่วนที่แสดงตอนยังไม่มีไฟล์ -->
-                      <div
-                        *ngIf="!selectedFile"
-                        fxLayout="column"
-                        fxLayoutAlign="center center"
-                        style="cursor: pointer"
-                        (click)="fileInput.click()"
-                      >
+                      <div *ngIf="!selectedFile" fxLayout="column" fxLayoutAlign="center center" style="cursor: pointer"
+                        (click)="fileInput.click()">
                         <mat-icon>cloud_upload</mat-icon>
                         <span>คลิกหรือลากไฟล์มาที่นี่เพื่ออัพโหลด</span>
                       </div>
 
                       <!-- ส่วนที่แสดงเมื่อมีไฟล์ -->
-                      <div
-                        *ngIf="selectedFile"
-                        fxLayout="row"
-                        fxLayoutAlign="space-between center"
-                        style="width: 100%; padding: 10px"
-                      >
-                        <div
-                          class="file-preview"
-                          fxLayout="row"
-                          fxLayoutAlign="start center"
-                          fxLayoutGap="10px"
-                        >
+                      <div *ngIf="selectedFile" fxLayout="row" fxLayoutAlign="space-between center"
+                        style="width: 100%; padding: 10px">
+                        <div class="file-preview" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
                           <mat-icon>insert_drive_file</mat-icon>
                           <span>{{ selectedFile.name }}</span>
                         </div>
-                        <div
-                          class="file-actions"
-                          fxLayout="row"
-                          fxLayoutGap="10px"
-                        >
-                          <button
-                            mat-icon-button
-                            color="primary"
-                            (click)="fileInput.click()"
-                          >
+                        <div class="file-actions" fxLayout="row" fxLayoutGap="10px">
+                          <button mat-icon-button color="primary" (click)="fileInput.click()">
                             <mat-icon>edit</mat-icon>
                           </button>
-                          <button
-                            mat-icon-button
-                            color="warn"
-                            (click)="removeFile()"
-                          >
+                          <button mat-icon-button color="warn" (click)="removeFile()">
                             <mat-icon>delete</mat-icon>
                           </button>
                         </div>
                       </div>
 
                       <!-- Progress Bar -->
-                      <mat-progress-bar
-                        *ngIf="uploadProgress > 0"
-                        mode="determinate"
-                        [value]="uploadProgress"
-                        style="width: 100%; margin-top: 10px"
-                      ></mat-progress-bar>
+                      <mat-progress-bar *ngIf="uploadProgress > 0" mode="determinate" [value]="uploadProgress"
+                        style="width: 100%; margin-top: 10px"></mat-progress-bar>
 
                       <!-- Input file ที่ซ่อนไว้ -->
-                      <input
-                        #fileInput
-                        type="file"
-                        (change)="onFileSelected($event)"
-                        style="display: none"
-                        accept="image/jpeg,image/jpg,image/png"
-                      />
+                      <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none"
+                        accept="image/jpeg,image/jpg,image/png" />
                     </div>
                   </div>
-                  <span class="upload-hint">รองรับไฟล์: JPG, PNG ขนาดไม่เกิน 5MB</span>
+                  <span class="upload-hint">รองรับไฟล์: JPG, PNG, WebP<br>
+                    ขนาดแนวนอน: 360x240px (4:3) หรือ 360x202px (16:9)<br>
+                    ขนาดไม่เกิน 5MB</span>
                 </div>
                 <div *ngIf="uploadProgress > 0">
                   Upload Progress: {{ uploadProgress }}%
@@ -123,26 +72,14 @@
             </div>
 
             <!-- ส่วนที่สอง: รายละเอียด -->
-            <div
-              class="detail-section"
-              fxLayout="column"
-              fxLayoutGap="16px"
-              style="width: 100%; max-width: 600px"
-            >
+            <div class="detail-section" fxLayout="column" fxLayoutGap="16px" style="width: 100%; max-width: 600px">
               <div fxLayout="column" fxLayoutGap="10px">
                 <span class="field-label">
                   <span class="required">*</span>หัวข้อประกาศ
                 </span>
                 <mat-form-field appearance="outline">
-                  <input
-                    matInput
-                    formControlName="title"
-                    placeholder="หัวข้อประกาศ"
-                    required
-                  />
-                  <mat-error
-                    *ngIf="announcementForm.get('title')?.hasError('required')"
-                  >
+                  <input matInput formControlName="title" placeholder="หัวข้อประกาศ" required />
+                  <mat-error *ngIf="announcementForm.get('title')?.hasError('required')">
                     กรุณาระบุหัวข้อประกาศ
                   </mat-error>
                 </mat-form-field>
@@ -154,19 +91,32 @@
                 </span>
                 <mat-form-field appearance="outline">
                   <mat-select formControlName="recipient" required>
-                    <mat-option
-                      *ngFor="let recipient of recipients"
-                      [value]="recipient.value"
-                    >
+                    <mat-option *ngFor="let recipient of recipients" [value]="recipient.value">
                       {{ recipient.label }}
                     </mat-option>
                   </mat-select>
-                  <mat-error
-                    *ngIf="
+                  <mat-error *ngIf="
                       announcementForm.get('recipient')?.hasError('required')
-                    "
-                  >
+                    ">
                     กรุณาเลือกผู้รับ
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div fxLayout="column" fxLayoutGap="10px">
+                <span class="field-label">
+                  <span class="required">*</span>ประเภท
+                </span>
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="type" required>
+                    <mat-option *ngFor="let type of types" [value]="type.value">
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="
+                      announcementForm.get('type')?.hasError('required')
+                    ">
+                    กรุณาเลือกประเภท
                   </mat-error>
                 </mat-form-field>
               </div>
@@ -174,12 +124,7 @@
               <div fxLayout="column" fxLayoutGap="10px">
                 <span class="field-label">เนื้อหา (optional)</span>
                 <mat-form-field appearance="outline">
-                  <textarea
-                    matInput
-                    formControlName="content"
-                    rows="6"
-                    placeholder="เนื้อหา"
-                  ></textarea>
+                  <textarea matInput formControlName="content" rows="6" placeholder="เนื้อหา"></textarea>
                 </mat-form-field>
               </div>
 
@@ -189,26 +134,17 @@
                   <span class="required">*</span>กำหนดเวลาเผยแพร่
                 </div>
                 <mat-radio-group formControlName="status" class="radio-group">
-                  <mat-radio-button value="published"
-                    >เผยแพร่ทันที</mat-radio-button
-                  >
-                  <mat-radio-button value="draft"
-                    >บันทึกเป็นแบบร่าง</mat-radio-button
-                  >
+                  <mat-radio-button value="published">เผยแพร่ทันที</mat-radio-button>
+                  <mat-radio-button value="draft">บันทึกเป็นแบบร่าง</mat-radio-button>
                 </mat-radio-group>
               </div>
-              <div class="btn-gruop">
+              <div class="btn-group">
                 <button mat-stroked-button (click)="onCancel()">ยกเลิก</button>
-                <button
-                  mat-flat-button
-                  color="primary"
-                  (click)="onSubmit()"
-                  [disabled]="!announcementForm.valid"
-                >
+                <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!announcementForm.valid">
                   {{
-                    announcementForm.get("status")?.value === "published"
-                      ? "เผยแพร่"
-                      : "บันทึก"
+                  announcementForm.get("status")?.value === "published"
+                  ? "เผยแพร่"
+                  : "บันทึก"
                   }}
                 </button>
               </div>

@@ -15,10 +15,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { RestService, Announcement as ApiAnnouncement, AnnouncementResponse } from '../../services/rest.service';
 
 // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
@@ -30,8 +30,9 @@ interface Announcement {
   id: number;
   title: string;
   content: string;
+  type: string; // เพิ่ม type field
   recipient: string;
-  postDate: Date;
+  postDate: Date | null;
   hasAttachment: boolean;
   attachmentUrls?: string[]; // เพิ่ม field นี้
   attachmentName?: string;
@@ -92,8 +93,6 @@ interface AttachmentUrl {
   styleUrls: ['./announcement.component.scss'],
 })
 export class AnnouncementComponent implements OnInit {
-  private apiUrl = 'http://localhost:5000/api/announcements';
-
   isLoading = new BehaviorSubject<boolean>(true);
   isLoading$: Observable<boolean> = this.isLoading.asObservable();
   // เพิ่ม property สำหรับ loading state
@@ -102,6 +101,7 @@ export class AnnouncementComponent implements OnInit {
     'sequence',
     'title',
     'content',
+    'type', // เพิ่ม type column
     'recipient',
     'postDate',
     'status',
@@ -111,12 +111,7 @@ export class AnnouncementComponent implements OnInit {
   dataSource: MatTableDataSource<Announcement>;
   searchTerm = '';
   selectedRecipient = '';
-  recipients = [
-    { value: '', label: 'ทั้งหมด' },
-    { value: 'all', label: 'ลูกบ้านทุกคน' },
-    { value: 'committee', label: 'กรรมการหมู่บ้าน' },
-    { value: 'security', label: 'รปภ.' },
-  ];
+
 
   pageEvent: PageEvent = {
     pageIndex: 0,
@@ -126,6 +121,29 @@ export class AnnouncementComponent implements OnInit {
 
   searchType = 'title';
   selectedStatus: AnnouncementStatus = 'all';
+  selectedType: string = 'all'; // เพิ่ม type filter
+
+  types = [
+    { value: 'all', label: 'ทั้งหมด' },
+    { value: 'announcement', label: 'ประกาศ' },
+    { value: 'event', label: 'กิจกรรม' },
+    { value: 'maintenance', label: 'การบำรุงรักษา' },
+    { value: 'emergency', label: 'เหตุฉุกเฉิน' }
+  ];
+
+  recipients = [
+    { value: '', label: 'ทั้งหมด' },
+    { value: 'all', label: 'ทุกคน' },
+    { value: 'residents', label: 'ลูกบ้าน' },
+    { value: 'committee', label: 'กรรมการหมู่บ้าน' },
+    { value: 'security', label: 'รปภ.' },
+  ];
+
+
+  private getRecipientLabel(audience: string): string {
+    const recipient = this.recipients.find(r => r.value === audience);
+    return recipient ? recipient.label : audience;
+  }
 
   private allAnnouncements: Announcement[] = [];
 
@@ -190,7 +208,7 @@ export class AnnouncementComponent implements OnInit {
   //   }
   // ];
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private rest: RestService, private router: Router) {
     this.dataSource = new MatTableDataSource<Announcement>([]);
     console.log('Initial selectedStatus:', this.selectedStatus); // เพิ่ม log เพื่อเช็คค่าเริ่มต้น
   }
@@ -212,40 +230,44 @@ export class AnnouncementComponent implements OnInit {
   // ใน loadAnnouncements() ควรเพิ่ม debug logs
   loadAnnouncements() {
     this.isLoading.next(true);
-    // console.log('Loading announcements...');
-
-    this.http
-      .get<APIResponse>(this.apiUrl)
+    this.rest
+      .getAnnouncements()
       .pipe(
-        map((response) => {
-          return response.data.map((item) => {
+        map((response: AnnouncementResponse) => {
+          return response.data.map((item: ApiAnnouncement) => {
             let hasAttachment = false;
-            let attachmentUrls: AttachmentUrl[] = [];
+            let attachmentUrls: string[] = [];
 
-            if (item.attachment_urls) {
+            // รองรับทั้งกรณี array จริง และ string ที่ต้อง parse (เพื่อความเข้ากันได้)
+            const raw = (item as any).attachment_urls;
+            if (Array.isArray(raw)) {
+              hasAttachment = raw.length > 0;
+              attachmentUrls = raw;
+            } else if (typeof raw === 'string') {
               try {
-                // แปลง JSON string เป็น array ของ AttachmentUrl
-                const parsed = JSON.parse(
-                  item.attachment_urls
-                ) as AttachmentUrl[];
+                const parsed = JSON.parse(raw) as AttachmentUrl[];
                 hasAttachment = Array.isArray(parsed) && parsed.length > 0;
                 if (hasAttachment) {
-                  attachmentUrls = parsed;
+                  attachmentUrls = parsed.map(a => a.url);
                 }
-              } catch (e) {
-                console.warn('Error parsing attachment_urls:', e);
+              } catch {
                 hasAttachment = false;
               }
             }
+
+            const createdAt = item.created_at && !isNaN(Date.parse(item.created_at))
+              ? new Date(item.created_at)
+              : null;
 
             return {
               id: Number(item.id.replace('annc', '')),
               title: item.title,
               content: item.content,
-              recipient: item.audience,
-              postDate: new Date(item.created_at),
+              type: item.type, // เพิ่ม type field  
+              recipient: this.getRecipientLabel(item.audience),
+              postDate: createdAt,
               hasAttachment: hasAttachment,
-              attachmentUrls: attachmentUrls.map((att) => att.url), // เก็บเฉพาะ URL
+              attachmentUrls: attachmentUrls,
               createdBy: item.posted_by,
               status: (item.status as StatusType) || 'all',
             };
@@ -262,9 +284,13 @@ export class AnnouncementComponent implements OnInit {
       )
       .subscribe({
         next: (announcements) => {
-          // console.log('Processed announcements:', announcements);
           this.allAnnouncements = announcements;
-          this.dataSource.data = announcements;
+          this.pageEvent = {
+            pageIndex: 0,
+            pageSize: 10,
+            length: announcements.length
+          };
+          this.dataSource.data = this.allAnnouncements.slice(0, 10); // Show first page
         },
         error: (error) => console.error('Subscription error:', error),
       });
@@ -273,42 +299,47 @@ export class AnnouncementComponent implements OnInit {
   onSearch(): void {
     this.isLoading.next(true);
 
-    const params = new URLSearchParams();
+    const params: any = {};
     if (this.selectedStatus !== 'all') {
-      params.append('status', this.selectedStatus);
+      params.status = this.selectedStatus;
     }
 
-    this.http
-      .get<APIResponse>(`${this.apiUrl}?${params.toString()}`)
+    this.rest
+      .getAnnouncements(params)
       .pipe(
-        map((response) => {
-          return response.data.map((item) => {
+        map((response: AnnouncementResponse) => {
+          return response.data.map((item: ApiAnnouncement) => {
             let hasAttachment = false;
-            let attachmentUrls: AttachmentUrl[] = [];
-
-            if (item.attachment_urls) {
+            let attachmentUrls: string[] = [];
+            const raw = (item as any).attachment_urls;
+            if (Array.isArray(raw)) {
+              hasAttachment = raw.length > 0;
+              attachmentUrls = raw;
+            } else if (typeof raw === 'string') {
               try {
-                const parsed = JSON.parse(
-                  item.attachment_urls
-                ) as AttachmentUrl[];
+                const parsed = JSON.parse(raw) as AttachmentUrl[];
                 hasAttachment = Array.isArray(parsed) && parsed.length > 0;
                 if (hasAttachment) {
-                  attachmentUrls = parsed;
+                  attachmentUrls = parsed.map(a => a.url);
                 }
-              } catch (e) {
-                console.warn('Error parsing attachment_urls:', e);
+              } catch {
                 hasAttachment = false;
               }
             }
+
+            const createdAt = item.created_at && !isNaN(Date.parse(item.created_at))
+              ? new Date(item.created_at)
+              : null;
 
             return {
               id: Number(item.id.replace('annc', '')),
               title: item.title,
               content: item.content,
-              recipient: item.audience,
-              postDate: new Date(item.created_at),
+              type: item.type, // เพิ่ม type field
+              recipient: this.getRecipientLabel(item.audience),
+              postDate: createdAt,
               hasAttachment: hasAttachment,
-              attachmentUrls: attachmentUrls.map((att) => att.url),
+              attachmentUrls: attachmentUrls,
               createdBy: item.posted_by,
               status: (item.status as StatusType) || 'all',
             };
@@ -323,14 +354,32 @@ export class AnnouncementComponent implements OnInit {
         })
       )
       .subscribe((announcements) => {
-        this.dataSource.data = announcements;
+        this.allAnnouncements = announcements;
+        this.pageEvent = {
+          pageIndex: 0,
+          pageSize: 10,
+          length: announcements.length
+        };
+        this.dataSource.data = this.allAnnouncements.slice(0, 10);
       });
   }
 
   onReset(): void {
     this.searchTerm = '';
     this.selectedStatus = 'all';
+    this.selectedType = 'all'; // รีเซ็ต type filter
     this.dataSource.data = this.allAnnouncements; // ใช้ข้อมูลที่มีอยู่แล้ว
+  }
+
+  // เพิ่ม method สำหรับ filter by type
+  filterByType(type: string) {
+    if (type === 'all') {
+      this.dataSource.data = this.allAnnouncements;
+    } else {
+      this.dataSource.data = this.allAnnouncements.filter(
+        (item) => item.type === type
+      );
+    }
   }
 
   // onStatusChange(event: any): void {
@@ -372,10 +421,9 @@ export class AnnouncementComponent implements OnInit {
 
   handlePageEvent(event: PageEvent) {
     this.pageEvent = event;
-    // console.log('Page changed:', {
-    //   pageIndex: event.pageIndex,
-    //   pageSize: event.pageSize,
-    //   length: event.length,
-    // });
+    this.dataSource.data = this.allAnnouncements.slice(
+      event.pageIndex * event.pageSize,
+      (event.pageIndex + 1) * event.pageSize
+    );
   }
 }

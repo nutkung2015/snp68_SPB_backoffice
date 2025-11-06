@@ -20,6 +20,9 @@ export class AuthService {
       tap((response: any) => {
         if (response && response.data && response.data.token) {
           this.setToken(response.data.token);
+          if (response.data.role) {
+            localStorage.setItem('userRole', response.data.role);
+          }
           if (response.data.projectMemberships) {
             localStorage.setItem('projectMemberships', JSON.stringify(response.data.projectMemberships));
           } else {
@@ -45,6 +48,7 @@ export class AuthService {
 
   removeToken(): void {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
     localStorage.removeItem('projectMemberships'); // Also remove project memberships on logout
   }
 
@@ -64,10 +68,20 @@ export class AuthService {
     return null;
   }
 
+  getUserRoleFromStorage(): string | null {
+    return localStorage.getItem('userRole');
+  }
+
   getUserRole(): string | null {
-    const decodedToken = this.getDecodedToken();
-    const role = decodedToken ? decodedToken.role : null;
-    console.log('AuthService: User Role from token:', role);
+    // Try to get role from localStorage first, fallback to token if not found
+    let role = this.getUserRoleFromStorage();
+    if (!role) {
+      const decodedToken = this.getDecodedToken();
+      role = decodedToken ? decodedToken.role : null;
+      console.log('AuthService: User Role from token:', role);
+    } else {
+      console.log('AuthService: User Role from storage:', role);
+    }
     return role;
   }
 
@@ -91,6 +105,24 @@ export class AuthService {
       return !!memberships && memberships.length > 0;
     }
     return true; // Non-juristic roles don't need project membership check for this logic
+  }
+
+  getUserName(): string | null {
+    const decodedToken = this.getDecodedToken();
+    if (decodedToken) {
+      // ลองดึงจาก name, username, หรือ email
+      return decodedToken.name || decodedToken.username || decodedToken.email || null;
+    }
+    return null;
+  }
+
+  getUserId(): string | null {
+    const decodedToken = this.getDecodedToken();
+    if (decodedToken) {
+      // ดึง user ID จาก token (อาจเป็น id, userId, user_id ขึ้นอยู่กับ backend)
+      return decodedToken.id || decodedToken.userId || decodedToken.user_id || null;
+    }
+    return null;
   }
 
   isLoggedIn(): boolean {

@@ -1,5 +1,5 @@
 .edit-announcement-container {
-  padding: 24px;
+  // padding: 24px;
   background-color: #f8f9fa;
   min-height: 100vh;
 
@@ -88,12 +88,26 @@
         color: white;
       }
     }
+
+    .upload-hint {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      line-height: 1.4;
+    }
+
+    .upload-progress {
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+    }
   }
 
   // Action Buttons
   .action-buttons {
     margin-top: 24px;
-    
+    max-width: 80% !important;
     button {
       min-width: 120px;
     }

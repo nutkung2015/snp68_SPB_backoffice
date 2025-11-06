@@ -1,0 +1,172 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div ngClass="header" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="10px">
+    <div>
+        <span ngClass="sub-header" style="color: #9fa9b6">จัดการคำเชิญ / </span>
+        <span ngClass="sub-header" style="color: #171a1e">สร้างคำเชิญ</span>
+    </div>
+    <span ngClass="sub-body" fxLayoutGap="20px">
+        <mat-icon (click)="onCancel()">arrow_back</mat-icon>
+        <span>สร้างคำเชิญ</span>
+    </span>
+</div>
+
+<div style="padding-top: 24px; padding-bottom: 120px">
+    <mat-card>
+        <div fxLayout="column" fxLayoutAlign="center stretch" style="
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 24px;
+        padding-right: 24px;
+      ">
+            <form [formGroup]="inviteForm">
+                <div class="form-content">
+                    <!-- Invite Type Selection -->
+                    <div fxLayout="column" fxLayoutGap="16px" style="margin-bottom: 24px">
+                        <div class="section-label">
+                            <span class="required">*</span>ประเภทคำเชิญ
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <mat-checkbox [checked]="inviteType === 'resident'"
+                                (change)="onInviteTypeChange('resident')">
+                                ส่งคำเชิญให้ผู้อยู่อาศัย (Resident)
+                            </mat-checkbox>
+                            <mat-checkbox [checked]="inviteType === 'juristic'"
+                                (change)="onInviteTypeChange('juristic')">
+                                ส่งคำเชิญให้นิติบุคคล/รปภ. (Juristic/Security)
+                            </mat-checkbox>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="60px">
+                        <!-- Left Section: Project Info -->
+                        <div class="info-section" fxFlex="30">
+                            <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="16px">
+                                <div fxLayout="column" fxLayoutGap="10px">
+                                    <span class="field-label">ชื่อโครงการ</span>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput [value]="projectName" readonly disabled />
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="info-card">
+                                    <mat-icon>info</mat-icon>
+                                    <div>
+                                        <p *ngIf="inviteType === 'resident'">
+                                            <strong>สำหรับผู้อยู่อาศัย:</strong><br />
+                                            กรุณาเลือกยูนิต บทบาท และระบุอีเมลของผู้ที่ต้องการเชิญ
+                                        </p>
+                                        <p *ngIf="inviteType === 'juristic'">
+                                            <strong>สำหรับนิติบุคคล/รปภ.:</strong><br />
+                                            กรุณาเลือกบทบาทที่ต้องการเชิญ ระบบจะสร้างรหัสคำเชิญให้อัตโนมัติ
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Section: Form Fields -->
+                        <div class="detail-section" fxLayout="column" fxLayoutGap="16px" fxFlex="70">
+                            <!-- Resident Form Fields -->
+                            <ng-container *ngIf="inviteType === 'resident'">
+                                <div fxLayout="column" fxLayoutGap="10px">
+                                    <span class="field-label">
+                                        <span class="required">*</span>เลือกยูนิต
+                                    </span>
+                                    <mat-form-field appearance="outline">
+                                        <mat-select formControlName="unit_id" required>
+                                            <mat-option *ngFor="let unit of units" [value]="unit.id">
+                                                {{ unit.unit_number }} - {{ unit.building_name || 'บ้าน' }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="inviteForm.get('unit_id')?.hasError('required')">
+                                            กรุณาเลือกยูนิต
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+
+                                <div fxLayout="column" fxLayoutGap="10px">
+                                    <span class="field-label">
+                                        <span class="required">*</span>บทบาท
+                                    </span>
+                                    <mat-form-field appearance="outline">
+                                        <mat-select formControlName="role" required>
+                                            <mat-option *ngFor="let role of residentRoles" [value]="role.value">
+                                                {{ role.label }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="inviteForm.get('role')?.hasError('required')">
+                                            กรุณาเลือกบทบาท
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+
+                                <div fxLayout="column" fxLayoutGap="10px">
+                                    <span class="field-label">
+                                        <span class="required">*</span>อีเมลผู้รับคำเชิญ
+                                    </span>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput formControlName="invited_email" placeholder="example@email.com"
+                                            type="email" required />
+                                        <mat-error *ngIf="
+                        inviteForm.get('invited_email')?.hasError('required')
+                      ">
+                                            กรุณาระบุอีเมล
+                                        </mat-error>
+                                        <mat-error *ngIf="inviteForm.get('invited_email')?.hasError('email')">
+                                            รูปแบบอีเมลไม่ถูกต้อง
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </ng-container>
+
+                            <!-- Juristic/Security Form Fields -->
+                            <ng-container *ngIf="inviteType === 'juristic'">
+                                <div fxLayout="column" fxLayoutGap="10px">
+                                    <span class="field-label">
+                                        <span class="required">*</span>บทบาท
+                                    </span>
+                                    <mat-form-field appearance="outline">
+                                        <mat-select formControlName="role" required>
+                                            <mat-option *ngFor="let role of juristicRoles" [value]="role.value">
+                                                {{ role.label }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="inviteForm.get('role')?.hasError('required')">
+                                            กรุณาเลือกบทบาท
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="info-note">
+                                    <mat-icon>check_circle</mat-icon>
+                                    <span>ระบบจะสร้างรหัสคำเชิญอัตโนมัติหลังจากกดบันทึก
+                                        คุณสามารถนำรหัสไปแจกจ่ายให้ผู้ที่ต้องการเชิญได้</span>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px" style="margin-top: 24px;">
+                        <button class="btn-cancel" (click)="onCancel()">
+                            ยกเลิก
+                        </button>
+                        <button class="btn-primary" (click)="onSubmit()">
+                            ส่งคำเชิญ
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </mat-card>
+</div>
+
+
+<!-- Footer
+<div class="footer">
+    <div class="footer-content" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+
+    </div>
+</div> -->

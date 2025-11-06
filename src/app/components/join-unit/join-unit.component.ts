@@ -1,30 +1,23 @@
 import { Component, OnInit } from '@angular/core'; // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../../services/auth.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RestService, ProjectMembership } from '../../services/rest.service';
 
 @Component({
   selector: 'app-join-unit',
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './join-unit.component.html',
-  styleUrl: './join-unit.component.scss',
+  styleUrls: ['./join-unit.component.scss'],
 })
 export class JoinUnitComponent implements OnInit {
   joinProjectForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
-    private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private restService: RestService
   ) {
     this.joinProjectForm = this.fb.group({
       projectCode: ['', Validators.required],
@@ -35,28 +28,34 @@ export class JoinUnitComponent implements OnInit {
 
   onSubmit(): void {
     if (this.joinProjectForm.valid) {
-      const invitation_code = this.joinProjectForm.value.projectCode;
-      console.log('Project Code Submitted:', invitation_code);
+      const invitationCode = this.joinProjectForm.value.projectCode;
+      console.log('Project Code Submitted:', invitationCode);
 
-      this.http
-        .post('http://localhost:5000/api/project_invitations/join', {
-          invitation_code,
-        })
-        .subscribe({
-          next: (response) => {
-            console.log('Project joined successfully:', response);
-            // Optionally, refresh user's project memberships or redirect
-            // For now, redirect to announcement page
-            this.router.navigate(['/announcement']);
-          },
-          error: (error) => {
-            console.error('Error joining project:', error);
-            alert(
-              'Failed to join project: ' +
-                (error.error.message || 'Unknown error')
-            );
-          },
-        });
+      this.restService.joinProject(invitationCode).subscribe({
+        next: (response) => {
+          console.log('Project joined successfully:', response);
+
+          // Create projectMemberships from API response
+          const projectMemberships: ProjectMembership[] = [{
+            project_id: response.project_id,
+            project_name: response.project_name,
+            role: response.role
+          }];
+
+          // Store in localStorage
+          localStorage.setItem('projectMemberships', JSON.stringify(projectMemberships));
+          console.log('Project memberships stored:', projectMemberships);
+
+          // Show success message and navigate to announcement page
+          alert('เข้าโครงการสำเร็จ');
+          this.router.navigate(['/announcement']);
+        },
+        error: (error) => {
+          console.error('Error joining project:', error);
+          alert('ไม่สามารถเข้าร่วมโครงการได้: ' + (error.message || 'เกิดข้อผิดพลาดไม่ทราบสาเหตุ'));
+          this.router.navigate(['/login']);
+        }
+      });
     } else {
       this.joinProjectForm.markAllAsTouched();
     }

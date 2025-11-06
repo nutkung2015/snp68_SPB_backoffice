@@ -3,15 +3,20 @@
   <div class="sidebar-header">
     <div class="admin-info">
       <div class="admin-icon">
-        <div class="icon-circle"></div>
+        <div class="icon-circle">
+          <img src="assets/icons/logo_3_white.png" alt="logo" class="logo">
+        </div>
       </div>
       <div class="admin-text" *ngIf="!isCollapsed">
-        <span>ผู้ดูแลระบบนิติบุคคล</span>
+        <span>{{ projectName }}</span>
       </div>
-      <button class="toggle-btn" (click)="toggleSidebar()">
+      <button class="toggle-btn" *ngIf="!isCollapsed" (click)="toggleSidebar()">
         <img src="assets/icons/arrow-right.svg" alt="Toggle" class="arrow-icon">
       </button>
     </div>
+    <button class="toggle-btn-collapsed" *ngIf="isCollapsed" (click)="toggleSidebar()">
+      <img src="assets/icons/arrow-right.svg" alt="Toggle" class="arrow-icon">
+    </button>
   </div>
 
   <!-- Navigation Menu -->

@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,17 +15,19 @@ export class SidebarComponent implements OnInit {
   @Input() isCollapsed = false;
   @Output() sidebarToggle = new EventEmitter<boolean>();
   
+  projectName: string = 'ผู้ดูแลระบบนิติบุคคล';
+  
   menuItems = [
     {
       title: 'ประกาศ',
       icon: 'assets/icons/announcement.svg',
       route: '/announcement',
-      active: true
+      active: false
     },
     {
       title: 'ปัญหา',
       icon: 'assets/icons/problem.svg',
-      route: '/problems',
+      route: '/issue',
       active: false
     },
     {
@@ -61,12 +65,37 @@ export class SidebarComponent implements OnInit {
       icon: 'assets/icons/residents.svg',
       route: '/residents',
       active: false
+    },
+    {
+      title: 'จัดการคำเชิญ',
+      icon: 'assets/icons/invite.svg',
+      route: '/invite-management',
+      active: false
     }
   ];
 
-  constructor() { }
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
+    this.loadProjectName();
+    this.updateActiveMenuItem();
+    // Listen to route changes
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateActiveMenuItem();
+      });
+  }
+
+  loadProjectName(): void {
+    const projectMemberships = this.authService.getProjectMemberships();
+    if (projectMemberships && projectMemberships.length > 0) {
+      const firstProject = projectMemberships[0];
+      this.projectName = firstProject.project_name || 'ผู้ดูแลระบบนิติบุคคล';
+    }
   }
 
   toggleSidebar(): void {
@@ -77,5 +106,27 @@ export class SidebarComponent implements OnInit {
   setActiveItem(item: any): void {
     this.menuItems.forEach(menuItem => menuItem.active = false);
     item.active = true;
+  }
+
+  private updateActiveMenuItem(): void {
+    const currentUrl = this.router.url;
+    
+    // Handle special cases
+    if (currentUrl === '/' || currentUrl.startsWith('/announcement')) {
+      this.setActiveByRoute('/announcement');
+    } else if (currentUrl.startsWith('/invite-management')) {
+      this.setActiveByRoute('/invite-management');
+    } else if (currentUrl.startsWith('/residents')) {
+      this.setActiveByRoute('/residents');
+    } else {
+      // Try to match exact route
+      this.setActiveByRoute(currentUrl);
+    }
+  }
+
+  private setActiveByRoute(route: string): void {
+    this.menuItems.forEach(menuItem => {
+      menuItem.active = menuItem.route === route;
+    });
   }
 }

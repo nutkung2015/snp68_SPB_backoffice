@@ -1,0 +1,87 @@
+.dialog-container {
+  padding: 32px;
+  min-width: 400px;
+  max-width: 500px;
+  text-align: center;
+}
+
+.success-icon {
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #52c41a;
+  }
+}
+
+.dialog-title {
+  h2 {
+    margin: 0;
+    color: #171a1e;
+    font-size: 24px;
+    font-weight: 600;
+  }
+}
+
+.invitation-info {
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+    
+    .label {
+      font-weight: 500;
+      color: #666;
+    }
+    
+    .value {
+      font-weight: 600;
+      color: #171a1e;
+    }
+  }
+}
+
+.invitation-code-section {
+  width: 100%;
+  
+  .code-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #171a1e;
+    margin-bottom: 8px;
+  }
+  
+  .code-display {
+    background-color: #f5f5f5;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    padding: 12px;
+    
+    .code-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      font-weight: 600;
+      color: #171a1e;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .copy-button {
+      color: #666;
+      
+      &:hover {
+        background-color: #e6f7ff;
+        color: #1890ff;
+      }
+    }
+  }
+}
+
+.dialog-actions {
+  margin-top: 16px;
+}

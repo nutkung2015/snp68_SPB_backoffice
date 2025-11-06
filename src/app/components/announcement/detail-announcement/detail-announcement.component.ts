@@ -10,6 +10,7 @@ import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.
 import { MatLabel } from '@angular/material/form-field';
 import { AnnouncementConfirmDeleteComponent } from '../../dialog/announcement-confirm-delete/announcement-confirm-delete.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RestService, Announcement as ApiAnnouncement } from '../../../services/rest.service';
 
 interface AttachmentUrl {
   url: string;
@@ -54,6 +55,7 @@ export class DetailAnnouncementComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private rest: RestService,
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog
@@ -65,14 +67,37 @@ export class DetailAnnouncementComponent implements OnInit {
   }
 
   loadAnnouncement(id: string) {
-    this.http
-      .get<any>(`http://localhost:5000/api/announcements/${id}`)
+    this.rest
+      .getAnnouncementById(id)
       .subscribe({
-        next: (response) => {
-          this.announcement = response.data;
-          if (this.announcement?.attachment_urls) {
-            this.attachmentUrls = JSON.parse(this.announcement.attachment_urls);
+        next: (data: ApiAnnouncement) => {
+          // Normalize to local interface shape
+          const raw = (data as any).attachment_urls;
+          let attachments: AttachmentUrl[] = [];
+          if (Array.isArray(raw)) {
+            attachments = raw.map((url: string) => ({ url, public_id: '', resource_type: '' }));
+          } else if (typeof raw === 'string') {
+            try {
+              attachments = JSON.parse(raw) as AttachmentUrl[];
+            } catch {
+              attachments = [];
+            }
           }
+
+          this.announcement = {
+            id: data.id,
+            title: data.title,
+            content: data.content,
+            type: data.type,
+            attachment_urls: typeof raw === 'string' ? raw : JSON.stringify(attachments),
+            posted_by: data.posted_by,
+            audience: data.audience,
+            status: data.status,
+            created_at: data.created_at || '',
+            updated_at: data.updated_at || ''
+          };
+
+          this.attachmentUrls = attachments;
         },
         error: (error) => {
           console.error('Error loading announcement:', error);
@@ -124,10 +149,9 @@ export class DetailAnnouncementComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
-          this.http
-            .delete(
-              `http://localhost:5000/api/announcements/${this.announcement?.id}`
-            ) // เพิ่ม ?. ตรงนี้
+          if (!this.announcement?.id) { return; }
+          this.rest
+            .deleteAnnouncement(this.announcement.id)
             .subscribe({
               next: () => {
                 this.router.navigate(['/announcement']);

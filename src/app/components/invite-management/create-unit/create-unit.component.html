@@ -1,0 +1,124 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div ngClass="header" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="10px">
+    <div>
+        <span ngClass="sub-header" style="color: #9fa9b6">จัดการคำเชิญ / </span>
+        <span ngClass="sub-header" style="color: #171a1e">สร้างหน่วย</span>
+    </div>
+    <span ngClass="sub-body" fxLayoutGap="20px">
+        <mat-icon (click)="onCancel()">arrow_back</mat-icon>
+        <span>สร้างหน่วย</span>
+    </span>
+</div>
+
+<div style="padding-top: 24px; padding-bottom: 120px">
+    <mat-card>
+        <div fxLayout="column" fxLayoutAlign="center stretch" style="
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 24px;
+        padding-right: 24px;
+      ">
+            <form [formGroup]="unitForm">
+                <div class="form-content">
+                    <div fxLayout="row" fxLayoutGap="60px">
+                        <!-- Left Section: Project Info -->
+                        <div class="info-section" fxFlex="30">
+                            <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="16px">
+                                <div fxLayout="column" fxLayoutGap="10px">
+                                    <span class="field-label">ชื่อโครงการ</span>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput [value]="projectName" readonly disabled />
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="info-card">
+                                    <mat-icon>info</mat-icon>
+                                    <div>
+                                        <p>
+                                            <strong>สร้างหน่วยใหม่:</strong><br />
+                                            กรุณากรอกข้อมูลหน่วยให้ครบถ้วน เลขที่บ้าน โซน อาคาร และชั้น
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Section: Form Fields -->
+                        <div class="detail-section" fxLayout="column" fxLayoutGap="16px" fxFlex="70">
+                            <!-- เลขที่บ้าน -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>เลขที่บ้าน
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <input matInput formControlName="unit_number" placeholder="เช่น 101, 205" required />
+                                    <mat-error *ngIf="getFieldError('unit_number')">
+                                        {{ getFieldError('unit_number') }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- โซน -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>โซน
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <mat-select formControlName="zone" required>
+                                        <mat-option *ngFor="let zone of zones" [value]="zone.value">
+                                            {{ zone.label }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="getFieldError('zone')">
+                                        {{ getFieldError('zone') }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- อาคาร -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>บ้าน
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <mat-select formControlName="building" required>
+                                        <mat-option *ngFor="let building of buildings" [value]="building.value">
+                                            {{ building.label }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="getFieldError('building')">
+                                        {{ getFieldError('building') }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- ชั้น -->
+                            <!-- <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>ชั้น
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <input matInput formControlName="floor" placeholder="เช่น 1, 2, 3" required />
+                                    <mat-error *ngIf="getFieldError('floor')">
+                                        {{ getFieldError('floor') }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div> -->
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px" style="margin-top: 24px;">
+                        <button class="btn-cancel" (click)="onCancel()">
+                            ยกเลิก
+                        </button>
+                        <button class="btn-primary" (click)="onSubmit()" [disabled]="!unitForm.valid || (isLoading$ | async)">
+                            สร้างหน่วย
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </mat-card>
+</div>

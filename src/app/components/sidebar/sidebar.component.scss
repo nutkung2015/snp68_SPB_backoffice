@@ -29,13 +29,18 @@
 
     .admin-icon {
       .icon-circle {
-        width: 24px;
-        height: 24px;
-        background: #667eea;
+        width: 30px;
+        height: 30px;
+        background: #205248;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .logo {
+        width: 24px;
+        height: 24px;
       }
     }
 
@@ -63,7 +68,33 @@
         width: 16px;
         height: 16px;
         filter: brightness(0) invert(1);
+        transform: rotate(180deg);
       }
+    }
+  }
+
+  .toggle-btn-collapsed {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+
+    &:hover {
+      background-color: #34495e;
+    }
+
+    .arrow-icon {
+      width: 16px;
+      height: 16px;
+      filter: brightness(0) invert(1);
+       // หมุนลูกศรเพื่อชี้กลับ
     }
   }
 }
@@ -152,6 +183,7 @@
 
   .admin-info {
     justify-content: center;
+    padding: 0 10px;
 
     .admin-text {
       display: none;
