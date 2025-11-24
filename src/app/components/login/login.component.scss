@@ -1,20 +1,65 @@
 .login-container {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #4BB59F;
-  padding: 20px;
-}
+  align-items: stretch;
+  background: #ffffff;
+  padding: 0;
 
-.login-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
-  animation: slideUp 0.6s ease-out;
+  .banner-card {
+    flex: 1;
+    min-height: 100vh;
+    background: #4BB59F;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    // สำหรับใส่รูป banner
+    // ถ้าต้องการใส่รูปผ่าน CSS:
+    // background-image: url('assets/images/banner.jpg');
+    
+    // หรือใส่ผ่าน HTML แล้วใช้ class:
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .login-section{
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 40px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: slideUp 0.6s ease-out;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .login-card {
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: slideUp 0.6s ease-out;
+    // box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
+  }
 }
 
 @keyframes slideUp {
@@ -31,6 +76,7 @@
 .login-header {
   text-align: center;
   margin-bottom: 30px;
+  width: 100%;
 
   h1 {
     color: #333;
@@ -47,6 +93,8 @@
 }
 
 .login-form {
+  width: 100%;
+
   .form-group {
     margin-bottom: 20px;
 
@@ -136,7 +184,7 @@
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 8px 25px rgba(32, 82, 72, 0.3);
     }
 
     &:active:not(:disabled) {
@@ -172,16 +220,33 @@
   100% { transform: rotate(360deg); }
 }
 
+// Responsive Design
+@media (max-width: 968px) {
+  .login-container {
+    flex-direction: column;
+
+    .banner-card {
+      min-height: 40vh;
+      flex: none;
+    }
+
+    .login-card {
+      min-height: 60vh;
+      flex: none;
+      max-width: 100%;
+      box-shadow: none;
+    }
+  }
+}
+
 @media (max-width: 480px) {
   .login-container {
-    padding: 10px;
-  }
+    .login-card {
+      padding: 30px 20px;
+    }
 
-  .login-card {
-    padding: 30px 20px;
-  }
-
-  .login-header h1 {
-    font-size: 24px;
+    .login-header h1 {
+      font-size: 24px;
+    }
   }
 }

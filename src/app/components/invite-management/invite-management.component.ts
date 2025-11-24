@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -25,27 +25,37 @@ import { PageHeaderComponent } from '../../shared/page-header/page-header.compon
 import { AuthService } from '../../services/auth.service';
 
 type InvitationStatus = StatusType | 'all';
-type StatusType = 'sent' | 'accepted' | 'declined' | 'pending' | 'expired';
+type StatusType = 'pending' | 'sent' | 'accepted' | 'declined' | 'expired';
 
-interface Invitation {
+interface UnitInvitation {
   id: string;
+  unit_id: string;
+  unit_number: string;
   project_id: string;
-  sender_id: string;
-  invitation_code: string;
-  role: string;
+  invited_by: string;
+  invited_by_name: string;
+  code: string;
+  qr_code_url?: string | null;
   status: string;
-  expires_at: Date;
-  created_at: Date;
-  project_name: string;
-  sender_name: string;
-  sender_email: string;
+  role: string;
+  invited_email?: string | null;
+  invited_phone?: string | null;
+  expires_at: Date | null;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 interface APIResponse {
   status: string;
   message: string;
-  data: Invitation[];
-  count: number;
+  data: {
+    all_units_invite: UnitInvitation[];
+    unit_invitations: UnitInvitation[];
+  };
+  count: {
+    project: number;
+    unit: number;
+  };
 }
 
 @Component({
@@ -71,41 +81,47 @@ interface APIResponse {
   styleUrls: ['./invite-management.component.scss'],
 })
 export class InviteManagementComponent implements OnInit {
-  private apiUrl = 'http://localhost:5000/api/project_invitations';
+  private apiUrl = 'http://localhost:5000/api/units/unit-invitations';
 
   isLoading = new BehaviorSubject<boolean>(true);
   isLoading$: Observable<boolean> = this.isLoading.asObservable();
 
   displayedColumns: string[] = [
     'sequence',
-    'project_name',
-    'sender_name',
-    'sender_email',
+    'unit_number',
+    'invited_email',
     'role',
     'status',
+    'invited_by_name',
     'expires_at',
-    'created_at',
-    'details',
+    'actions',
   ];
-  dataSource: MatTableDataSource<Invitation>;
-  searchTerm = '';
 
+  dataSource: MatTableDataSource<UnitInvitation>;
+  searchTerm = '';
   pageEvent: PageEvent = {
     pageIndex: 0,
     pageSize: 10,
     length: 0,
   };
 
-  searchType = 'project_name';
   selectedStatus: InvitationStatus = 'all';
+  selectedUnitId: string | null = null;
+  selectedUnitNumber: string | null = null;
 
-  private allInvitations: Invitation[] = [];
+  private allInvitations: UnitInvitation[] = [];
+  currentProjectName = '';
+  currentProjectId = '';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private http: HttpClient, private router: Router, private authService: AuthService) {
-    this.dataSource = new MatTableDataSource<Invitation>([]);
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.dataSource = new MatTableDataSource<UnitInvitation>([]);
   }
 
   ngOnInit() {
@@ -116,117 +132,133 @@ export class InviteManagementComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
-    // กำหนด filter predicate สำหรับการค้นหา
-    this.dataSource.filterPredicate = (data: Invitation, filter: string) => {
-      return data.project_name.toLowerCase().includes(filter.toLowerCase()) ||
-             data.sender_name.toLowerCase().includes(filter.toLowerCase()) ||
-             data.sender_email.toLowerCase().includes(filter.toLowerCase());
+    this.dataSource.filterPredicate = (data: UnitInvitation, filter: string) => {
+      const searchLower = filter.toLowerCase();
+      return (
+        (data.unit_number || '').toLowerCase().includes(searchLower) ||
+        (data.invited_email || '').toLowerCase().includes(searchLower) ||
+        (data.invited_by_name || '').toLowerCase().includes(searchLower) ||
+        (data.code || '').toLowerCase().includes(searchLower)
+      );
     };
   }
 
-  loadInvitations() {
-    const userRole = this.authService.getUserRole();
-    const projectMemberships = this.authService.getProjectMemberships();
+  private parseDate(dateValue: any): Date | null {
+    if (!dateValue) return null;
+    if (dateValue instanceof Date) {
+      return isNaN(dateValue.getTime()) ? null : dateValue;
+    }
+    const parsedDate = new Date(dateValue);
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
+  }
 
+  formatDate(date: Date | null | undefined, format = 'dd/MM/yyyy HH:mm'): string {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return '-';
+    }
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+
+    return format
+      .replace('dd', day)
+      .replace('MM', month)
+      .replace('yyyy', String(year))
+      .replace('HH', hours)
+      .replace('mm', minutes);
+  }
+
+  private getHttpHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+  }
+
+  private buildParams(): URLSearchParams {
     const params = new URLSearchParams();
+
     if (this.selectedStatus !== 'all') {
       params.append('status', this.selectedStatus);
     }
-
-    // ตรรกะตามบทบาทผู้ใช้
-    if (userRole === 'super-admin') {
-      // ผู้ดูแลระบบสามารถดูคำเชิญทั้งหมดได้
-      console.log('กำลังโหลดคำเชิญทั้งหมดในฐานะผู้ดูแลระบบ');
-    } else if (userRole === 'juristic') {
-      // ผู้ใช้ฝ่ายนิติบุคคลต้องการ project_id จากการเป็นสมาชิก
-      if (projectMemberships && projectMemberships.length > 0) {
-        // สำหรับความง่าย ใช้การเป็นสมาชิกโครงการแรก
-        const firstProject = projectMemberships[0];
-        params.append('project_id', firstProject.project_id);
-        console.log('กำลังโหลดคำเชิญสำหรับโครงการ:', firstProject.project_id);
-      } else {
-        console.error('ไม่พบการเป็นสมาชิกโครงการสำหรับผู้ใช้ฝ่ายนิติบุคคล');
-        this.isLoading.next(false);
-        return;
-      }
+    if (this.selectedUnitId) {
+      params.append('unit_id', this.selectedUnitId);
     }
 
+    return params;
+  }
+
+  loadInvitations() {
+    this.isLoading.next(true);
+  
+    const projectMemberships = this.authService.getProjectMemberships();
+    if (!projectMemberships || projectMemberships.length === 0) {
+      alert('ไม่พบการเป็นสมาชิกโครงการ กรุณาติดต่อผู้ดูแลระบบ');
+      this.isLoading.next(false);
+      return;
+    }
+  
+    const firstProject = projectMemberships[0];
+    this.currentProjectId = firstProject.project_id;
+    this.currentProjectName = firstProject.project_name || 'โครงการ';
+  
+    const params = this.buildParams();
+    params.append('project_id', this.currentProjectId);
+  
+    const headers = this.getHttpHeaders();
+    const url = `${this.apiUrl}?${params.toString()}`;
+  
+    console.log('Request URL:', url); // เพิ่ม log เพื่อ debug
+  
     this.http
-      .get<APIResponse>(`${this.apiUrl}?${params.toString()}`)
+      .get<APIResponse>(url, { headers })
       .pipe(
         map((response) => {
-          return response.data.map((item) => ({
+          console.log('Full Response:', response); // เพิ่ม log เพื่อ debug
+          
+          // เช็ค response structure
+          if (!response || !response.data) {
+            console.warn('Response structure ไม่ถูกต้อง:', response);
+            return [];
+          }
+  
+          // ดึงข้อมูลจาก all_units_invite (คำเชิญทั้งหมดใน project)
+          const invitations = response.data.all_units_invite || [];
+          
+          console.log('Invitations found:', invitations.length); // เพิ่ม log เพื่อ debug
+  
+          // Map และแปลง date
+          return invitations.map((item) => ({
             ...item,
-            expires_at: new Date(item.expires_at),
-            created_at: new Date(item.created_at),
+            expires_at: this.parseDate(item.expires_at),
+            created_at: this.parseDate(item.created_at),
+            updated_at: this.parseDate(item.updated_at),
           }));
         }),
         catchError((error) => {
-          console.error('เกิดข้อผิดพลาดในการโหลดคำเชิญ:', error);
-          return of([] as Invitation[]);
+          console.error('Error loading unit invitations:', error);
+          console.error('Error details:', error.error); // เพิ่ม log เพื่อ debug
+          if (error.error?.message) {
+            alert(`เกิดข้อผิดพลาด: ${error.error.message}`);
+          }
+          return of([] as UnitInvitation[]);
         }),
-        finalize(() => {
-          this.isLoading.next(false);
-        })
+        finalize(() => this.isLoading.next(false))
       )
-      .subscribe({
-        next: (invitations) => {
-          this.allInvitations = invitations;
-          this.dataSource.data = invitations;
-        },
-        error: (error) => console.error('เกิดข้อผิดพลาดในการสมัครรับข้อมูล:', error),
+      .subscribe((invitations) => {
+        console.log('Final invitations:', invitations); // เพิ่ม log เพื่อ debug
+        this.allInvitations = invitations;
+        this.dataSource.data = invitations;
+        this.pageEvent.length = invitations.length;
       });
   }
 
   onSearch(): void {
-    this.isLoading.next(true);
-
-    const userRole = this.authService.getUserRole();
-    const projectMemberships = this.authService.getProjectMemberships();
-
-    const params = new URLSearchParams();
-    if (this.selectedStatus !== 'all') {
-      params.append('status', this.selectedStatus);
-    }
-
-    // ตรรกะตามบทบาทผู้ใช้สำหรับการค้นหา
-    if (userRole === 'super-admin') {
-      // ผู้ดูแลระบบสามารถค้นหาคำเชิญทั้งหมดได้
-      console.log('กำลังค้นหาคำเชิญทั้งหมดในฐานะผู้ดูแลระบบ');
-    } else if (userRole === 'juristic') {
-      // ผู้ใช้ฝ่ายนิติบุคคลต้องการ project_id จากการเป็นสมาชิก
-      if (projectMemberships && projectMemberships.length > 0) {
-        const firstProject = projectMemberships[0];
-        params.append('project_id', firstProject.project_id);
-        console.log('กำลังค้นหาคำเชิญสำหรับโครงการ:', firstProject.project_id);
-      } else {
-        console.error('ไม่พบการเป็นสมาชิกโครงการสำหรับผู้ใช้ฝ่ายนิติบุคคล');
-        this.isLoading.next(false);
-        return;
-      }
-    }
-
-    this.http
-      .get<APIResponse>(`${this.apiUrl}?${params.toString()}`)
-      .pipe(
-        map((response) => {
-          return response.data.map((item) => ({
-            ...item,
-            expires_at: new Date(item.expires_at),
-            created_at: new Date(item.created_at),
-          }));
-        }),
-        catchError((error) => {
-          console.error('เกิดข้อผิดพลาดในการค้นหาคำเชิญ:', error);
-          return of([] as Invitation[]);
-        }),
-        finalize(() => {
-          this.isLoading.next(false);
-        })
-      )
-      .subscribe((invitations) => {
-        this.dataSource.data = invitations;
-      });
+    this.loadInvitations();
   }
 
   onReset(): void {
@@ -240,29 +272,34 @@ export class InviteManagementComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  filterByStatus(status: string) {
-    if (status === 'all') {
-      this.dataSource.data = this.allInvitations;
-    } else {
-      this.dataSource.data = this.allInvitations.filter(
-        (item) => item.status === status
-      );
-    }
+  filterByStatus(status: InvitationStatus) {
+    this.selectedStatus = status;
+    this.onSearch();
+  }
+
+  filterByUnit(unitId: string | null) {
+    this.selectedUnitId = unitId;
+    this.onSearch();
   }
 
   onCreateNew(): void {
     this.router.navigate(['/invite-management/create']);
   }
 
-    onCreateUnit(): void {
+  onCreateUnit(): void {
     this.router.navigate(['/invite-management/create-unit']);
   }
 
-  viewDetails(invitation: Invitation): void {
+  viewDetails(invitation: UnitInvitation): void {
     this.router.navigate(['/invite-management/detail', invitation.id]);
   }
 
   handlePageEvent(event: PageEvent) {
     this.pageEvent = event;
+  }
+
+  openQrCode(url: string | null | undefined): void {
+    if (!url) return;
+    window.open(url, '_blank', 'noopener');
   }
 }

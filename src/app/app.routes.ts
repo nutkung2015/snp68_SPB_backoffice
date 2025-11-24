@@ -146,9 +146,42 @@ export const routes: Routes = [
       },
       {
         path: 'issue',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/issue/issue.component').then(
+                (m) => m.IssueComponent
+              ),
+          },
+          // {
+          //   path: 'create',
+          //   loadComponent: () =>
+          //     import(
+          //       './components/issue/create-issue-personal/create-issue-personal.component'
+          //     ).then((m) => m.CreateIssuePersonalComponent),
+          // },
+          {
+            path: 'detail/:id',
+            loadComponent: () =>
+              import(
+                './components/issue/detail-issue-personal/detail-issue-personal.component'
+              ).then((m) => m.DetailIssuePersonalComponent),
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () =>
+              import(
+                './components/issue/edit-issue-personal/edit-issue-personal.component'
+              ).then((m) => m.EditIssuePersonalComponent),
+          },
+        ],
+      },
+      {
+        path: 'custom-theme-app',
         loadComponent: () =>
-          import('./components/issue/issue.component').then(
-            (m) => m.IssueComponent
+          import('./components/custom-theme-app/custom-theme-app.component').then(
+            (m) => m.CustomThemeAppComponent
           ),
       },
     ],

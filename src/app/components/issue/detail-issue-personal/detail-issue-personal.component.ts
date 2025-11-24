@@ -13,7 +13,6 @@ import { RestService, PersonalRepair } from '../../../services/rest.service';
 interface ImageUrl {
   url: string;
   public_id: string;
-  resource_type: string;
 }
 
 @Component({
@@ -50,14 +49,11 @@ export class DetailIssuePersonalComponent implements OnInit {
   }
 
   loadIssue(id: string) {
-    // ต้องเพิ่ม method getIssueById ใน RestService
-    const params = {
-      project_id: localStorage.getItem('project_id'),
-      issue_id: id.replace('iss', '')
-    };
-
-    this.rest.getPersonalRepairById(params).subscribe({
-      next: (data: any) => {
+    // ถ้า id มี prefix 'iss' ให้ตัดออก
+    const cleanId = id.startsWith('iss') ? id.replace('iss', '') : id;
+    
+    this.rest.getPersonalRepairById(cleanId).subscribe({
+      next: (data: PersonalRepair) => {
         this.issue = data;
         this.imageUrls = data.image_urls || [];
         this.isLoading.next(false);
@@ -102,5 +98,26 @@ export class DetailIssuePersonalComponent implements OnInit {
 
   onBack(): void {
     this.router.navigate(['/issue']);
+  }
+
+  onEdit(): void {
+    if (this.issue) {
+      this.router.navigate([`/issue/edit/${this.issue.id}`]);
+    }
+  }
+
+  onDelete(): void {
+    // if (this.issue?.id) {
+    //   // เช็ค id ด้วยเพื่อให้แน่ใจว่ามีค่า   
+    //   const dialogRef = this.dialog.open(IssueConfirmDeleteComponent, {
+    //     width: '400px',
+    //     data: {},
+    //   });
+    //   dialogRef.afterClosed().subscribe((result) => {
+    //     if (result) {
+    //       if (!this.issue?.id) { return; }
+    //     }
+    //   });
+    // }
   }
 }

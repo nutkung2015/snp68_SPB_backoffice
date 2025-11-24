@@ -1,0 +1,170 @@
+<div class="theme-customization">
+  <div class="theme-customization">
+    <app-page-header iconSrc="assets/icons/announcement.svg" title="ตั้งค่าธีม" subtitle="Theme Customization"
+      iconColor="invert(100%)">
+    </app-page-header>
+
+    <div class="container">
+      <div class="customization-section">
+        <h2 class="header-text">ตั้งค่าธีม</h2>
+
+        <div class=" ">
+          <mat-card class="form-card">
+            <mat-card-content>
+              <div class="form-group">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>ชื่อโครงการ</mat-label>
+                  <input matInput [value]="projectName" [disabled]="true">
+                </mat-form-field>
+              </div>
+
+              <div class="form-group">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>สีหลัก</mat-label>
+                  <input matInput type="color" [(ngModel)]="theme.primary_color" (change)="updatePreview()">
+                </mat-form-field>
+              </div>
+
+              <div class="form-group">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>สีรอง</mat-label>
+                  <input matInput type="color" [(ngModel)]="theme.secondary_color" (change)="updatePreview()">
+                </mat-form-field>
+              </div>
+
+              <div class="form-group">
+                <label class="file-upload-label">โลโก้</label>
+                <div class="file-upload-container">
+                  <button mat-stroked-button type="button" (click)="fileInputLogo.click()">
+                    <mat-icon>upload</mat-icon> อัปโหลดโลโก้
+                  </button>
+                  <input #fileInputLogo type="file" (change)="onFileSelected($event, 'logo')" accept="image/*" hidden>
+                  <span class="file-name" *ngIf="theme.logo_url">{{ theme.logo_url | slice:0:30 }}{{
+                    theme.logo_url.length > 30 ? '...' : '' }}</span>
+                </div>
+              </div>
+
+              <!-- <div class="form-group">
+                <label class="file-upload-label">ไอคอน (Favicon)</label>
+                <div class="file-upload-container">
+                  <button mat-stroked-button type="button" (click)="fileInputFavicon.click()">
+                    <mat-icon>upload</mat-icon> อัปโหลดไอคอน
+                  </button>
+                  <input #fileInputFavicon type="file" (change)="onFileSelected($event, 'favicon')"
+                    accept=".ico,image/x-icon" hidden>
+                  <span class="file-name" *ngIf="theme.favicon_url">{{ theme.favicon_url | slice:0:30 }}{{
+                    theme.favicon_url.length > 30 ? '...' : '' }}</span>
+                </div>
+              </div> -->
+
+              <div class="button-group">
+                <button mat-raised-button color="primary" (click)="saveTheme()">
+                  <mat-icon>{{ hasExistingCustomization ? 'update' : 'add' }}</mat-icon>
+                  {{ hasExistingCustomization ? 'อัปเดตธีม' : 'สร้างธีม' }}
+                </button>
+                <button mat-stroked-button color="warn" (click)="resetToDefault()">
+                  <mat-icon>restore</mat-icon> กลับเป็นค่าเริ่มต้น
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+
+      <div class="preview-section">
+        <h2 class="header-text">ตัวอย่างธีม</h2>
+        <mat-card class="preview-card">
+          <div class="phone-mockup">
+            <div class="phone-frame">
+              <!-- Phone notch -->
+              <div class="phone-notch"></div>
+
+              <!-- Phone header -->
+              <div class="phone-header" [ngStyle]="{'background-color': previewTheme.primary_color}">
+                <div class="phone-time">9:41</div>
+                <div class="phone-status">
+                  <span class="signal"></span>
+                  <span class="wifi"></span>
+                  <span class="battery"></span>
+                </div>
+              </div>
+
+              <!-- App header -->
+              <div class="app-header">
+                <div class="app-logo">
+                  <img [src]="previewTheme.logo_url || 'assets/images/logo-default.png'" alt="Logo"
+                    (error)="previewTheme.logo_url = 'assets/images/logo-default.png'">
+                </div>
+                <div class="app-title">
+                  <div class="app-name" [ngStyle]="{'color': previewTheme.primary_color}">SNP68</div>
+                  <div class="app-subtitle">Smart Property</div>
+                </div>
+              </div>
+
+              <!-- App content -->
+              <div class="app-content">
+                <div class="app-nav" [ngStyle]="{'border-bottom-color': previewTheme.primary_color + '33'}">
+                  <div class="nav-item active"
+                    [ngStyle]="{'color': previewTheme.primary_color, 'border-bottom-color': previewTheme.primary_color}">
+                    หน้าแรก
+                  </div>
+                  <div class="nav-item">บริการ</div>
+                  <div class="nav-item">แจ้งซ่อม</div>
+                  <div class="nav-item">อื่นๆ</div>
+                </div>
+
+                <div class="app-banner" [ngStyle]="{'background-color': previewTheme.primary_color + '1A'}">
+                  <div class="banner-content">
+                    <div class="banner-text">
+                      <h3>ยินดีต้อนรับ</h3>
+                      <p>สวัสดีค่ะ คุณผู้ใช้งาน</p>
+                    </div>
+                    <div class="banner-icon">
+                      <mat-icon [ngStyle]="{'color': previewTheme.primary_color}">waving_hand</mat-icon>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="quick-actions">
+                  <div class="action-item" *ngFor="let item of quickActions">
+                    <div class="action-icon" [ngStyle]="{'background-color': previewTheme.primary_color + '1A'}">
+                      <mat-icon [ngStyle]="{'color': previewTheme.primary_color}">{{item.icon}}</mat-icon>
+                    </div>
+                    <div class="action-label">{{item.label}}</div>
+                  </div>
+                </div>
+
+                <div class="announcement" *ngIf="isDefaultTheme">
+                  <div class="announcement-icon">
+                    <mat-icon>info</mat-icon>
+                  </div>
+                  <div class="announcement-text">ขณะนี้คุณใช้ธีมของระบบอยู่</div>
+                </div>
+              </div>
+
+              <!-- Bottom navigation -->
+              <div class="bottom-nav" [ngStyle]="{'border-top-color': previewTheme.primary_color + '1A'}">
+                <div class="nav-item active" [ngStyle]="{'color': previewTheme.primary_color}">
+                  <mat-icon>home</mat-icon>
+                  <span>หน้าแรก</span>
+                </div>
+                <div class="nav-item">
+                  <mat-icon>receipt</mat-icon>
+                  <span>บิลค่าใช้จ่าย</span>
+                </div>
+                <div class="nav-item">
+                  <mat-icon>chat</mat-icon>
+                  <span>แชท</span>
+                </div>
+                <div class="nav-item">
+                  <mat-icon>person</mat-icon>
+                  <span>ฉัน</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

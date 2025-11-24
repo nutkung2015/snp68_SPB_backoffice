@@ -1,0 +1,108 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="edit-issue-personal-container">
+    <!-- Header Section -->
+    <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+        <div class="breadcrumb">
+            <span class="sub-header" style="color: #9fa9b6">แจ้งซ่อม / </span>
+            <span class="sub-header" style="color: #171a1e">แก้ไขแจ้งซ่อมส่วนตัว</span>
+        </div>
+        <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <button mat-icon-button (click)="onCancel()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <span class="sub-body">แก้ไขแจ้งซ่อมส่วนตัว</span>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="form-content" *ngIf="issue">
+        <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <div fxLayout="column" fxLayoutGap="24px" style="max-width: 80% !important;">
+
+                    <!-- Form Fields -->
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ประเภทงานซ่อม</mat-label>
+                            <mat-select formControlName="repair_category" required>
+                                <mat-option *ngFor="let option of repairCategoryOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>พื้นที่ซ่อมแซม</mat-label>
+                            <mat-select formControlName="repair_area" required>
+                                <mat-option *ngFor="let option of repairAreaOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ความเร่งด่วน</mat-label>
+                            <mat-select formControlName="priority" required>
+                                <mat-option *ngFor="let option of priorityOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>สถานะ</mat-label>
+                            <mat-select formControlName="status" required>
+                                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ผู้รับผิดชอบ</mat-label>
+                            <mat-select formControlName="assigned_to">
+                                <mat-option [value]="null">ไม่ระบุ</mat-option>
+                                <mat-option *ngFor="let member of juristicMembers" [value]="member.id">
+                                    {{member.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ราคาประเมิน</mat-label>
+                            <input matInput type="number" formControlName="estimated_cost">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ราคาจริง</mat-label>
+                            <input matInput type="number" formControlName="actual_cost">
+                        </mat-form-field>
+                    </div>
+
+                    <mat-form-field class="full-width" appearance="outline">
+                        <mat-label>หมายเหตุ</mat-label>
+                        <textarea matInput formControlName="notes" rows="6"></textarea>
+                    </mat-form-field>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px"
+                    style="max-width: 80% !important;">
+                    <button mat-stroked-button type="button" (click)="onCancel()">
+                        ยกเลิก
+                    </button>
+                    <button mat-flat-button color="primary" type="submit" [disabled]="!editForm.valid">
+                        บันทึก
+                    </button>
+                </div>
+            </mat-card>
+        </form>
+    </div>
+</div>

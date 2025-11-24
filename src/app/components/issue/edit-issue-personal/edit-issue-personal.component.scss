@@ -1,0 +1,126 @@
+.edit-issue-personal-container {
+  // padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+  // Header Styles
+  .header {
+    background-color: #ffffff;
+    padding: 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+
+    .sub-header {
+      font-weight: 400;
+      font-size: 14px;
+    }
+
+    .sub-body {
+      font-weight: 600;
+      font-size: 28px;
+      color: #333;
+    }
+  }
+
+  // Form Content
+  .form-content {
+    mat-card {
+      padding: 24px;
+      border-radius: 12px;
+    }
+  }
+
+  // Field Styles
+  .field-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+  }
+
+  .half-width {
+    width: 50%;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  // File Upload Styles
+  .file-upload {
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .upload-container {
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      padding: 20px;
+      min-height: 150px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #2196F3;
+        background-color: rgba(33, 150, 243, 0.04);
+      }
+    }
+
+    .preview-container {
+      position: relative;
+      width: 100%;
+
+      img {
+        max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+      }
+
+      .remove-button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+      }
+    }
+
+    .upload-hint {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      line-height: 1.4;
+    }
+
+    .upload-progress {
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  // Action Buttons
+  .action-buttons {
+    margin-top: 24px;
+    max-width: 80% !important;
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+// Material Overrides
+::ng-deep {
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    background-color: white;
+  }
+
+  .mat-card {
+    box-shadow: none !important;
+  }
+}

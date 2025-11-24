@@ -5,10 +5,7 @@
   </div>
 
   <!-- Page Header -->
-  <app-page-header 
-    iconSrc="assets/icons/problem.svg" 
-    title="จัดการรายงานปัญหา"
-    subtitle="Issue Management" 
+  <app-page-header iconSrc="assets/icons/problem.svg" title="จัดการรายงานปัญหา" subtitle="Issue Management"
     iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
       <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
@@ -29,15 +26,11 @@
           <div class="filter-input right" fxFlex="350px">
             <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
               <mat-icon class="secondary">search</mat-icon>
-              <input 
-                matInput 
-                type="text" 
-                (keyup)="applyFilter($event)" 
-                placeholder="ค้นหาปัญหา"
+              <input matInput type="text" (keyup)="applyFilter($event)" placeholder="ค้นหาปัญหา"
                 style="border: none; width: 100%; height: 100%" />
             </div>
           </div>
-          
+
           <!-- Status Filter -->
           <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
             <div fxFlex="50px" fxLayoutAlign="end center">
@@ -51,7 +44,7 @@
               </mat-select>
             </div>
           </div>
-          
+
           <!-- Type Filter -->
           <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
             <div fxFlex="50px" fxLayoutAlign="end center">
@@ -65,7 +58,7 @@
               </mat-select>
             </div>
           </div>
-          
+
           <!-- Priority Filter -->
           <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
             <div fxFlex="50px" fxLayoutAlign="end center">
@@ -98,7 +91,7 @@
   </div>
 
   <!-- Issues Table Section -->
-  <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column" 
+  <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
     fxLayoutAlign="start stretch" fxLayoutGap.gt-sm="20px">
     <mat-card fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
       <ng-container *ngIf="dataSource.data.length > 0; else noData">
@@ -182,7 +175,7 @@
               </td>
             </ng-container>
 
-            <!-- Actions Column -->
+            <!-- Actions Column
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>จัดการ</th>
               <td mat-cell *matCellDef="let element">
@@ -198,26 +191,49 @@
                   </button>
                 </div>
               </td>
+            </ng-container> -->
+
+            <!-- Attachment Column -->
+            <ng-container matColumnDef="attachment">
+              <th mat-header-cell *matHeaderCellDef>ไฟล์แนบ</th>
+              <td mat-cell *matCellDef="let element">
+                <ng-container *ngIf="
+                    element.hasAttachment && element.attachmentUrls?.length > 0;
+                    else noAttachment
+                  ">
+                  <button mat-stroked-button class="view-attachment-btn" (click)="viewAttachment(element)">
+                    <mat-icon>search</mat-icon>
+                    ดู
+                  </button>
+                </ng-container>
+                <ng-template #noAttachment>
+                  <span class="no-attachment">ไม่มีไฟล์</span>
+                </ng-template>
+              </td>
             </ng-container>
 
+            <!-- Details Column -->
+            <ng-container matColumnDef="details">
+              <th mat-header-cell *matHeaderCellDef style="padding-left: 24px">
+                รายละเอียด
+              </th>
+              <td mat-cell *matCellDef="let element" style="padding-left: 24px">
+                <a mat-button color="primary" (click)="viewDetails(element)">รายละเอียดเพิ่มเติม</a>
+              </td>
+            </ng-container>
+
+
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr 
-              mat-row 
-              *matRowDef="let row; columns: displayedColumns;" 
-              [class.selected]="selectedRowIndex === row.id"
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.selected]="selectedRowIndex === row.id"
               (click)="selectedRowIndex = row.id">
             </tr>
           </table>
         </div>
 
         <!-- Pagination -->
-        <mat-paginator 
-          [length]="pageEvent.length"
-          [pageSize]="pageEvent.pageSize"
-          [pageIndex]="pageEvent.pageIndex"
-          [pageSizeOptions]="[5, 10, 25, 100]"
-          (page)="handlePageEvent($event)"
-          aria-label="Select page"
+        <mat-paginator [length]="pageEvent.length" [pageSize]="pageEvent.pageSize" [pageIndex]="pageEvent.pageIndex"
+          [pageSizeOptions]="[5, 10, 25, 100]" (page)="handlePageEvent($event)" aria-label="Select page"
           showFirstLastButtons>
         </mat-paginator>
       </ng-container>

@@ -71,6 +71,12 @@ export class SidebarComponent implements OnInit {
       icon: 'assets/icons/invite.svg',
       route: '/invite-management',
       active: false
+    },
+    {
+      title: 'ธีม',
+      icon: 'assets/icons/theme.svg',
+      route: '/custom-theme-app',
+      active: false
     }
   ];
 

@@ -22,9 +22,16 @@ export class AuthService {
           this.setToken(response.data.token);
           if (response.data.role) {
             localStorage.setItem('userRole', response.data.role);
+            localStorage.setItem(
+              'projectCustomizations',
+              JSON.stringify(response.data.projectCustomizations)
+            );
           }
           if (response.data.projectMemberships) {
-            localStorage.setItem('projectMemberships', JSON.stringify(response.data.projectMemberships));
+            localStorage.setItem(
+              'projectMemberships',
+              JSON.stringify(response.data.projectMemberships)
+            );
           } else {
             localStorage.removeItem('projectMemberships');
           }
@@ -111,7 +118,9 @@ export class AuthService {
     const decodedToken = this.getDecodedToken();
     if (decodedToken) {
       // ลองดึงจาก name, username, หรือ email
-      return decodedToken.name || decodedToken.username || decodedToken.email || null;
+      return (
+        decodedToken.name || decodedToken.username || decodedToken.email || null
+      );
     }
     return null;
   }
@@ -120,7 +129,9 @@ export class AuthService {
     const decodedToken = this.getDecodedToken();
     if (decodedToken) {
       // ดึง user ID จาก token (อาจเป็น id, userId, user_id ขึ้นอยู่กับ backend)
-      return decodedToken.id || decodedToken.userId || decodedToken.user_id || null;
+      return (
+        decodedToken.id || decodedToken.userId || decodedToken.user_id || null
+      );
     }
     return null;
   }

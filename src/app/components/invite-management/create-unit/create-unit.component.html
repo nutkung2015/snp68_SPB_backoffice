@@ -52,7 +52,8 @@
                                     <span class="required">*</span>เลขที่บ้าน
                                 </span>
                                 <mat-form-field appearance="outline">
-                                    <input matInput formControlName="unit_number" placeholder="เช่น 101, 205" required />
+                                    <input matInput formControlName="unit_number" placeholder="เช่น 101, 205"
+                                        required />
                                     <mat-error *ngIf="getFieldError('unit_number')">
                                         {{ getFieldError('unit_number') }}
                                     </mat-error>
@@ -107,13 +108,18 @@
                             </div> -->
                         </div>
                     </div>
-                    
+
                     <!-- Action Buttons -->
                     <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px" style="margin-top: 24px;">
+                        <button class="btn-import" (click)="openImportModal()">
+                            <mat-icon>upload_file</mat-icon>
+                            นำเข้าจากไฟล์
+                        </button>
                         <button class="btn-cancel" (click)="onCancel()">
                             ยกเลิก
                         </button>
-                        <button class="btn-primary" (click)="onSubmit()" [disabled]="!unitForm.valid || (isLoading$ | async)">
+                        <button class="btn-primary" (click)="onSubmit()"
+                            [disabled]="!unitForm.valid || (isLoading$ | async)">
                             สร้างหน่วย
                         </button>
                     </div>
@@ -121,4 +127,121 @@
             </form>
         </div>
     </mat-card>
+</div>
+
+<!-- Import Modal -->
+<div class="import-modal-overlay" *ngIf="showImportModal" (click)="closeImportModal()">
+    <div class="import-modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>
+                <mat-icon>upload_file</mat-icon>
+                นำเข้าข้อมูลหน่วยจากไฟล์ Excel
+            </h2>
+            <button class="close-btn" (click)="closeImportModal()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <!-- File Upload Section -->
+            <div class="upload-section">
+                <div class="upload-area" [class.has-file]="selectedFile">
+                    <input type="file" #fileInput accept=".xlsx,.xls" (change)="onFileSelected($event)"
+                        style="display: none;" />
+
+                    <div *ngIf="!selectedFile" class="upload-placeholder" (click)="fileInput.click()">
+                        <mat-icon>cloud_upload</mat-icon>
+                        <p class="upload-title">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</p>
+                        <p class="upload-subtitle">รองรับไฟล์ .xlsx และ .xls เท่านั้น</p>
+                    </div>
+
+                    <div *ngIf="selectedFile" class="file-info">
+                        <div class="file-icon">
+                            <mat-icon>description</mat-icon>
+                        </div>
+                        <div class="file-details">
+                            <p class="file-name">{{ selectedFile.name }}</p>
+                            <p class="file-size">ขนาดไฟล์: {{ fileSize }}</p>
+                        </div>
+                        <button class="remove-file-btn" (click)="resetImportData(); $event.stopPropagation()">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-select-file" (click)="fileInput.click()" *ngIf="!selectedFile">
+                    <mat-icon>folder_open</mat-icon>
+                    เลือกไฟล์
+                </button>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" *ngIf="previewData.length > 0">
+                <div class="preview-header">
+                    <h3>
+                        <mat-icon>visibility</mat-icon>
+                        ตัวอย่างข้อมูล (แสดง 10 แถวแรก)
+                    </h3>
+                </div>
+
+                <div class="table-container">
+                    <table mat-table [dataSource]="previewData" class="preview-table">
+                        <!-- House Number Column -->
+                        <ng-container matColumnDef="house_number">
+                            <th mat-header-cell *matHeaderCellDef>เลขที่บ้าน</th>
+                            <td mat-cell *matCellDef="let element">{{ element.house_number }}</td>
+                        </ng-container>
+
+                        <!-- Zone Column -->
+                        <ng-container matColumnDef="zone">
+                            <th mat-header-cell *matHeaderCellDef>โซน</th>
+                            <td mat-cell *matCellDef="let element">{{ element.zone }}</td>
+                        </ng-container>
+
+                        <!-- Building Column -->
+                        <ng-container matColumnDef="building">
+                            <th mat-header-cell *matHeaderCellDef>อาคาร</th>
+                            <td mat-cell *matCellDef="let element">{{ element.building }}</td>
+                        </ng-container>
+
+                        <!-- Area Column -->
+                        <ng-container matColumnDef="area_sqm">
+                            <th mat-header-cell *matHeaderCellDef>พื้นที่ (ตร.ม.)</th>
+                            <td mat-cell *matCellDef="let element">{{ element.area_sqm }}</td>
+                        </ng-container>
+
+                        <!-- Status Column -->
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>สถานะ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="status-badge" [class.status-vacant]="element.status === 'vacant'"
+                                    [class.status-occupied]="element.status === 'occupied'">
+                                    {{ element.status }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+
+                <div class="preview-info">
+                    <mat-icon>info</mat-icon>
+                    <span>กำลังแสดงตัวอย่าง {{ previewData.length }} แถวจากไฟล์ที่เลือก</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeImportModal()" [disabled]="isUploading">
+                ยกเลิก
+            </button>
+            <button class="btn-primary" (click)="uploadImportFile()" [disabled]="!selectedFile || isUploading">
+                <mat-icon *ngIf="isUploading">hourglass_empty</mat-icon>
+                <mat-icon *ngIf="!isUploading">upload</mat-icon>
+                {{ isUploading ? 'กำลังนำเข้า...' : 'นำเข้าข้อมูล' }}
+            </button>
+        </div>
+    </div>
 </div>

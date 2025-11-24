@@ -150,7 +150,7 @@ export class RestService {
     return this._apiUrl;
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Announcement related methods
   getAnnouncements(params?: any): Observable<AnnouncementResponse> {
@@ -308,34 +308,12 @@ export class RestService {
    * Get personal repair by ID
    * @param params Object containing project_id and issue_id, or just a string ID
    */
-  getPersonalRepairById(params: { project_id: string | null; issue_id: string } | string): Observable<PersonalRepair> {
+  getPersonalRepairById(id: string): Observable<PersonalRepair> {
     this.isLoadingSubject.next(true);
-
-    let url: string;
-    let httpParams: HttpParams;
-
-    if (typeof params === 'string') {
-      // If params is a string, it's the ID
-      url = `${this.apiUrl}/api/repairs/personal/${params}`;
-      const projectId = localStorage.getItem('project_id');
-      httpParams = new HttpParams();
-      if (projectId) {
-        httpParams = httpParams.append('project_id', projectId);
-      }
-    } else {
-      // If params is an object
-      url = `${this.apiUrl}/api/repairs/personal/${params.issue_id}`;
-      httpParams = new HttpParams();
-      if (params.project_id) {
-        httpParams = httpParams.append('project_id', params.project_id);
-      }
-    }
+    const url = `${this.apiUrl}/api/repairs/personal/${id}`;
 
     return this.http
-      .get<{ status: string; data: PersonalRepair }>(url, {
-        ...this.getHttpOptions(),
-        params: httpParams,
-      })
+      .get<{ status: string; data: PersonalRepair }>(url, this.getHttpOptions())
       .pipe(
         map((response) => response.data),
         catchError((error) => this.handleError(error)),
@@ -387,6 +365,38 @@ export class RestService {
     return this.http.delete(url, this.getHttpOptions());
   }
 
+  /**
+   * Update personal repair with flexible field updates
+   * Supports partial updates - only send fields that need to be updated
+   * 
+   * @param id - The repair ID
+   * @param data - Partial update data (can include any combination of fields)
+   * 
+   * Examples:
+   * 1. Update only status: { status: "pending" }
+   * 2. Update status to completed: { status: "completed", actual_cost: 4500, notes: "ซ่อมเสร็จเรียบร้อย" }
+   * 3. Full update: { status: "in_progress", assigned_to: "user123", notes: "...", estimated_cost: 3000, actual_cost: 2800 }
+   */
+  updatePersonalRepair(id: string, data: Partial<{
+    status?: string;
+    assigned_to?: string;
+    assigned_to_id?: string;
+    notes?: string;
+    estimated_cost?: number;
+    actual_cost?: number;
+    repair_area?: string;
+    priority?: string;
+    repair_category?: string;
+  }>): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/repairs/personal/${id}`;
+
+    return this.http.put(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
   // ==================== Common Issues ====================
 
   /**
@@ -409,10 +419,25 @@ export class RestService {
         }
       });
     }
-    const url = `${this.apiUrl}/api/repairs/common${
-      queryParams.toString() ? `?${queryParams.toString()}` : ''
-    }`;
+    const url = `${this.apiUrl}/api/repairs/common${queryParams.toString() ? `?${queryParams.toString()}` : ''
+      }`;
     return this.http.get(url, this.getHttpOptions());
+  }
+
+  // ==================== Juristic Members ====================
+
+  /**
+   * Get juristic members for a project
+   */
+  getJuristicMembers(projectId: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/members`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
   }
 
   /**
