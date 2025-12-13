@@ -20,6 +20,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   isLoading = false;
+  showPassword = false;
+  thaiWarning = {
+    email: false,
+    password: false
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -32,7 +37,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
@@ -89,5 +94,26 @@ export class LoginComponent implements OnInit {
       }
     }
     return '';
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  checkThaiInput(fieldName: 'email' | 'password', event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+
+    // Check if the input contains Thai characters (Unicode range: 0E00-0E7F)
+    const thaiRegex = /[\u0E00-\u0E7F]/;
+    const hasThai = thaiRegex.test(value);
+
+    this.thaiWarning[fieldName] = hasThai;
+
+    // If Thai characters are detected, remove them from the input
+    if (hasThai) {
+      const cleanedValue = value.replace(/[\u0E00-\u0E7F]/g, '');
+      this.loginForm.get(fieldName)?.setValue(cleanedValue, { emitEvent: false });
+    }
   }
 }

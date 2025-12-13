@@ -31,6 +31,7 @@ interface Issue {
   priority: string;
   status: IssueStatus;
   reportedBy: string;
+  reportedTel: string;
   assignedTo: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -73,6 +74,7 @@ export class IssueComponent implements OnInit {
     'priority',
     'status',
     'reportedBy',
+    'reportedTel',
     'assignedTo',
     'createdAt',
     'attachment',
@@ -232,6 +234,7 @@ export class IssueComponent implements OnInit {
       priority: item.priority,
       status: (item.status as IssueStatus) || 'pending',
       reportedBy: item.reporter_name,
+      reportedTel: item.reporter_tel,
       assignedTo: item.assigned_to,
       createdAt: new Date(item.submitted_date),
       updatedAt: new Date(item.updated_at),

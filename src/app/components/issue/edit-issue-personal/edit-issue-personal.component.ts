@@ -15,6 +15,11 @@ import { BehaviorSubject } from 'rxjs';
 import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.component';
 import { RestService, PersonalRepair } from '../../../services/rest.service';
 
+interface AttachmentUrl {
+  url: string;
+  public_id: string;
+}
+
 @Component({
   selector: 'app-edit-issue-personal',
   standalone: true,
@@ -42,6 +47,12 @@ export class EditIssuePersonalComponent implements OnInit {
   editForm: FormGroup;
   issue?: PersonalRepair;
   juristicMembers: any[] = [];
+
+  // Image upload properties
+  attachmentUrls: AttachmentUrl[] = [];
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
+  uploadProgress = 0;
 
   statusOptions = [
     { value: 'pending', label: 'รอดำเนินการ' },
@@ -85,9 +96,9 @@ export class EditIssuePersonalComponent implements OnInit {
     private router: Router
   ) {
     this.editForm = this.fb.group({
-      repair_area: ['', Validators.required],
+      repair_area: [{ value: '', disabled: true }, Validators.required],
       priority: ['', Validators.required],
-      repair_category: ['', Validators.required],
+      repair_category: [{ value: '', disabled: true }, Validators.required],
       status: ['', Validators.required],
       assigned_to: [''],
       notes: [''],
@@ -125,12 +136,19 @@ export class EditIssuePersonalComponent implements OnInit {
       .subscribe({
         next: (data: PersonalRepair) => {
           this.issue = data;
+
+          // Load existing image if available
+          if (this.issue.image_urls && this.issue.image_urls.length > 0) {
+            this.previewUrl = this.issue.image_urls[0].url;
+            this.attachmentUrls = this.issue.image_urls;
+          }
+
           this.editForm.patchValue({
             repair_area: this.issue.repair_area,
             priority: this.issue.priority,
             repair_category: this.issue.repair_category,
             status: this.issue.status,
-            assigned_to: this.issue.assigned_to, // This should be ID if available, but PersonalRepair interface shows it as string (name)
+            assigned_to: this.issue.assigned_to,
             notes: this.issue.notes,
             estimated_cost: this.issue.estimated_cost,
             actual_cost: this.issue.actual_cost
@@ -143,6 +161,24 @@ export class EditIssuePersonalComponent implements OnInit {
           this.isLoading.next(false);
         }
       });
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewUrl = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
+  removeFile() {
+    this.selectedFile = null;
+    this.previewUrl = null;
   }
 
   onSubmit() {

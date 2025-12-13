@@ -27,7 +27,7 @@ type AnnouncementStatus = StatusType | 'all';
 type StatusType = 'published' | 'draft' | 'unpublished';
 // สร้าง interface สำหรับข้อมูล
 interface Announcement {
-  id: number;
+  id: string;
   title: string;
   content: string;
   type: string; // เพิ่ม type field
@@ -231,7 +231,7 @@ export class AnnouncementComponent implements OnInit {
   loadAnnouncements() {
     this.isLoading.next(true);
     this.rest
-      .getAnnouncements()
+      .getAnnouncementsByProject() // ใช้ getAnnouncementsByProject แทน getAnnouncements
       .pipe(
         map((response: AnnouncementResponse) => {
           return response.data.map((item: ApiAnnouncement) => {
@@ -260,7 +260,7 @@ export class AnnouncementComponent implements OnInit {
               : null;
 
             return {
-              id: Number(item.id.replace('annc', '')),
+              id: item.id,
               title: item.title,
               content: item.content,
               type: item.type, // เพิ่ม type field  
@@ -305,7 +305,7 @@ export class AnnouncementComponent implements OnInit {
     }
 
     this.rest
-      .getAnnouncements(params)
+      .getAnnouncementsByProject(params) // ใช้ getAnnouncementsByProject แทน getAnnouncements
       .pipe(
         map((response: AnnouncementResponse) => {
           return response.data.map((item: ApiAnnouncement) => {
@@ -332,7 +332,7 @@ export class AnnouncementComponent implements OnInit {
               : null;
 
             return {
-              id: Number(item.id.replace('annc', '')),
+              id: item.id,
               title: item.title,
               content: item.content,
               type: item.type, // เพิ่ม type field
@@ -416,7 +416,7 @@ export class AnnouncementComponent implements OnInit {
   }
 
   viewDetails(announcement: Announcement): void {
-    this.router.navigate(['/announcement/detail', `annc${announcement.id}`]);
+    this.router.navigate(['/announcement/detail', announcement.id]);
   }
 
   handlePageEvent(event: PageEvent) {

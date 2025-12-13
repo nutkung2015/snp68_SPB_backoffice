@@ -53,6 +53,7 @@ export class CustomThemeAppComponent implements OnInit {
   previewTheme: Partial<ThemeSettings> = {};
   isDefaultTheme = true;
   hasExistingCustomization = false; // ตรวจสอบว่ามี customization อยู่แล้วหรือไม่
+  selectedFile: File | null = null;
 
   quickActions = [
     { icon: 'receipt', label: 'บิลค่าใช้จ่าย' },
@@ -153,18 +154,31 @@ export class CustomThemeAppComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: Event, type: 'logo' | 'favicon') {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (file) {
+      // ตรวจสอบประเภทไฟล์
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!validTypes.includes(file.type)) {
+        alert('รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
+        return;
+      }
+
+      // ตรวจสอบขนาดไฟล์
+      if (file.size > maxSize) {
+        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
+        return;
+      }
+
+      console.log('Selected file:', file);
+      this.selectedFile = file;
+
+      // แสดง preview ของรูปที่เลือก
       const reader = new FileReader();
       reader.onload = () => {
-        const url = reader.result as string;
-        if (type === 'logo') {
-          this.theme.logo_url = url;
-        } else {
-          this.theme.favicon_url = url;
-        }
+        this.theme.logo_url = reader.result as string;
         this.updatePreview();
         this.isDefaultTheme = false;
       };
@@ -188,33 +202,44 @@ export class CustomThemeAppComponent implements OnInit {
   // สร้าง customization ใหม่
   createTheme() {
     const apiUrl = `${environment.apiUrl}/api/project-customizations`;
-    const payload = {
-      project_id:
-        this.theme.project_id || localStorage.getItem('project_id') || '',
-      primary_color: this.theme.primary_color,
-      secondary_color: this.theme.secondary_color,
-      logo_url: this.theme.logo_url,
-      favicon_url: this.theme.favicon_url,
-    };
 
-    console.log('Creating new theme with payload:', payload);
+    // สร้าง FormData สำหรับส่งไฟล์และข้อมูลอื่นๆ
+    const formData = new FormData();
+    const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
 
-    this.http.post(apiUrl, payload).subscribe({
+    formData.append('project_id', projectId);
+    formData.append('primary_color', this.theme.primary_color);
+    formData.append('secondary_color', this.theme.secondary_color);
+
+    // เพิ่มไฟล์โลโก้ถ้ามีการเลือก
+    if (this.selectedFile) {
+      formData.append('logo', this.selectedFile, this.selectedFile.name);
+    }
+
+    console.log('Creating new theme with FormData');
+
+    this.http.post(apiUrl, formData).subscribe({
       next: (response: any) => {
         console.log('Create API Response:', response);
+
+        // อัปเดต logo_url จาก response ที่ได้จาก Cloudinary
+        if (response.data && response.data.logo_url) {
+          this.theme.logo_url = response.data.logo_url;
+          this.updatePreview();
+        }
 
         // บันทึกข้อมูลลง localStorage ในคีย์ projectCustomizations
         try {
           const customizationData = {
-            customization_id: response.customization_id || response.id,
+            customization_id: response.data?.id || response.customization_id || response.id,
             project_id: this.theme.project_id,
             primary_color: this.theme.primary_color,
             secondary_color: this.theme.secondary_color,
-            accent_color: response.accent_color || null,
-            logo_url: this.theme.logo_url,
+            accent_color: response.data?.accent_color || response.accent_color || null,
+            logo_url: response.data?.logo_url || this.theme.logo_url,
             favicon_url: this.theme.favicon_url,
-            created_at: response.created_at || new Date().toISOString(),
-            updated_at: response.updated_at || new Date().toISOString(),
+            created_at: response.data?.created_at || response.created_at || new Date().toISOString(),
+            updated_at: response.data?.updated_at || response.updated_at || new Date().toISOString(),
           };
 
           localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));
@@ -245,18 +270,29 @@ export class CustomThemeAppComponent implements OnInit {
   updateTheme() {
     const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
     const apiUrl = `${environment.apiUrl}/api/project-customizations/${projectId}`;
-    const payload = {
-      primary_color: this.theme.primary_color,
-      secondary_color: this.theme.secondary_color,
-      logo_url: this.theme.logo_url,
-      favicon_url: this.theme.favicon_url,
-    };
 
-    console.log('Updating theme with payload:', payload);
+    // สร้าง FormData สำหรับส่งไฟล์และข้อมูลอื่นๆ
+    const formData = new FormData();
 
-    this.http.put(apiUrl, payload).subscribe({
+    formData.append('primary_color', this.theme.primary_color);
+    formData.append('secondary_color', this.theme.secondary_color);
+
+    // เพิ่มไฟล์โลโก้ถ้ามีการเลือกใหม่
+    if (this.selectedFile) {
+      formData.append('logo', this.selectedFile, this.selectedFile.name);
+    }
+
+    console.log('Updating theme with FormData');
+
+    this.http.put(apiUrl, formData).subscribe({
       next: (response: any) => {
         console.log('Update API Response:', response);
+
+        // อัปเดต logo_url จาก response ที่ได้จาก Cloudinary (ถ้ามีการอัปโหลดใหม่)
+        if (response.data && response.data.logo_url) {
+          this.theme.logo_url = response.data.logo_url;
+          this.updatePreview();
+        }
 
         // อัปเดตข้อมูลใน localStorage
         try {
@@ -265,9 +301,9 @@ export class CustomThemeAppComponent implements OnInit {
             ...existingData,
             primary_color: this.theme.primary_color,
             secondary_color: this.theme.secondary_color,
-            logo_url: this.theme.logo_url,
+            logo_url: response.data?.logo_url || this.theme.logo_url,
             favicon_url: this.theme.favicon_url,
-            updated_at: response.updated_at || new Date().toISOString(),
+            updated_at: response.data?.updated_at || response.updated_at || new Date().toISOString(),
           };
 
           localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));

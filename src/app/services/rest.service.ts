@@ -113,6 +113,7 @@ export interface PersonalRepair {
   status: string;
   reporter_name: string;
   reporter_id: string;
+  reporter_tel: string;
   image_urls: {
     url: string;
     public_id: string;
@@ -136,6 +137,22 @@ export interface PersonalRepairResponse {
     total: number;
   };
 }
+// ... existing interfaces ...
+
+export interface HouseModel {
+  id: number;
+  project_id: string;
+  model_name: string;
+  plan_file_url: string | null;
+  detail_file_url: string | null;
+  updated_at: string;
+}
+
+export interface GenericApiResponse<T> {
+  status: 'success' | 'error';
+  message?: string;
+  data?: T;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -157,7 +174,57 @@ export class RestService {
     this.isLoadingSubject.next(true);
     return this.http
       .get<AnnouncementResponse>(`${this._apiUrl}/api/announcements`, {
+        ...this.getHttpOptions(),
         params,
+      })
+      .pipe(
+        catchError((error) => this.handleError(error)),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
+  }
+
+  /**
+   * Get announcements for a specific project (resident view)
+   * Automatically retrieves project_id from projectMemberships in localStorage
+   */
+  getAnnouncementsByProject(params?: any): Observable<AnnouncementResponse> {
+    this.isLoadingSubject.next(true);
+
+    // ดึง project_id จาก projectMemberships ใน localStorage
+    let projectId: string | null = null;
+    const projectMembershipsStr = localStorage.getItem('projectMemberships');
+    if (projectMembershipsStr) {
+      try {
+        const projectMemberships = JSON.parse(projectMembershipsStr);
+        // ถ้ามี projectMemberships และมีข้อมูล ให้เอา project_id จากตัวแรก
+        if (projectMemberships && projectMemberships.length > 0) {
+          projectId = projectMemberships[0].project_id;
+          console.log('RestService: Using project_id from memberships:', projectId);
+        }
+      } catch (e) {
+        console.error('RestService: Error parsing projectMemberships:', e);
+      }
+    }
+
+    // สร้าง HttpParams และเพิ่ม project_id
+    let httpParams = new HttpParams();
+    if (projectId) {
+      httpParams = httpParams.set('project_id', projectId);
+    }
+
+    // เพิ่ม params อื่นๆ ที่ส่งมา
+    if (params) {
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+
+    return this.http
+      .get<AnnouncementResponse>(`${this._apiUrl}/api/announcements/resident`, {
+        ...this.getHttpOptions(),
+        params: httpParams,
       })
       .pipe(
         catchError((error) => this.handleError(error)),
@@ -169,7 +236,8 @@ export class RestService {
     this.isLoadingSubject.next(true);
     return this.http
       .get<{ status: string; data: Announcement }>(
-        `${this._apiUrl}/api/announcements/${id}`
+        `${this._apiUrl}/api/announcements/${id}`,
+        this.getHttpOptions()
       )
       .pipe(
         map((response) => response.data),
@@ -185,7 +253,8 @@ export class RestService {
     return this.http
       .post<{ status: string; data: Announcement }>(
         `${this._apiUrl}/api/announcements`,
-        announcement
+        announcement,
+        this.getHttpOptions()
       )
       .pipe(
         map((response) => response.data),
@@ -196,8 +265,26 @@ export class RestService {
 
   createAnnouncementMultipart(formData: FormData): Observable<HttpEvent<any>> {
     this.isLoadingSubject.next(true);
+
+    // ดึง project_id จาก projectMemberships ใน localStorage
+    const projectMembershipsStr = localStorage.getItem('projectMemberships');
+    if (projectMembershipsStr) {
+      try {
+        const projectMemberships = JSON.parse(projectMembershipsStr);
+        // ถ้ามี projectMemberships และมีข้อมูล ให้เอา project_id จากตัวแรก
+        if (projectMemberships && projectMemberships.length > 0) {
+          const projectId = projectMemberships[0].project_id;
+          formData.append('project_id', projectId);
+          console.log('RestService: Added project_id to FormData:', projectId);
+        }
+      } catch (e) {
+        console.error('RestService: Error parsing projectMemberships:', e);
+      }
+    }
+
     return this.http
       .post(`${this._apiUrl}/api/announcements`, formData, {
+        ...this.getHttpOptionsForFormData(),
         reportProgress: true,
         observe: 'events',
       })
@@ -215,7 +302,8 @@ export class RestService {
     return this.http
       .put<{ status: string; data: Announcement }>(
         `${this._apiUrl}/api/announcements/${id}`,
-        announcement
+        announcement,
+        this.getHttpOptions()
       )
       .pipe(
         map((response) => response.data),
@@ -230,7 +318,8 @@ export class RestService {
     this.isLoadingSubject.next(true);
     return this.http
       .delete<{ status: string; message: string }>(
-        `${this._apiUrl}/api/announcements/${id}`
+        `${this._apiUrl}/api/announcements/${id}`,
+        this.getHttpOptions()
       )
       .pipe(
         catchError((error) => this.handleError(error)),
@@ -245,6 +334,7 @@ export class RestService {
 
     return this.http
       .post(`${this._apiUrl}/api/announcements/upload`, formData, {
+        ...this.getHttpOptionsForFormData(),
         reportProgress: true,
         observe: 'events',
       })
@@ -258,6 +348,15 @@ export class RestService {
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
+        Authorization:
+          'Bearer ' + localStorage.getItem(environment.auth.tokenKey),
+      }),
+    };
+  }
+
+  private getHttpOptionsForFormData() {
+    return {
+      headers: new HttpHeaders({
         Authorization:
           'Bearer ' + localStorage.getItem(environment.auth.tokenKey),
       }),
@@ -410,8 +509,13 @@ export class RestService {
   /**
    * Get all common issues
    */
-  getCommonIssues(params?: any): Observable<any> {
+  getCommonIssues(params?: any): Observable<PersonalRepairResponse> {
+    this.isLoadingSubject.next(true);
+
+    // สร้าง HttpParams
     let queryParams = new HttpParams();
+
+    // เพิ่ม params ทั้งหมดที่ส่งมา
     if (params) {
       Object.keys(params).forEach((key) => {
         if (params[key] && params[key] !== 'all') {
@@ -419,9 +523,18 @@ export class RestService {
         }
       });
     }
-    const url = `${this.apiUrl}/api/repairs/common${queryParams.toString() ? `?${queryParams.toString()}` : ''
-      }`;
-    return this.http.get(url, this.getHttpOptions());
+
+    const url = `${this.apiUrl}/api/repairs/common`;
+
+    return this.http
+      .get<PersonalRepairResponse>(url, {
+        ...this.getHttpOptions(),
+        params: queryParams,
+      })
+      .pipe(
+        catchError((error) => this.handleError(error)),
+        finalize(() => this.isLoadingSubject.next(false))
+      );
   }
 
   // ==================== Juristic Members ====================
@@ -449,11 +562,11 @@ export class RestService {
   }
 
   /**
-   * Update common issue status
+   * Update common issue (status, assigned_to, notes)
    */
-  updateCommonIssueStatus(id: string, statusData: any): Observable<any> {
+  updateCommonIssueStatus(id: string, data: any): Observable<any> {
     const url = `${this.apiUrl}/api/repairs/common/${id}`;
-    return this.http.patch(url, statusData, this.getHttpOptions());
+    return this.http.patch(url, data, this.getHttpOptions());
   }
 
   /**
@@ -564,6 +677,86 @@ export class RestService {
       }),
       catchError(this.handleError.bind(this))
     );
+  }
+
+  // ==================== House Project Management ====================
+
+  /**
+   * ดึงข้อมูลแบบบ้านทั้งหมดในโครงการ
+   * GET /api/projects/:id/house-models
+   */
+  getHouseModels(projectId: string): Observable<GenericApiResponse<HouseModel[]>> {
+    const url = `${this.apiUrl}/api/projects/${projectId}/house-models`;
+    return this.http.get<GenericApiResponse<HouseModel[]>>(url, this.getHttpOptions());
+  }
+
+  /**
+   * บันทึกหรืออัปเดตข้อมูลไฟล์ของแบบบ้าน (Upsert)
+   * POST /api/house-models
+   * รับ FormData ที่มี project_id, model_name, files
+   */
+  saveHouseModel(data: FormData): Observable<GenericApiResponse<HouseModel>> {
+    // เปลี่ยนจาก /api/house-models เป็น /api/projects/house-models
+    const url = `${this.apiUrl}/api/projects/house-models`;
+    return this.http.post<GenericApiResponse<HouseModel>>(url, data, this.getHttpOptionsForFormData());
+  }
+
+  /**
+   * ลบข้อมูลแบบบ้าน
+   * DELETE /api/house-models/:id
+   */
+  deleteHouseModel(id: number): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/house-models/${id}`;
+    return this.http.delete<GenericApiResponse<any>>(url, this.getHttpOptions());
+  }
+
+  // ==================== Project Information (Village Info) ====================
+
+  /**
+   * ข้อมูลหมู่บ้าน (Project Info)
+   * GET /api/projects/info-docs?project_id={project_id}
+   */
+  getProjectInfoDocs(projectId: string): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/projects/info-docs`;
+    const params = new HttpParams().set('project_id', projectId);
+    return this.http.get<GenericApiResponse<any>>(url, { ...this.getHttpOptions(), params });
+  }
+
+  /**
+   * บันทึกข้อมูลหมู่บ้าน (Project Info)
+   * POST /api/projects/info-docs
+   * ส่ง project_id ใน FormData (ดึงจาก localStorage อัตโนมัติ)
+   */
+  saveProjectInfoDocs(data: FormData): Observable<GenericApiResponse<any>> {
+    // ดึง project_id จาก projectMemberships ใน localStorage
+    const projectMembershipsStr = localStorage.getItem('projectMemberships');
+    if (projectMembershipsStr) {
+      try {
+        const projectMemberships = JSON.parse(projectMembershipsStr);
+        // ถ้ามี projectMemberships และมีข้อมูล ให้เอา project_id จากตัวแรก
+        if (projectMemberships && projectMemberships.length > 0) {
+          const projectId = projectMemberships[0].project_id;
+          // เช็คว่ามี project_id ใน FormData แล้วหรือยัง ถ้ายังให้ append
+          if (!data.has('project_id')) {
+            data.append('project_id', projectId);
+            console.log('RestService: Added project_id to FormData:', projectId);
+          }
+        }
+      } catch (e) {
+        console.error('RestService: Error parsing projectMemberships:', e);
+      }
+    }
+
+    const url = `${this.apiUrl}/api/projects/info-docs`;
+    return this.http.post<GenericApiResponse<any>>(url, data, this.getHttpOptionsForFormData());
+  }
+
+  deleteProjectInfoDocs(projectId: string, fileType: 'rules' | 'project_detail'): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/projects/info-docs`;
+    return this.http.delete<GenericApiResponse<any>>(url, {
+      ...this.getHttpOptions(),
+      body: { project_id: projectId, file_type: fileType }
+    });
   }
 
   /**

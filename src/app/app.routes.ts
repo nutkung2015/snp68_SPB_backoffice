@@ -7,6 +7,7 @@ import { AuthGuard } from './services/auth.guard';
 import { AnnouncementComponent } from './components/announcement/announcement.component';
 import { NoProjectLayoutComponent } from './components/no-project-layout/no-project-layout.component';
 import { JoinUnitComponent } from './components/join-unit/join-unit.component';
+// import {  } from './components/issue/issue.component';
 
 export const routes: Routes = [
   {
@@ -178,10 +179,83 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'issue-common',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/issue-common/issue-common.component').then(
+                (m) => m.IssueCommonComponent
+              ),
+          },
+          // {
+          //   path: 'create',
+          //   loadComponent: () =>
+          //     import(
+          //       './components/issue-common/create-issue-common/create-issue-common.component'
+          //     ).then((m) => m.CreateIssueCommonComponent),
+          // },
+          {
+            path: 'detail/:id',
+            loadComponent: () =>
+              import(
+                './components/issue-common/issue-common-detail/issue-common-detail.component'
+              ).then((m) => m.IssueCommonDetailComponent),
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () =>
+              import(
+                './components/issue-common/issue-common-edit/issue-common-edit.component'
+              ).then((m) => m.IssueCommonEditComponent),
+          },
+        ],
+      },
+      {
         path: 'custom-theme-app',
         loadComponent: () =>
           import('./components/custom-theme-app/custom-theme-app.component').then(
             (m) => m.CustomThemeAppComponent
+          ),
+      },
+      {
+        path: 'residents-management',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/residents-management/residents-management.component').then(
+                (m) => m.ResidentsManagementComponent
+              ),
+          },
+          // {
+          //   path: 'create',
+          //   loadComponent: () =>
+          //     import('./components/residents-management/create-resident/create-resident.component').then(
+          //       (m) => m.CreateResidentComponent
+          //     ),
+          // },
+          // {
+          //   path: 'detail/:id',
+          //   loadComponent: () =>
+          //     import('./components/residents-management/detail-resident/detail-resident.component').then(
+          //       (m) => m.DetailResidentComponent
+          //     ),
+          // },
+          // {
+          //   path: 'edit/:id',
+          //   loadComponent: () =>
+          //     import('./components/residents-management/edit-resident/edit-resident.component').then(
+          //       (m) => m.EditResidentComponent
+          //     ),
+          // },
+        ],
+      },
+      {
+        path: 'information-home-project',
+        loadComponent: () =>
+          import('./components/infomation-home-project-management/infomation-home-project-management.component').then(
+            (m) => m.InfomationHomeProjectManagementComponent
           ),
       },
     ],

@@ -5,7 +5,7 @@
   </div>
 
   <!-- Page Header -->
-  <app-page-header iconSrc="assets/icons/problem.svg" title="จัดการรายงานปัญหา" subtitle="Issue Management"
+  <app-page-header iconSrc="assets/icons/problem.svg" title="จัดการปัญหาส่วนบุคคล" subtitle="Issue Management"
     iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
       <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
@@ -151,6 +151,11 @@
               <td mat-cell *matCellDef="let element">{{ element.reportedBy }}</td>
             </ng-container>
 
+            <ng-container matColumnDef="reportedTel">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>เบอร์โทรศัพท์</th>
+              <td mat-cell *matCellDef="let element">{{ element.reportedTel }}</td>
+            </ng-container>
+
             <!-- Assigned To Column -->
             <ng-container matColumnDef="assignedTo">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>ผู้รับผิดชอบ</th>
@@ -218,7 +223,7 @@
                 รายละเอียด
               </th>
               <td mat-cell *matCellDef="let element" style="padding-left: 24px">
-                <a mat-button color="primary" (click)="viewDetails(element)">รายละเอียดเพิ่มเติม</a>
+                <a mat-button color="primary" (click)="viewDetails(element)">ตรวจสอบและแก้ไข</a>
               </td>
             </ng-container>
 
@@ -243,10 +248,10 @@
         <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
           <mat-icon>info_outline</mat-icon>
           <p>ไม่พบข้อมูลรายงานปัญหา</p>
-          <button mat-raised-button color="primary" (click)="onCreateNew()">
+          <!-- <button mat-raised-button color="primary" (click)="onCreateNew()">
             <mat-icon>add</mat-icon>
             <span>รายงานปัญหาใหม่</span>
-          </button>
+          </button> -->
         </div>
       </ng-template>
     </mat-card>

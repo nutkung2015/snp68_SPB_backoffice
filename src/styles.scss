@@ -1,12 +1,46 @@
 /* You can add global styles to this file, and also import other style files */
 
+// LINE Seed Sans Font Family
+@font-face {
+  font-family: 'LINE Seed Sans TH';
+  src: url('/assets/fonts/LINESEEDSANSTH_A_HE.TTF') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LINE Seed Sans TH';
+  src: url('/assets/fonts/LINESEEDSANSTH_A_RG.TTF') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LINE Seed Sans TH';
+  src: url('/assets/fonts/LINESEEDSANSTH_A_XBD.TTF') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LINE Seed Sans TH';
+  src: url('/assets/fonts/LINESEEDSANSTH_A.TTF') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'LINE Seed Sans TH', sans-serif;
 }
 
 // Color

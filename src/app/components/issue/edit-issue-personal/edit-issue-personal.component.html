@@ -20,6 +20,38 @@
         <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
             <mat-card>
                 <div fxLayout="column" fxLayoutGap="24px" style="max-width: 80% !important;">
+                    <!-- File Upload Section -->
+                    <div class="file-upload">
+                        <mat-label class="field-label">รูปภาพแนบ</mat-label>
+                        <div class="upload-container" (click)="fileInput.click()">
+                            <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none"
+                                accept="image/*" />
+                            <ng-container *ngIf="!previewUrl && !selectedFile">
+                                <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                                    <mat-icon>cloud_upload</mat-icon>
+                                    <span>คลิกเพื่ออัพโหลดรูปภาพ</span>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="previewUrl || selectedFile">
+                                <div class="preview-container">
+                                    <img [src]="previewUrl" alt="Preview" />
+                                    <button mat-icon-button class="remove-button"
+                                        (click)="removeFile(); $event.stopPropagation()">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
+
+                            <!-- Progress Bar -->
+                            <mat-progress-bar *ngIf="uploadProgress > 0" mode="determinate" [value]="uploadProgress"
+                                style="width: 100%; margin-top: 10px"></mat-progress-bar>
+                        </div>
+                        <span class="upload-hint">รองรับไฟล์: JPG, PNG, WebP<br>
+                            ขนาดไม่เกิน 5MB</span>
+                        <div *ngIf="uploadProgress > 0" class="upload-progress">
+                            Upload Progress: {{ uploadProgress }}%
+                        </div>
+                    </div>
 
                     <!-- Form Fields -->
                     <div class="field-row">
@@ -73,17 +105,17 @@
                             </mat-select>
                         </mat-form-field>
 
-                        <mat-form-field class="half-width" appearance="outline">
+                        <!-- <mat-form-field class="half-width" appearance="outline">
                             <mat-label>ราคาประเมิน</mat-label>
                             <input matInput type="number" formControlName="estimated_cost">
-                        </mat-form-field>
+                        </mat-form-field> -->
                     </div>
 
                     <div class="field-row">
-                        <mat-form-field class="half-width" appearance="outline">
+                        <!-- <mat-form-field class="half-width" appearance="outline">
                             <mat-label>ราคาจริง</mat-label>
                             <input matInput type="number" formControlName="actual_cost">
-                        </mat-form-field>
+                        </mat-form-field> -->
                     </div>
 
                     <mat-form-field class="full-width" appearance="outline">
@@ -95,10 +127,10 @@
                 <!-- Action Buttons -->
                 <div class="action-buttons" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px"
                     style="max-width: 80% !important;">
-                    <button mat-stroked-button type="button" (click)="onCancel()">
+                    <button mat-stroked-button class="btn-cancel" type="button" (click)="onCancel()">
                         ยกเลิก
                     </button>
-                    <button mat-flat-button color="primary" type="submit" [disabled]="!editForm.valid">
+                    <button mat-flat-button class="btn-edit" color="primary" type="submit" [disabled]="!editForm.valid">
                         บันทึก
                     </button>
                 </div>

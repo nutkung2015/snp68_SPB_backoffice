@@ -9,6 +9,8 @@ import { BehaviorSubject } from 'rxjs';
 import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.component';
 import { MatLabel } from '@angular/material/form-field';
 import { RestService, PersonalRepair } from '../../../services/rest.service';
+import { IssuePersonalConfirmDeleteComponent } from '../../dialog/issue-personal-confirm-delete/issue-personal-confirm-delete.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface ImageUrl {
   url: string;
@@ -40,8 +42,9 @@ export class DetailIssuePersonalComponent implements OnInit {
     private http: HttpClient,
     private rest: RestService,
     private route: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit() {
     const id = this.route.snapshot.params['id'];
@@ -51,7 +54,7 @@ export class DetailIssuePersonalComponent implements OnInit {
   loadIssue(id: string) {
     // ถ้า id มี prefix 'iss' ให้ตัดออก
     const cleanId = id.startsWith('iss') ? id.replace('iss', '') : id;
-    
+
     this.rest.getPersonalRepairById(cleanId).subscribe({
       next: (data: PersonalRepair) => {
         this.issue = data;
@@ -107,17 +110,30 @@ export class DetailIssuePersonalComponent implements OnInit {
   }
 
   onDelete(): void {
-    // if (this.issue?.id) {
-    //   // เช็ค id ด้วยเพื่อให้แน่ใจว่ามีค่า   
-    //   const dialogRef = this.dialog.open(IssueConfirmDeleteComponent, {
-    //     width: '400px',
-    //     data: {},
-    //   });
-    //   dialogRef.afterClosed().subscribe((result) => {
-    //     if (result) {
-    //       if (!this.issue?.id) { return; }
-    //     }
-    //   });
-    // }
+    if (this.issue?.id) {
+
+      const dialogRef = this.dialog.open(IssuePersonalConfirmDeleteComponent, {
+        width: '400px',
+        data: {
+          toppic: 'คุณต้องการลบงานช่างช่างนี้หรือไม่?',
+          cancel: 'ยกเลิก',
+          confirm: 'ยืนยัน'
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: boolean) => {
+        if (result) {
+          if (!this.issue?.id) { return; }
+          this.rest.deletePersonalRepair(this.issue.id).subscribe({
+            next: () => {
+              this.router.navigate(['/issue']);
+            },
+            error: (error) => {
+              console.error('Error deleting issue:', error);
+            }
+          });
+        }
+      });
+    }
   }
 }

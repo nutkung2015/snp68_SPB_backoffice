@@ -20,7 +20,7 @@
     // สำหรับใส่รูป banner
     // ถ้าต้องการใส่รูปผ่าน CSS:
     // background-image: url('assets/images/banner.jpg');
-    
+
     // หรือใส่ผ่าน HTML แล้วใช้ class:
     img {
       width: 100%;
@@ -29,7 +29,7 @@
     }
   }
 
-  .login-section{
+  .login-section {
     flex: 1;
     min-height: 100vh;
     display: flex;
@@ -67,6 +67,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -134,6 +135,65 @@
       color: #e74c3c;
       font-size: 12px;
       margin-top: 4px;
+    }
+
+    .warning-message {
+      color: #f39c12;
+      font-size: 12px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background-color: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 6px;
+      animation: fadeIn 0.3s ease-in-out;
+
+      svg {
+        flex-shrink: 0;
+        color: #f39c12;
+      }
+    }
+
+    .password-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      input {
+        padding-right: 45px; // Make room for the toggle button
+      }
+
+      .password-toggle-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        transition: all 0.2s ease;
+        border-radius: 4px;
+
+        &:hover {
+          color: #667eea;
+          background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        &:active {
+          transform: translateY(-50%) scale(0.95);
+        }
+
+        svg {
+          display: block;
+        }
+      }
     }
   }
 
@@ -215,9 +275,26 @@
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 // Responsive Design

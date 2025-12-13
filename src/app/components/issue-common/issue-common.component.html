@@ -1,0 +1,236 @@
+<div class="issue-page">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading$ | async">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/problem.svg" title="จัดการปัญหาส่วนกลาง" subtitle="Common Issue Management"
+        iconColor="invert(100%)">
+        <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
+                <div style="display: flex; align-items: center; gap: 5px">
+                    <mat-icon>add</mat-icon>
+                    <span>รายงานปัญหาใหม่</span>
+                </div>
+            </button>
+        </div>
+    </app-page-header>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-container">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+                <!-- Search Section -->
+                <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                    <div class="filter-input right" fxFlex="350px">
+                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
+                            <mat-icon class="secondary">search</mat-icon>
+                            <input matInput type="text" (keyup)="applyFilter($event)" placeholder="ค้นหาปัญหา"
+                                style="border: none; width: 100%; height: 100%" />
+                        </div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                        <div fxFlex="50px" fxLayoutAlign="end center">
+                            <span>สถานะ</span>
+                        </div>
+                        <div class="filter-input left" fxFlex style="height: 100%">
+                            <mat-select [(ngModel)]="selectedStatus" (selectionChange)="filterByStatus($event)">
+                                <mat-option *ngFor="let status of statuses" [value]="status.value">
+                                    {{ status.label }}
+                                </mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+
+                    <!-- Type Filter -->
+                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                        <div fxFlex="50px" fxLayoutAlign="end center">
+                            <span>ประเภท</span>
+                        </div>
+                        <div class="filter-input left" fxFlex style="height: 100%">
+                            <mat-select [(ngModel)]="selectedType" (selectionChange)="filterByType($event)">
+                                <mat-option *ngFor="let type of types" [value]="type.value">
+                                    {{ type.label }}
+                                </mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+
+                    <!-- Priority Filter -->
+                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                        <div fxFlex="50px" fxLayoutAlign="end center">
+                            <span>ความสำคัญ</span>
+                        </div>
+                        <div class="filter-input left" fxFlex style="height: 100%">
+                            <mat-select [(ngModel)]="selectedPriority" (selectionChange)="filterByPriority($event)">
+                                <mat-option *ngFor="let priority of priorities" [value]="priority.value">
+                                    {{ priority.label }}
+                                </mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons Section -->
+                <div fxLayout="row" fxLayoutGap="10px">
+                    <button mat-stroked-button class="reset-btn" (click)="onReset()">
+                        รีเซ็ต
+                    </button>
+                    <button mat-stroked-button class="search-btn" (click)="onSearch()">
+                        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
+                            <mat-icon style="width: 14px; height: 14px; font-size: 14px">search</mat-icon>
+                            <span>ค้นหา</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issues Table Section -->
+    <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+        fxLayoutAlign="start stretch" fxLayoutGap.gt-sm="20px">
+        <mat-card fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+            <ng-container *ngIf="dataSource.data.length > 0; else noData">
+                <div class="table-responsive">
+                    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z1">
+                        <!-- Sequence Column -->
+                        <ng-container matColumnDef="sequence">
+                            <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+                            <td mat-cell *matCellDef="let element; let i = index">
+                                {{ i + 1 }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Title Column -->
+                        <ng-container matColumnDef="title">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>หัวข้อปัญหา</th>
+                            <td mat-cell *matCellDef="let element">
+                                <div class="issue-title" (click)="viewDetails(element)">
+                                    {{ element.title }}
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <!-- Type Column -->
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ประเภท</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="type-badge">
+                                    {{ getTypeLabel(element.type) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Priority Column -->
+                        <ng-container matColumnDef="priority">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ความสำคัญ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="priority-badge" [ngClass]="getPriorityBadgeClass(element.priority)">
+                                    {{ getPriorityLabel(element.priority) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Status Column -->
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="status-badge" [ngClass]="getStatusBadgeClass(element.status)">
+                                    {{ getStatusLabel(element.status) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Reported By Column -->
+                        <ng-container matColumnDef="reportedBy">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ผู้รายงาน</th>
+                            <td mat-cell *matCellDef="let element">{{ element.reportedBy }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="reportedTel">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>เบอร์โทรศัพท์</th>
+                            <td mat-cell *matCellDef="let element">{{ element.reportedTel }}</td>
+                        </ng-container>
+
+                        <!-- Assigned To Column -->
+                        <ng-container matColumnDef="assignedTo">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ผู้รับผิดชอบ</th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element.assignedTo || '-' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Created At Column -->
+                        <ng-container matColumnDef="createdAt">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>วันที่รายงาน</th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Due Date Column -->
+                        <ng-container matColumnDef="dueDate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>กำหนดเสร็จ</th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element.dueDate ? (element.dueDate | date: 'dd/MM/yyyy') : '-' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Attachment Column -->
+                        <ng-container matColumnDef="attachment">
+                            <th mat-header-cell *matHeaderCellDef>ไฟล์แนบ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <ng-container *ngIf="
+                    element.hasAttachment && element.attachmentUrls?.length > 0;
+                    else noAttachment
+                  ">
+                                    <button mat-stroked-button class="view-attachment-btn"
+                                        (click)="viewAttachment(element)">
+                                        <mat-icon>search</mat-icon>
+                                        ดู
+                                    </button>
+                                </ng-container>
+                                <ng-template #noAttachment>
+                                    <span class="no-attachment">ไม่มีไฟล์</span>
+                                </ng-template>
+                            </td>
+                        </ng-container>
+
+                        <!-- Details Column -->
+                        <ng-container matColumnDef="details">
+                            <th mat-header-cell *matHeaderCellDef style="padding-left: 24px">
+                                รายละเอียด
+                            </th>
+                            <td mat-cell *matCellDef="let element" style="padding-left: 24px">
+                                <a mat-button color="primary" (click)="viewDetails(element)">ตรวจสอบและแก้ไข</a>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                            [class.selected]="selectedRowIndex === row.id" (click)="selectedRowIndex = row.id">
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <mat-paginator [length]="pageEvent.length" [pageSize]="pageEvent.pageSize"
+                    [pageIndex]="pageEvent.pageIndex" [pageSizeOptions]="[5, 10, 25, 100]"
+                    (page)="handlePageEvent($event)" aria-label="Select page" showFirstLastButtons>
+                </mat-paginator>
+            </ng-container>
+
+            <!-- No Data Template -->
+            <ng-template #noData>
+                <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                    <mat-icon>info_outline</mat-icon>
+                    <p>ไม่พบข้อมูลรายงานปัญหา</p>
+                </div>
+            </ng-template>
+        </mat-card>
+    </div>
+</div>

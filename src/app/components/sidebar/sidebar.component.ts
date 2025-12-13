@@ -14,9 +14,9 @@ import { AuthService } from '../../services/auth.service';
 export class SidebarComponent implements OnInit {
   @Input() isCollapsed = false;
   @Output() sidebarToggle = new EventEmitter<boolean>();
-  
+
   projectName: string = 'ผู้ดูแลระบบนิติบุคคล';
-  
+
   menuItems = [
     {
       title: 'ประกาศ',
@@ -25,9 +25,15 @@ export class SidebarComponent implements OnInit {
       active: false
     },
     {
-      title: 'ปัญหา',
+      title: 'ปัญหาส่วนบุคคล',
       icon: 'assets/icons/problem.svg',
       route: '/issue',
+      active: false
+    },
+    {
+      title: 'ปัญหาส่วนกลาง',
+      icon: 'assets/icons/common-problem.svg',
+      route: '/issue-common',
       active: false
     },
     {
@@ -63,7 +69,7 @@ export class SidebarComponent implements OnInit {
     {
       title: 'จัดการลูกบ้าน',
       icon: 'assets/icons/residents.svg',
-      route: '/residents',
+      route: '/residents-management',
       active: false
     },
     {
@@ -76,6 +82,12 @@ export class SidebarComponent implements OnInit {
       title: 'ธีม',
       icon: 'assets/icons/theme.svg',
       route: '/custom-theme-app',
+      active: false
+    },
+    {
+      title: 'ข้อมูลแบบบ้าน',
+      icon: 'assets/icons/village.svg', // Using village icon temporarily or you can change to a new one
+      route: '/information-home-project',
       active: false
     }
   ];
@@ -116,7 +128,7 @@ export class SidebarComponent implements OnInit {
 
   private updateActiveMenuItem(): void {
     const currentUrl = this.router.url;
-    
+
     // Handle special cases
     if (currentUrl === '/' || currentUrl.startsWith('/announcement')) {
       this.setActiveByRoute('/announcement');

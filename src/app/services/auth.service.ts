@@ -9,7 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 export class AuthService {
   private apiUrl = 'http://localhost:5000/api/auth'; // Adjust your backend API URL
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, userData);
@@ -56,7 +56,9 @@ export class AuthService {
   removeToken(): void {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
-    localStorage.removeItem('projectMemberships'); // Also remove project memberships on logout
+    localStorage.removeItem('projectMemberships');
+    localStorage.removeItem('projectCustomizations');
+    localStorage.removeItem('project_id');
   }
 
   getDecodedToken(): any {

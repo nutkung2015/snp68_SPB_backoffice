@@ -1,0 +1,114 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="issue-common-edit-container">
+    <!-- Header Section -->
+    <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+        <div class="breadcrumb">
+            <span class="sub-header" style="color: #9fa9b6">แจ้งปัญหา / </span>
+            <span class="sub-header" style="color: #171a1e">แก้ไขการแจ้งปัญหา</span>
+        </div>
+        <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <button mat-icon-button (click)="onCancel()" type="button">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <span class="sub-body">แก้ไขการแจ้งปัญหา</span>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="form-content" *ngIf="issue">
+        <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <div fxLayout="column" fxLayoutGap="24px" style="max-width: 80% !important;">
+
+                    <!-- Image Display Section -->
+                    <div class="file-preview" *ngIf="imageUrls.length > 0">
+                        <mat-label class="field-label">รูปภาพแนบ</mat-label>
+                        <div class="image-container">
+                            <img [src]="imageUrls[0].url" alt="รูปภาพการแจ้งปัญหา" />
+                        </div>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ประเภทปัญหา</mat-label>
+                            <!-- Use Select if values match, or Input if free text. Using Select for consistency found in TS -->
+                            <mat-select formControlName="issue_type">
+                                <mat-option *ngFor="let option of repairCategoryOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                                <!-- Fallback for unknown types -->
+                                <mat-option *ngIf="issue.issue_type && !isKnownIssueType(issue.issue_type)"
+                                    [value]="issue.issue_type">
+                                    {{issue.issue_type}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>สถานที่</mat-label>
+                            <!-- Location is free text -->
+                            <input matInput formControlName="location">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ความเร่งด่วน</mat-label>
+                            <mat-select formControlName="priority">
+                                <mat-option *ngFor="let option of priorityOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>สถานะ</mat-label>
+                            <mat-select formControlName="status" required>
+                                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                                    {{option.label}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="full-width-field">
+                        <div class="description-box">
+                            <span class="field-label">รายละเอียดปัญหา</span>
+                            <p class="description-text">{{ issue.description }}</p>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <mat-form-field class="half-width" appearance="outline">
+                            <mat-label>ผู้รับผิดชอบ</mat-label>
+                            <mat-select formControlName="assigned_to">
+                                <mat-option [value]="null">ไม่ระบุ</mat-option>
+                                <mat-option *ngFor="let member of juristicMembers" [value]="member.id">
+                                    {{member.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <mat-form-field class="full-width" appearance="outline">
+                        <mat-label>หมายเหตุ</mat-label>
+                        <textarea matInput formControlName="notes" rows="6"></textarea>
+                    </mat-form-field>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px"
+                    style="max-width: 80% !important;">
+                    <button mat-stroked-button class="btn-cancel" type="button" (click)="onCancel()">
+                        ยกเลิก
+                    </button>
+                    <button mat-flat-button class="btn-edit" color="primary" type="submit" [disabled]="!editForm.valid">
+                        บันทึก
+                    </button>
+                </div>
+            </mat-card>
+        </form>
+    </div>
+</div>

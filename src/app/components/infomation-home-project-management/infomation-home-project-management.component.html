@@ -1,0 +1,245 @@
+<app-page-header iconSrc="assets/icons/building.svg" title="จัดการข้อมูลแบบบ้าน"
+    subtitle="จัดการไฟล์แปลนบ้านและรายละเอียดสำหรับแต่ละแบบบ้าน" iconColor="invert(100%)">
+    <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+        <mat-button-toggle-group #group="matButtonToggleGroup" [value]="viewMode" (change)="setViewMode(group.value)">
+            <mat-button-toggle value="house_models">จัดการแบบบ้าน</mat-button-toggle>
+            <mat-button-toggle value="project_info">จัดการข้อมูลหมู่บ้าน</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <button *ngIf="viewMode === 'house_models' && canEdit" mat-stroked-button color="primary" (click)="addNewCard()"
+            style="margin-left: 10px;">
+            <mat-icon>add</mat-icon>
+            เพิ่มแบบบ้าน
+        </button>
+    </div>
+</app-page-header>
+
+<div class="container">
+    <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- House Models Grid -->
+    <div class="card-grid" *ngIf="!isLoading && viewMode === 'house_models'">
+        <div class="house-card" *ngFor="let element of dataSource" [class.editing]="element.isEditing">
+            <div class="card-header">
+                <div class="icon-wrapper">
+                    <mat-icon>home</mat-icon>
+                </div>
+                <h3>{{element.model_name}}</h3>
+                <span class="update-badge" *ngIf="element.updated_at">
+                    อัปเดต: {{element.updated_at | date:'dd/MM/yy'}}
+                </span>
+            </div>
+
+            <div class="card-content">
+                <!-- Plan Section -->
+                <div class="file-section">
+                    <div class="section-label">แปลนบ้าน</div>
+                    <div class="file-box" [class.has-file]="element.plan_file_url">
+                        <!-- View State -->
+                        <div class="file-display" *ngIf="!element.isEditing || !element.plan_file_url">
+                            <div class="file-status" *ngIf="!element.plan_file_url">
+                                <mat-icon class="no-file-icon">description</mat-icon>
+                                <span>ไม่มีไฟล์</span>
+                            </div>
+                            <div class="file-status has-file" *ngIf="element.plan_file_url"
+                                (click)="openUrl(element.plan_file_url)" style="cursor: pointer;">
+                                <img src="assets/icons/pdf-file.svg" alt="PDF"
+                                    onerror="this.src='assets/icons/file.svg'">
+                                <span class="file-name">ดูไฟล์แปลน</span>
+                            </div>
+                        </div>
+
+                        <!-- Edit State Actions (Overlay or Replacement) -->
+                        <div class="edit-actions" *ngIf="element.isEditing">
+                            <button mat-icon-button color="warn" class="delete-btn"
+                                *ngIf="element.plan_file_url && canDelete" (click)="deleteFile(element, 'plan_file')"
+                                matTooltip="ลบไฟล์">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+
+                            <button mat-stroked-button class="upload-btn-mini" (click)="planInput.click()"
+                                [disabled]="element.isUploadingPlan || !canUpload">
+                                <mat-icon>cloud_upload</mat-icon>
+                                {{element.plan_file_url ? 'เปลี่ยนไฟล์' : 'เพิ่มไฟล์'}}
+                            </button>
+                            <input #planInput type="file" class="hidden-input" accept="application/pdf"
+                                (change)="onFileSelected($event, element, 'plan_file')" [disabled]="!canUpload">
+                        </div>
+
+                        <div *ngIf="element.isUploadingPlan" class="uploading-overlay">
+                            <mat-spinner diameter="20"></mat-spinner>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Section -->
+                <div class="file-section">
+                    <div class="section-label">รายละเอียด</div>
+                    <div class="file-box" [class.has-file]="element.detail_file_url">
+                        <!-- View State -->
+                        <div class="file-display" *ngIf="!element.isEditing || !element.detail_file_url">
+                            <div class="file-status" *ngIf="!element.detail_file_url">
+                                <mat-icon class="no-file-icon">description</mat-icon>
+                                <span>ไม่มีไฟล์</span>
+                            </div>
+                            <div class="file-status has-file" *ngIf="element.detail_file_url"
+                                (click)="openUrl(element.detail_file_url)" style="cursor: pointer;">
+                                <img src="assets/icons/pdf-file.svg" alt="PDF"
+                                    onerror="this.src='assets/icons/file.svg'">
+                                <span class="file-name">ดูไฟล์รายละเอียด</span>
+                            </div>
+                        </div>
+
+                        <!-- Edit State Actions -->
+                        <div class="edit-actions" *ngIf="element.isEditing">
+                            <button mat-icon-button color="warn" class="delete-btn"
+                                *ngIf="element.detail_file_url && canDelete"
+                                (click)="deleteFile(element, 'detail_file')" matTooltip="ลบไฟล์">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+
+                            <button mat-stroked-button class="upload-btn-mini" (click)="detailInput.click()"
+                                [disabled]="element.isUploadingDetail || !canUpload">
+                                <mat-icon>cloud_upload</mat-icon>
+                                {{element.detail_file_url ? 'เปลี่ยนไฟล์' : 'เพิ่มไฟล์'}}
+                            </button>
+                            <input #detailInput type="file" class="hidden-input" accept="application/pdf"
+                                (change)="onFileSelected($event, element, 'detail_file')" [disabled]="!canUpload">
+                        </div>
+
+                        <div *ngIf="element.isUploadingDetail" class="uploading-overlay">
+                            <mat-spinner diameter="20"></mat-spinner>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button mat-icon-button color="warn" *ngIf="element.isEditing && canDelete"
+                    (click)="deleteCard(element)" matTooltip="ลบแบบบ้าน">
+                    <mat-icon>delete_forever</mat-icon>
+                </button>
+                <button mat-button class="edit-toggle-btn" [color]="element.isEditing ? 'primary' : 'basic'"
+                    (click)="toggleEdit(element)" *ngIf="canEdit">
+                    <mat-icon>{{element.isEditing ? 'check' : 'edit'}}</mat-icon>
+                    {{element.isEditing ? 'เสร็จสิ้น' : 'แก้ไข'}}
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="dataSource.length === 0">
+            <mat-icon>home_work</mat-icon>
+            <p>ยังไม่มีข้อมูลแบบบ้าน</p>
+            <button mat-stroked-button color="primary" (click)="addNewCard()" *ngIf="canEdit">เพิ่มแบบบ้านแรก</button>
+        </div>
+    </div>
+    <!-- Project Info View (Single Card) -->
+    <div class="card-grid" *ngIf="!isLoading && viewMode === 'project_info'">
+        <div class="house-card" [class.editing]="projectInfoData.isEditing">
+            <div class="card-header">
+                <div class="icon-wrapper">
+                    <mat-icon>location_city</mat-icon>
+                </div>
+                <h3>ข้อมูลของหมู่บ้าน</h3>
+                <span class="update-badge" *ngIf="projectInfoData.updated_at">
+                    อัปเดต: {{projectInfoData.updated_at | date:'dd/MM/yy'}}
+                </span>
+            </div>
+
+            <div class="card-content">
+                <!-- Project Detail Section -->
+                <div class="file-section">
+                    <div class="section-label">ข้อมูลรายละเอียดโครงการ</div>
+                    <div class="file-box" [class.has-file]="projectInfoData.project_detail_file_url">
+                        <!-- View State -->
+                        <div class="file-display">
+                            <div class="file-status" *ngIf="!projectInfoData.project_detail_file_url">
+                                <mat-icon class="no-file-icon">description</mat-icon>
+                                <span>ไม่มีไฟล์</span>
+                            </div>
+                            <div class="file-status has-file" *ngIf="projectInfoData.project_detail_file_url"
+                                (click)="openUrl(projectInfoData.project_detail_file_url)" style="cursor: pointer;">
+                                <img src="assets/icons/pdf-file.svg" alt="PDF"
+                                    onerror="this.src='assets/icons/file.svg'">
+                                <span class="file-name">ดูไฟล์ข้อมูล</span>
+                            </div>
+                        </div>
+
+                        <!-- Edit State Actions -->
+                        <div class="edit-actions" *ngIf="projectInfoData.isEditing">
+                            <button mat-icon-button color="warn" class="delete-btn"
+                                *ngIf="projectInfoData.project_detail_file_url && canDelete"
+                                (click)="deleteProjectFile('project_detail')" matTooltip="ลบไฟล์">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+
+                            <button mat-stroked-button class="upload-btn-mini" (click)="projectDetailInput.click()"
+                                [disabled]="projectInfoData.isUploadingDetail || !canUpload">
+                                <mat-icon>cloud_upload</mat-icon>
+                                {{projectInfoData.project_detail_file_url ? 'เปลี่ยนไฟล์' : 'เพิ่มไฟล์'}}
+                            </button>
+                            <input #projectDetailInput type="file" class="hidden-input" accept="application/pdf"
+                                (change)="onProjectFileSelected($event, 'project_detail')" [disabled]="!canUpload">
+                        </div>
+
+                        <div *ngIf="projectInfoData.isUploadingDetail" class="uploading-overlay">
+                            <mat-spinner diameter="20"></mat-spinner>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules Section -->
+                <div class="file-section">
+                    <div class="section-label">กฎระเบียบและข้อบังคับ</div>
+                    <div class="file-box" [class.has-file]="projectInfoData.rules_file_url">
+                        <!-- View State -->
+                        <div class="file-display">
+                            <div class="file-status" *ngIf="!projectInfoData.rules_file_url">
+                                <mat-icon class="no-file-icon">gavel</mat-icon>
+                                <span>ไม่มีไฟล์</span>
+                            </div>
+                            <div class="file-status has-file" *ngIf="projectInfoData.rules_file_url"
+                                (click)="openUrl(projectInfoData.rules_file_url)" style="cursor: pointer;">
+                                <img src="assets/icons/pdf-file.svg" alt="PDF"
+                                    onerror="this.src='assets/icons/file.svg'">
+                                <span class="file-name">ดูไฟล์กฎระเบียบ</span>
+                            </div>
+                        </div>
+
+                        <!-- Edit State Actions -->
+                        <div class="edit-actions" *ngIf="projectInfoData.isEditing">
+                            <button mat-icon-button color="warn" class="delete-btn"
+                                *ngIf="projectInfoData.rules_file_url && canDelete" (click)="deleteProjectFile('rules')"
+                                matTooltip="ลบไฟล์">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+
+                            <button mat-stroked-button class="upload-btn-mini" (click)="rulesInput.click()"
+                                [disabled]="projectInfoData.isUploadingRules || !canUpload">
+                                <mat-icon>cloud_upload</mat-icon>
+                                {{projectInfoData.rules_file_url ? 'เปลี่ยนไฟล์' : 'เพิ่มไฟล์'}}
+                            </button>
+                            <input #rulesInput type="file" class="hidden-input" accept="application/pdf"
+                                (change)="onProjectFileSelected($event, 'rules')" [disabled]="!canUpload">
+                        </div>
+
+                        <div *ngIf="projectInfoData.isUploadingRules" class="uploading-overlay">
+                            <mat-spinner diameter="20"></mat-spinner>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button mat-button class="edit-toggle-btn" [color]="projectInfoData.isEditing ? 'primary' : 'basic'"
+                    (click)="toggleEditProjectInfo()" *ngIf="canEdit">
+                    <mat-icon>{{projectInfoData.isEditing ? 'check' : 'edit'}}</mat-icon>
+                    {{projectInfoData.isEditing ? 'เสร็จสิ้น' : 'แก้ไข'}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

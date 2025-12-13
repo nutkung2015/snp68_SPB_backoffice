@@ -38,7 +38,7 @@
                   <button mat-stroked-button type="button" (click)="fileInputLogo.click()">
                     <mat-icon>upload</mat-icon> อัปโหลดโลโก้
                   </button>
-                  <input #fileInputLogo type="file" (change)="onFileSelected($event, 'logo')" accept="image/*" hidden>
+                  <input #fileInputLogo type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
                   <span class="file-name" *ngIf="theme.logo_url">{{ theme.logo_url | slice:0:30 }}{{
                     theme.logo_url.length > 30 ? '...' : '' }}</span>
                 </div>
@@ -79,8 +79,8 @@
               <!-- Phone notch -->
               <div class="phone-notch"></div>
 
-              <!-- Phone header -->
-              <div class="phone-header" [ngStyle]="{'background-color': previewTheme.primary_color}">
+              <!-- Phone status bar -->
+              <div class="phone-status-bar">
                 <div class="phone-time">9:41</div>
                 <div class="phone-status">
                   <span class="signal"></span>
@@ -89,77 +89,155 @@
                 </div>
               </div>
 
-              <!-- App header -->
-              <div class="app-header">
-                <div class="app-logo">
-                  <img [src]="previewTheme.logo_url || 'assets/images/logo-default.png'" alt="Logo"
-                    (error)="previewTheme.logo_url = 'assets/images/logo-default.png'">
-                </div>
-                <div class="app-title">
-                  <div class="app-name" [ngStyle]="{'color': previewTheme.primary_color}">SNP68</div>
-                  <div class="app-subtitle">Smart Property</div>
-                </div>
-              </div>
+              <!-- App Container -->
+              <div class="app-container">
+                <!-- Header -->
+                <div class="gradient-header"
+                  [style.background]="'linear-gradient(to right, ' + (previewTheme.primary_color || '#143D60') + ', ' + (previewTheme.secondary_color || '#A0C878') + ')'">
 
-              <!-- App content -->
-              <div class="app-content">
-                <div class="app-nav" [ngStyle]="{'border-bottom-color': previewTheme.primary_color + '33'}">
-                  <div class="nav-item active"
-                    [ngStyle]="{'color': previewTheme.primary_color, 'border-bottom-color': previewTheme.primary_color}">
-                    หน้าแรก
-                  </div>
-                  <div class="nav-item">บริการ</div>
-                  <div class="nav-item">แจ้งซ่อม</div>
-                  <div class="nav-item">อื่นๆ</div>
-                </div>
-
-                <div class="app-banner" [ngStyle]="{'background-color': previewTheme.primary_color + '1A'}">
-                  <div class="banner-content">
-                    <div class="banner-text">
-                      <h3>ยินดีต้อนรับ</h3>
-                      <p>สวัสดีค่ะ คุณผู้ใช้งาน</p>
+                  <!-- Top Row -->
+                  <div class="header-row-top">
+                    <img [src]="previewTheme.logo_url || 'assets/images/logo-default.png'" class="header-logo"
+                      (error)="previewTheme.logo_url = 'assets/images/logo-default.png'">
+                    <div class="header-actions">
+                      <div class="notification-btn">
+                        <mat-icon>notifications_none</mat-icon>
+                        <span class="badge">5</span>
+                      </div>
+                      <div class="profile-circle">NC</div>
                     </div>
-                    <div class="banner-icon">
-                      <mat-icon [ngStyle]="{'color': previewTheme.primary_color}">waving_hand</mat-icon>
+                  </div>
+
+                  <!-- Bottom Row -->
+                  <div class="header-row-bottom">
+                    <mat-icon class="house-icon">home</mat-icon>
+                    <div class="user-info">
+                      <div class="user-greeting">สวัสดีคุณ User</div>
+                      <div class="user-address">123/45 The Project</div>
                     </div>
                   </div>
                 </div>
 
-                <div class="quick-actions">
-                  <div class="action-item" *ngFor="let item of quickActions">
-                    <div class="action-icon" [ngStyle]="{'background-color': previewTheme.primary_color + '1A'}">
-                      <mat-icon [ngStyle]="{'color': previewTheme.primary_color}">{{item.icon}}</mat-icon>
+                <!-- Scroll Content -->
+                <div class="content-scroll">
+                  <!-- Village & Home -->
+                  <div class="section">
+                    <h3 class="section-title">ข้อมูลหมู่บ้านและบ้าน</h3>
+                    <div class="menu-grid">
+                      <div class="menu-btn" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
+                        <mat-icon>home</mat-icon>
+                        <span>บ้านของฉัน</span>
+                      </div>
+                      <div class="menu-btn" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
+                        <mat-icon>people</mat-icon>
+                        <span>หมู่บ้านของฉัน</span>
+                      </div>
                     </div>
-                    <div class="action-label">{{item.label}}</div>
+                  </div>
+
+                  <!-- All Services -->
+                  <div class="section">
+                    <div class="section-header">
+                      <h3 class="section-title">บริการทั้งหมด</h3>
+                    </div>
+                    <div class="services-grid">
+                      <div class="service-item">
+                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">campaign</mat-icon>
+                        </div>
+                        <span>ข่าวสาร</span>
+                      </div>
+                      <div class="service-item">
+                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">report_problem</mat-icon>
+                        </div>
+                        <span>แจ้งปัญหา</span>
+                      </div>
+                      <div class="service-item">
+                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">directions_car</mat-icon>
+                        </div>
+                        <span>ผู้มาเยี่ยม</span>
+                      </div>
+                      <div class="service-item">
+                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
+                          <mat-icon
+                            [style.color]="previewTheme.primary_color || '#4BB59F'">chat_bubble_outline</mat-icon>
+                        </div>
+                        <span>ช่วยเหลือ</span>
+                      </div>
+                      <div class="service-item">
+                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">call</mat-icon>
+                        </div>
+                        <span>ฉุกเฉิน</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- News -->
+                  <div class="section">
+                    <div class="section-header">
+                      <h3 class="section-title">ข่าวสารและประกาศ</h3>
+                      <span class="see-all">ดูทั้งหมด ></span>
+                    </div>
+                    <div class="news-list">
+                      <!-- Mock Item 1 -->
+                      <div class="news-card">
+                        <div class="news-image">
+                          <div class="image-placeholder" style="background: #e0e0e0; height: 100%; width: 100%;"></div>
+                          <div class="image-gradient"></div>
+                          <div class="type-badge" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
+                            <span>ประกาศ</span>
+                          </div>
+                        </div>
+                        <div class="news-content">
+                          <div class="news-title">แจ้งซ่อมถนนในหมู่บ้าน</div>
+                          <div class="news-date">
+                            <mat-icon>access_time</mat-icon> 10 ต.ค. 66
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Mock Item 2 -->
+                      <div class="news-card">
+                        <div class="news-image">
+                          <div class="image-placeholder" style="background: #e0e0e0; height: 100%; width: 100%;"></div>
+                          <div class="image-gradient"></div>
+                          <div class="type-badge" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
+                            <span>กิจกรรม</span>
+                          </div>
+                        </div>
+                        <div class="news-content">
+                          <div class="news-title">กิจกรรมวันเด็ก</div>
+                          <div class="news-date">
+                            <mat-icon>access_time</mat-icon> 12 ม.ค. 67
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="announcement" *ngIf="isDefaultTheme">
-                  <div class="announcement-icon">
-                    <mat-icon>info</mat-icon>
+                <!-- Bottom Navigation -->
+                <!-- <div class="bottom-nav">
+                  <div class="nav-item active" [style.color]="previewTheme.primary_color || '#4BB59F'">
+                    <mat-icon>home</mat-icon>
+                    <span>หน้าแรก</span>
                   </div>
-                  <div class="announcement-text">ขณะนี้คุณใช้ธีมของระบบอยู่</div>
-                </div>
-              </div>
+                  <div class="nav-item">
+                    <mat-icon>receipt</mat-icon>
+                    <span>บิล</span>
+                  </div>
+                  <div class="nav-item">
+                    <mat-icon>chat</mat-icon>
+                    <span>แชท</span>
+                  </div>
+                  <div class="nav-item">
+                    <mat-icon>person</mat-icon>
+                    <span>ฉัน</span>
+                  </div>
+                </div> -->
 
-              <!-- Bottom navigation -->
-              <div class="bottom-nav" [ngStyle]="{'border-top-color': previewTheme.primary_color + '1A'}">
-                <div class="nav-item active" [ngStyle]="{'color': previewTheme.primary_color}">
-                  <mat-icon>home</mat-icon>
-                  <span>หน้าแรก</span>
-                </div>
-                <div class="nav-item">
-                  <mat-icon>receipt</mat-icon>
-                  <span>บิลค่าใช้จ่าย</span>
-                </div>
-                <div class="nav-item">
-                  <mat-icon>chat</mat-icon>
-                  <span>แชท</span>
-                </div>
-                <div class="nav-item">
-                  <mat-icon>person</mat-icon>
-                  <span>ฉัน</span>
-                </div>
               </div>
             </div>
           </div>

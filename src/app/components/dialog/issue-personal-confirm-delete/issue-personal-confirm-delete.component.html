@@ -1,0 +1,19 @@
+<div class="dialog-container">
+    <div class="warning-message">
+        <div class="warning-icon">
+            <mat-icon>error</mat-icon>
+        </div>
+        <div class="warning-text">
+            {{ data.toppic }}
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button mat-raised-button class="bt-white" (click)="cancel()">
+            {{ data.cancel }}
+        </button>
+        <button mat-raised-button class="bt-error" (click)="confirm()">
+            {{ data.confirm }}
+        </button>
+    </div>
+</div>

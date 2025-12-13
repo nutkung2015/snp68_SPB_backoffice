@@ -1,0 +1,109 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="detail-issue-container">
+    <!-- Header Section -->
+    <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+        <div class="breadcrumb">
+            <span class="sub-header" style="color: #9fa9b6">แจ้งปัญหา / </span>
+            <span class="sub-header" style="color: #171a1e">รายละเอียดการแจ้งปัญหา</span>
+        </div>
+        <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon (click)="onBack()">arrow_back</mat-icon>
+            <span class="sub-body">รายละเอียดการแจ้งปัญหา</span>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="form-content" *ngIf="issue">
+        <mat-card>
+            <div fxLayout="column" fxLayoutGap="24px">
+                <!-- Image Section -->
+                <div class="file-preview" *ngIf="issue.image_urls && issue.image_urls.length > 0">
+                    <mat-label class="field-label">รูปภาพแนบ</mat-label>
+                    <div class="image-container">
+                        <img [src]="issue.image_urls[0].url" alt="รูปภาพการแจ้งปัญหา" />
+                    </div>
+                </div>
+
+                <!-- Details Section -->
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">ประเภทปัญหา</mat-label>
+                        <div class="field-value">{{ getTypeLabel(issue.issue_type) }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">สถานที่</mat-label>
+                        <div class="field-value">{{ issue.location }}</div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">โซน</mat-label>
+                        <div class="field-value">{{ issue.zone }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">ความเร่งด่วน</mat-label>
+                        <div class="field-value">{{ getPriorityLabel(issue.priority) }}</div>
+                    </div>
+                </div>
+
+                <div class="full-width">
+                    <mat-label class="field-label">รายละเอียด</mat-label>
+                    <div class="field-value content-box">{{ issue.description }}</div>
+                </div>
+
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">ผู้แจ้ง</mat-label>
+                        <div class="field-value">{{ issue.reporter_name }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">มอบหมายให้</mat-label>
+                        <div class="field-value">{{ issue.assigned_to || '-' }}</div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">วันที่แจ้ง</mat-label>
+                        <div class="field-value">{{ issue.reported_date | date:'medium' }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">แก้ไขล่าสุด</mat-label>
+                        <div class="field-value">{{ issue.updated_at | date:'medium' }}</div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">สถานะ</mat-label>
+                        <div class="field-value">{{ getStatusLabel(issue.status) }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">หมายเหตุ</mat-label>
+                        <div class="field-value">{{ issue.notes || '-' }}</div>
+                    </div>
+                </div>
+
+                <!-- ตัดส่วน Cost ออกเนื่องจากไม่มีใน Common Issue Data Shape -->
+            </div>
+
+            <div class="btn-group">
+                <div class="btn-left">
+                    <button class="btn-delete" mat-stroked-button (click)="onDelete()">
+                        ลบรายการ
+                    </button>
+                </div>
+                <div class="btn-right">
+                    <button class="btn-cancel" mat-stroked-button (click)="onBack()">
+                        ยกเลิก
+                    </button>
+                    <button class="btn-edit" mat-flat-button color="primary" (click)="onEdit()">
+                        แก้ไข
+                    </button>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>

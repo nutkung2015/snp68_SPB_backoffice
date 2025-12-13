@@ -108,6 +108,7 @@
   .action-buttons {
     margin-top: 24px;
     max-width: 80% !important;
+
     button {
       min-width: 120px;
     }
@@ -123,4 +124,24 @@
   .mat-card {
     box-shadow: none !important;
   }
+}
+
+
+.btn-cancel {
+  min-width: 100px;
+  padding: 10px;
+  border: solid 2px #07354E !important;
+  background-color: white !important;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.btn-edit {
+  min-width: 100px;
+  padding: 10px;
+  // border: solid 2px #205248 !important;
+  background-color: #07354E !important;
+  color: white !important;
+  border-radius: 10px;
+  font-size: 16px;
 }

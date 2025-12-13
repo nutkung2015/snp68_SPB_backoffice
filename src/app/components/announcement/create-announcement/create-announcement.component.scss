@@ -6,7 +6,7 @@
 
   .header {
     margin-bottom: 24px;
-    
+
     h2 {
       font-size: 24px;
       margin: 0;
@@ -95,7 +95,7 @@ textarea {
   }
 }
 
-.btn-group{
+.btn-group {
   gap: 16px;
   display: flex;
 }
@@ -134,11 +134,12 @@ textarea {
   font-size: 12px;
   margin-top: 8px;
 }
+
 // Form Fields
 .field-label {
   font-size: 14px;
   color: #171a1e;
-  
+
   .required {
     color: #f5222d;
     margin-right: 4px;
@@ -164,7 +165,7 @@ mat-form-field {
   left: 0;
   right: 0;
   background: #ffffff;
-  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 
   .footer-content {
@@ -177,6 +178,8 @@ mat-form-field {
     min-width: 120px;
   }
 }
+
+
 
 // Material Overrides
 ::ng-deep {
@@ -207,4 +210,3 @@ mat-form-field {
   background-color: #f5222d;
   color: white;
 }
-
