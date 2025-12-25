@@ -1,0 +1,58 @@
+.dialog-container {
+    padding: 0;
+    min-width: 400px;
+}
+
+div[mat-dialog-title] {
+    margin: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+}
+
+div[mat-dialog-content] {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+div[mat-dialog-actions] {
+    padding: 16px 24px;
+    margin: 0;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.color-picker-field {
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    label {
+        color: #475569;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    input[type="color"] {
+        cursor: pointer;
+        padding: 0;
+        height: 36px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+}
+
+.btn-cancel {
+    color: #64748b;
+}
+
+mat-form-field {
+    width: 100%;
+}

@@ -15,14 +15,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
 import { AuthService } from '../../services/auth.service';
+import { RestService } from '../../services/rest.service'; // Added RestService import
 
 type InvitationStatus = StatusType | 'all';
 type StatusType = 'pending' | 'sent' | 'accepted' | 'declined' | 'expired';
@@ -81,7 +81,7 @@ interface APIResponse {
   styleUrls: ['./invite-management.component.scss'],
 })
 export class InviteManagementComponent implements OnInit {
-  private apiUrl = 'http://localhost:5000/api/units/unit-invitations';
+  // private apiUrl = 'http://localhost:5000/api/units/unit-invitations'; // Removed as RestService handles it
 
   isLoading = new BehaviorSubject<boolean>(true);
   isLoading$: Observable<boolean> = this.isLoading.asObservable();
@@ -119,7 +119,8 @@ export class InviteManagementComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private restService: RestService // Injected RestService
   ) {
     this.dataSource = new MatTableDataSource<UnitInvitation>([]);
   }
@@ -174,7 +175,7 @@ export class InviteManagementComponent implements OnInit {
   private getHttpHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token} `,
       'Content-Type': 'application/json',
     });
   }
@@ -194,43 +195,24 @@ export class InviteManagementComponent implements OnInit {
 
   loadInvitations() {
     this.isLoading.next(true);
-  
+
     const projectMemberships = this.authService.getProjectMemberships();
     if (!projectMemberships || projectMemberships.length === 0) {
       alert('ไม่พบการเป็นสมาชิกโครงการ กรุณาติดต่อผู้ดูแลระบบ');
       this.isLoading.next(false);
       return;
     }
-  
+
     const firstProject = projectMemberships[0];
     this.currentProjectId = firstProject.project_id;
     this.currentProjectName = firstProject.project_name || 'โครงการ';
-  
-    const params = this.buildParams();
-    params.append('project_id', this.currentProjectId);
-  
-    const headers = this.getHttpHeaders();
-    const url = `${this.apiUrl}?${params.toString()}`;
-  
-    console.log('Request URL:', url); // เพิ่ม log เพื่อ debug
-  
-    this.http
-      .get<APIResponse>(url, { headers })
+
+    // ใช้ RestService แทน direct http call
+    this.restService.getUnitInvitations(this.currentProjectId, this.selectedStatus !== 'all' ? this.selectedStatus : undefined)
       .pipe(
-        map((response) => {
-          console.log('Full Response:', response); // เพิ่ม log เพื่อ debug
-          
-          // เช็ค response structure
-          if (!response || !response.data) {
-            console.warn('Response structure ไม่ถูกต้อง:', response);
-            return [];
-          }
-  
-          // ดึงข้อมูลจาก all_units_invite (คำเชิญทั้งหมดใน project)
-          const invitations = response.data.all_units_invite || [];
-          
-          console.log('Invitations found:', invitations.length); // เพิ่ม log เพื่อ debug
-  
+        map((invitations: any[]) => {
+          console.log('Invitations found:', invitations.length);
+
           // Map และแปลง date
           return invitations.map((item) => ({
             ...item,
@@ -241,7 +223,6 @@ export class InviteManagementComponent implements OnInit {
         }),
         catchError((error) => {
           console.error('Error loading unit invitations:', error);
-          console.error('Error details:', error.error); // เพิ่ม log เพื่อ debug
           if (error.error?.message) {
             alert(`เกิดข้อผิดพลาด: ${error.error.message}`);
           }
@@ -250,7 +231,7 @@ export class InviteManagementComponent implements OnInit {
         finalize(() => this.isLoading.next(false))
       )
       .subscribe((invitations) => {
-        console.log('Final invitations:', invitations); // เพิ่ม log เพื่อ debug
+        console.log('Final invitations:', invitations);
         this.allInvitations = invitations;
         this.dataSource.data = invitations;
         this.pageEvent.length = invitations.length;

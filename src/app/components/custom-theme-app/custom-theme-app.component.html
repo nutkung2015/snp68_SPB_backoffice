@@ -18,18 +18,74 @@
                 </mat-form-field>
               </div>
 
-              <div class="form-group">
-                <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>สีหลัก</mat-label>
-                  <input matInput type="color" [(ngModel)]="theme.primary_color" (change)="updatePreview()">
-                </mat-form-field>
-              </div>
+              <!-- Theme Style Selector -->
+              <div class="form-group theme-style-section">
+                <label class="section-label">
+                  <mat-icon>palette</mat-icon>
+                  เลือกสไตล์ธีม
+                </label>
 
-              <div class="form-group">
-                <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>สีรอง</mat-label>
-                  <input matInput type="color" [(ngModel)]="theme.secondary_color" (change)="updatePreview()">
-                </mat-form-field>
+                <div class="theme-groups-container">
+                  <div *ngFor="let group of themeStyleGroups" class="theme-group">
+                    <!-- Group Header -->
+                    <div class="group-header">
+                      <div class="group-title">
+                        <mat-icon class="group-icon">{{ group.groupIcon }}</mat-icon>
+                        <div class="group-text">
+                          <span class="group-name">{{ group.groupName }}</span>
+                          <span class="group-name-th">{{ group.groupNameTH }}</span>
+                        </div>
+                      </div>
+                      <span class="group-description">{{ group.description }}</span>
+                    </div>
+
+                    <!-- Theme Cards in this group -->
+                    <div class="theme-cards">
+                      <div *ngFor="let themeItem of group.themes" class="theme-card"
+                        [class.selected]="selectedThemeId === themeItem.id"
+                        (click)="selectThemeStyle(themeItem.id, themeItem.primary, themeItem.secondary)">
+                        <!-- Color Preview Bar -->
+                        <div class="color-preview-bar">
+                          <div class="primary-half" [style.background-color]="themeItem.primary"></div>
+                          <div class="secondary-half" [style.background-color]="themeItem.secondary"></div>
+                        </div>
+
+                        <!-- Theme Info -->
+                        <div class="theme-info">
+                          <span class="theme-name">{{ themeItem.name }}</span>
+                          <span class="theme-name-th">{{ themeItem.nameTH }}</span>
+                          <span class="theme-preview-text">{{ themeItem.preview }}</span>
+                        </div>
+
+                        <!-- Selection Indicator -->
+                        <div class="selection-indicator" *ngIf="selectedThemeId === themeItem.id">
+                          <mat-icon>check_circle</mat-icon>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Current Selection Display -->
+                <div class="current-selection" *ngIf="selectedThemeId">
+                  <div class="selection-label">สีที่เลือก:</div>
+                  <div class="color-chips">
+                    <div class="color-chip">
+                      <div class="chip-color" [style.background-color]="theme.primary_color"></div>
+                      <div class="chip-info">
+                        <span class="chip-label">Primary</span>
+                        <span class="chip-hex">{{ theme.primary_color }}</span>
+                      </div>
+                    </div>
+                    <div class="color-chip">
+                      <div class="chip-color" [style.background-color]="theme.secondary_color"></div>
+                      <div class="chip-info">
+                        <span class="chip-label">Secondary</span>
+                        <span class="chip-hex">{{ theme.secondary_color }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="form-group">

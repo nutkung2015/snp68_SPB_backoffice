@@ -1,0 +1,212 @@
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.bt-outline {
+    border: 1px solid #d3d9e0 !important;
+    color: #171a1e !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+
+    mat-icon {
+        margin-right: 5px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.bt-search {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+
+    mat-icon {
+        margin-right: 5px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+// Status styles
+.status-active {
+    color: #10b981;
+    background-color: #d1fae5;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-inactive {
+    color: #ef4444;
+    background-color: #fee2e2;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.building-type {
+    background-color: #f1f5f9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+}
+
+.unit-management-page {
+    position: relative;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+
+    .search-filter-section {
+        background: white;
+        padding: 0px 24px 24px 24px;
+        margin-bottom: 24px;
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .filter-input {
+            height: 44px;
+            padding: 5px 12px;
+            border: 1px solid #d3d9e0;
+            background: #ffffff;
+            transition: all 0.2s;
+
+            &:focus-within {
+                border-color: #2084fc;
+                box-shadow: 0 0 0 3px rgba(32, 132, 252, 0.1);
+            }
+
+            &.left,
+            &.right {
+                border-radius: 8px;
+            }
+
+            mat-select {
+                width: 100%;
+                height: 100%;
+                font-size: 14px;
+            }
+
+            input {
+                font-size: 14px;
+
+                &::placeholder {
+                    color: #94a3b8;
+                }
+            }
+        }
+
+        .results-count {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        mat-icon.secondary {
+            color: #94a3b8;
+        }
+    }
+}
+
+.font-semibold {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+// Material Design Overrides
+::ng-deep {
+    .mat-table {
+        background: white !important;
+
+        th.mat-header-cell {
+            background: #f8fafc !important;
+            color: #64748b !important;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td.mat-cell {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        tr.mat-row:hover {
+            background-color: #f8fafc !important;
+        }
+    }
+
+    .div-table {
+        background: white !important;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    mat-card {
+        background: white !important;
+        border-radius: 12px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 0 !important;
+    }
+
+    .mat-mdc-paginator {
+        background: white !important;
+        border-top: 1px solid #e2e8f0;
+    }
+}
+
+.no-data-container {
+    padding: 80px 40px;
+
+    .no-data-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        color: #cbd5e1;
+    }
+
+    .no-data-text {
+        color: #64748b;
+        font-size: 16px;
+        font-weight: 500;
+    }
+}
+
+// Responsive Design
+@media (max-width: 960px) {
+    .unit-management-page {
+        .search-filter-section {
+            padding: 16px;
+
+            [fxFlex="300px"],
+            [fxFlex="150px"],
+            [fxFlex="180px"] {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+            }
+        }
+    }
+}

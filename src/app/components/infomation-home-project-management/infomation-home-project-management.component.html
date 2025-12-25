@@ -44,7 +44,8 @@
                                 <span>ไม่มีไฟล์</span>
                             </div>
                             <div class="file-status has-file" *ngIf="element.plan_file_url"
-                                (click)="openUrl(element.plan_file_url)" style="cursor: pointer;">
+                                (click)="viewPdf(element.plan_file_url, element.model_name + '_plan.pdf')"
+                                style="cursor: pointer;">
                                 <img src="assets/icons/pdf-file.svg" alt="PDF"
                                     onerror="this.src='assets/icons/file.svg'">
                                 <span class="file-name">ดูไฟล์แปลน</span>
@@ -85,7 +86,8 @@
                                 <span>ไม่มีไฟล์</span>
                             </div>
                             <div class="file-status has-file" *ngIf="element.detail_file_url"
-                                (click)="openUrl(element.detail_file_url)" style="cursor: pointer;">
+                                (click)="viewPdf(element.detail_file_url, element.model_name + '_detail.pdf')"
+                                style="cursor: pointer;">
                                 <img src="assets/icons/pdf-file.svg" alt="PDF"
                                     onerror="this.src='assets/icons/file.svg'">
                                 <span class="file-name">ดูไฟล์รายละเอียด</span>
@@ -161,7 +163,8 @@
                                 <span>ไม่มีไฟล์</span>
                             </div>
                             <div class="file-status has-file" *ngIf="projectInfoData.project_detail_file_url"
-                                (click)="openUrl(projectInfoData.project_detail_file_url)" style="cursor: pointer;">
+                                (click)="viewPdf(projectInfoData.project_detail_file_url, 'project_detail.pdf')"
+                                style="cursor: pointer;">
                                 <img src="assets/icons/pdf-file.svg" alt="PDF"
                                     onerror="this.src='assets/icons/file.svg'">
                                 <span class="file-name">ดูไฟล์ข้อมูล</span>
@@ -202,7 +205,8 @@
                                 <span>ไม่มีไฟล์</span>
                             </div>
                             <div class="file-status has-file" *ngIf="projectInfoData.rules_file_url"
-                                (click)="openUrl(projectInfoData.rules_file_url)" style="cursor: pointer;">
+                                (click)="viewPdf(projectInfoData.rules_file_url, 'project_rules.pdf')"
+                                style="cursor: pointer;">
                                 <img src="assets/icons/pdf-file.svg" alt="PDF"
                                     onerror="this.src='assets/icons/file.svg'">
                                 <span class="file-name">ดูไฟล์กฎระเบียบ</span>

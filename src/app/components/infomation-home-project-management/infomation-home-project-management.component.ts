@@ -367,7 +367,18 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
     });
   }
 
-  openUrl(url: string): void {
-    window.open(url, '_blank');
+  viewPdf(url: string, filename: string): void {
+    if (!this.projectId || !url) {
+      window.open(url, '_blank');
+      return;
+    }
+
+    const streamUrl = this.restService.getStreamPdfUrl(
+      this.projectId,
+      url,
+      filename,
+      'inline'
+    );
+    window.open(streamUrl, '_blank');
   }
 }

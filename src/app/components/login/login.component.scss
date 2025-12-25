@@ -273,6 +273,29 @@
       }
     }
   }
+
+  .form-footer {
+    margin-top: 20px;
+    text-align: center;
+
+    p {
+      color: #666;
+      font-size: 14px;
+      margin: 0;
+
+      .link-text {
+        color: #205248;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #4BB59F;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
 }
 
 @keyframes fadeIn {

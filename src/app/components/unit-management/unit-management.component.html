@@ -1,0 +1,170 @@
+<div class="unit-management-page">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading$ | async">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/village.svg" title="จัดการข้อมูลยูนิต / บ้าน" subtitle="Unit Management"
+        iconColor="invert(100%)">
+    </app-page-header>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-container">
+            <div fxLayout="row" fxLayoutAlign="space-between center">
+                <!-- Left Section: Filters -->
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                    <!-- Search Input -->
+                    <div class="filter-input right" fxFlex="350px">
+                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
+                            <mat-icon class="secondary">search</mat-icon>
+                            <input matInput type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()"
+                                placeholder="ค้นหาเลขที่บ้าน" style="border: none; width: 100%; height: 100%" />
+                        </div>
+                    </div>
+
+                    <!-- Zone Filter -->
+                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 200px">
+                        <div fxFlex="50px" fxLayoutAlign="end center">
+                            <span>โซน</span>
+                        </div>
+                        <div class="filter-input left" fxFlex style="height: 100%">
+                            <mat-select [(ngModel)]="selectedZone" (selectionChange)="applyFilter()">
+                                <mat-option value="all">ทั้งหมด</mat-option>
+                                <mat-option *ngFor="let zone of zones" [value]="zone">{{ zone }}</mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+
+                    <!-- Building/Type Filter -->
+                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 220px">
+                        <div fxFlex="60px" fxLayoutAlign="end center">
+                            <span>แบบบ้าน</span>
+                        </div>
+                        <div class="filter-input left" fxFlex style="height: 100%">
+                            <mat-select [(ngModel)]="selectedBuilding" (selectionChange)="applyFilter()">
+                                <mat-option value="all">ทั้งหมด</mat-option>
+                                <mat-option *ngFor="let building of buildings" [value]="building">{{ building
+                                    }}</mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 220px">
+                        <div fxFlex="50px" fxLayoutAlign="end center">
+                            <span>สถานะ</span>
+                        </div>
+                        <div class="filter-input left" fxFlex style="height: 100%">
+                            <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()">
+                                <mat-option value="all">ทั้งหมด</mat-option>
+                                <mat-option value="active">มีผู้อยู่อาศัย</mat-option>
+                                <mat-option value="inactive">ไม่มีผู้อยู่อาศัย</mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Buttons -->
+                <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+                    <button mat-button class="bt-outline" (click)="onReset()">Reset</button>
+                    <button mat-flat-button color="primary" class="bt-search" (click)="applyFilter()">
+                        <mat-icon>search</mat-icon>
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Units Table Section -->
+    <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+        fxLayoutAlign="start stretch">
+        <mat-card>
+            <ng-container *ngTemplateOutlet="dataSource.data.length > 0 ? tableContent : noData"></ng-container>
+
+            <ng-template #tableContent>
+                <div class="div-table">
+                    <table mat-table [dataSource]="dataSource" matSort>
+                        <!-- Sequence Column -->
+                        <ng-container matColumnDef="sequence">
+                            <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+                            <td mat-cell *matCellDef="let element; let i = index">
+                                {{ paginator ? (paginator.pageIndex * paginator.pageSize) + i + 1 : i + 1 }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Unit Number Column -->
+                        <ng-container matColumnDef="unitNumber">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>เลขที่บ้าน</th>
+                            <td mat-cell *matCellDef="let element" class="font-semibold">{{ element.unit_number }}</td>
+                        </ng-container>
+
+                        <!-- Zone Column -->
+                        <ng-container matColumnDef="zone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>โซน</th>
+                            <td mat-cell *matCellDef="let element">{{ element.zone || '-' }}</td>
+                        </ng-container>
+
+                        <!-- Building Column -->
+                        <ng-container matColumnDef="building">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>แบบบ้าน</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="building-type">{{ element.building || '-' }}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Area Column -->
+                        <ng-container matColumnDef="area">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ขนาดพื้นที่ (ตร.ม.)</th>
+                            <td mat-cell *matCellDef="let element">{{ element.area_sqm || '-' }}</td>
+                        </ng-container>
+
+                        <!-- Status Column -->
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span [ngClass]="{
+                    'status-active': element.status === 'active' || !element.status,
+                    'status-inactive': element.status === 'inactive'
+                  }">
+                                    {{ (element.status === 'active' || !element.status) ? 'มีผู้อยู่อาศัย' :
+                                    'ไม่มีผู้อยู่อาศัย' }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Actions Column -->
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef style="text-align: center;">จัดการ</th>
+                            <td mat-cell *matCellDef="let element" style="text-align: center;">
+                                <!-- <button mat-icon-button color="primary" (click)="viewDetails(element)"
+                                    matTooltip="ดูรายละเอียด">
+                                    <mat-icon>visibility</mat-icon>
+                                </button> -->
+                                <button mat-icon-button color="accent" (click)="viewDetails(element)"
+                                    matTooltip="แก้ไข">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                    </table>
+
+                    <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons
+                        (page)="handlePageEvent($event)"></mat-paginator>
+                </div>
+            </ng-template>
+
+            <ng-template #noData>
+                <div class="no-data-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                    <mat-icon class="no-data-icon">home_work</mat-icon>
+                    <span class="no-data-text">ไม่พบข้อมูลยูนิต / บ้าน</span>
+                </div>
+            </ng-template>
+        </mat-card>
+    </div>
+</div>

@@ -19,6 +19,12 @@ export class SidebarComponent implements OnInit {
 
   menuItems = [
     {
+      title: 'ภาพรวม',
+      icon: 'assets/icons/village.svg',
+      route: '/dashboard',
+      active: false
+    },
+    {
       title: 'ประกาศ',
       icon: 'assets/icons/announcement.svg',
       route: '/announcement',
@@ -45,7 +51,7 @@ export class SidebarComponent implements OnInit {
     {
       title: 'ผู้มาเยี่ยม',
       icon: 'assets/icons/visitor.svg',
-      route: '/visitors',
+      route: '/vistor-management',
       active: false
     },
     {
@@ -72,6 +78,12 @@ export class SidebarComponent implements OnInit {
       route: '/residents-management',
       active: false
     },
+    // {
+    //   title: 'จัดการบ้าน/ยูนิต',
+    //   icon: 'assets/icons/village.svg',
+    //   route: '/unit-management',
+    //   active: false
+    // },
     {
       title: 'จัดการคำเชิญ',
       icon: 'assets/icons/invite.svg',
@@ -88,6 +100,12 @@ export class SidebarComponent implements OnInit {
       title: 'ข้อมูลแบบบ้าน',
       icon: 'assets/icons/village.svg', // Using village icon temporarily or you can change to a new one
       route: '/information-home-project',
+      active: false
+    },
+    {
+      title: 'จัดการสิทธิ์นิติ',
+      icon: 'assets/icons/security.svg',
+      route: '/edit-permission',
       active: false
     }
   ];
@@ -130,7 +148,9 @@ export class SidebarComponent implements OnInit {
     const currentUrl = this.router.url;
 
     // Handle special cases
-    if (currentUrl === '/' || currentUrl.startsWith('/announcement')) {
+    if (currentUrl === '/' || currentUrl.startsWith('/dashboard')) {
+      this.setActiveByRoute('/dashboard');
+    } else if (currentUrl.startsWith('/announcement')) {
       this.setActiveByRoute('/announcement');
     } else if (currentUrl.startsWith('/invite-management')) {
       this.setActiveByRoute('/invite-management');

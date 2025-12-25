@@ -1,0 +1,99 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="detail-container">
+    <!-- Header Section -->
+    <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+        <div class="breadcrumb">
+            <span class="sub-header" style="color: #9fa9b6">จัดการผู้มาเยี่ยม / </span>
+            <span class="sub-header" style="color: #171a1e">รายละเอียด</span>
+        </div>
+        <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon (click)="onBack()" class="back-icon">arrow_back</mat-icon>
+            <span class="sub-body">รายละเอียดผู้มาเยี่ยม</span>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="form-content" *ngIf="entryLog">
+        <mat-card>
+            <div fxLayout="column" fxLayoutGap="24px">
+                <!-- Images Section -->
+                <div class="images-section" fxLayout="row" fxLayoutGap="24px" fxLayout.lt-md="column">
+                    <!-- Car Image -->
+                    <div class="image-block" fxFlex="50" fxFlex.lt-md="100">
+                        <mat-label class="field-label">รูปภาพรถ</mat-label>
+                        <div class="image-container" *ngIf="entryLog.image_car_url; else noCarImage">
+                            <img [src]="entryLog.image_car_url" alt="รูปภาพรถ" (click)="viewCarImage()" />
+                        </div>
+                        <ng-template #noCarImage>
+                            <div class="no-image">
+                                <mat-icon>image_not_supported</mat-icon>
+                                <span>ไม่มีรูปภาพรถ</span>
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <!-- Driver Image -->
+                    <div class="image-block" fxFlex="50" fxFlex.lt-md="100">
+                        <mat-label class="field-label">รูปภาพคนขับ</mat-label>
+                        <div class="image-container" *ngIf="entryLog.image_driver_url; else noDriverImage">
+                            <img [src]="entryLog.image_driver_url" alt="รูปภาพคนขับ" (click)="viewDriverImage()" />
+                        </div>
+                        <ng-template #noDriverImage>
+                            <div class="no-image">
+                                <mat-icon>person_off</mat-icon>
+                                <span>ไม่มีรูปภาพคนขับ</span>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- Details Section -->
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">ทะเบียนรถ</mat-label>
+                        <div class="field-value plate-badge">{{ entryLog.plate_number }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">ชื่อผู้มาเยือน</mat-label>
+                        <div class="field-value">{{ entryLog.visitor_name || '-' }}</div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">บ้านเลขที่</mat-label>
+                        <div class="field-value">{{ entryLog.unit_number || '-' }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">สถานะ</mat-label>
+                        <div class="field-value">
+                            <span class="status-badge" [ngClass]="getStatusBadgeClass(entryLog)">
+                                {{ getStatusText(entryLog) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="half-width">
+                        <mat-label class="field-label">เวลาเข้า</mat-label>
+                        <div class="field-value">{{ formatDateTime(entryLog.check_in_time) }}</div>
+                    </div>
+                    <div class="half-width">
+                        <mat-label class="field-label">เวลาออก</mat-label>
+                        <div class="field-value">{{ formatDateTime(entryLog.check_out_time) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Button Group -->
+            <div class="btn-group">
+                <button class="btn-back" mat-stroked-button (click)="onBack()">
+                    <mat-icon>arrow_back</mat-icon>
+                    กลับ
+                </button>
+            </div>
+        </mat-card>
+    </div>
+</div>

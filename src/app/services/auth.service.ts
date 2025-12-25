@@ -2,17 +2,36 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs'; // Import tap operator
 import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../environments/environment';
+
+export interface RegisterRequest {
+  full_name: string;
+  phone: string;
+  email: string;
+  password: string;
+  role: 'juristic' | 'resident';
+}
+
+export interface RegisterResponse {
+  status: string;
+  message: string;
+  data?: {
+    user_id: string;
+    email: string;
+    role: string;
+  };
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api/auth'; // Adjust your backend API URL
+  private apiUrl = `${environment.apiUrl}/api/auth`;
 
   constructor(private http: HttpClient) { }
 
-  register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, userData);
   }
 
   login(credentials: any): Observable<any> {

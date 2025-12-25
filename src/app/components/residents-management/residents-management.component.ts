@@ -20,6 +20,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+// Service
+import { RestService } from '../../services/rest.service';
+import { AuthService } from '../../services/auth.service';
+
 // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
@@ -28,7 +32,7 @@ type StatusType = 'active' | 'inactive' | 'pending';
 
 // สร้าง interface สำหรับข้อมูลผู้อยู่อาศัย
 interface Resident {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   houseNumber: string;
@@ -38,6 +42,7 @@ interface Resident {
   status: ResidentStatus;
   createdAt: Date;
   updatedAt: Date;
+  role: string;
 }
 
 interface APIResponse {
@@ -52,16 +57,18 @@ interface APIResponse {
 }
 
 interface ResidentAPI {
-  id: string;
-  first_name: string;
-  last_name: string;
-  house_number: string;
-  phone: string;
+  membership_id: string;
+  unit_id: string;
+  user_id: string;
+  unit_role: string;
+  joined_at: string;
+  full_name: string;
   email: string;
-  move_in_date: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
+  phone: string;
+  unit_number: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 @Component({
@@ -87,8 +94,6 @@ interface ResidentAPI {
   styleUrls: ['./residents-management.component.scss'],
 })
 export class ResidentsManagementComponent implements OnInit {
-  private apiUrl = 'http://localhost:5000/api/residents';
-
   isLoading = new BehaviorSubject<boolean>(true);
   isLoading$: Observable<boolean> = this.isLoading.asObservable();
 
@@ -116,16 +121,30 @@ export class ResidentsManagementComponent implements OnInit {
   selectedStatus: ResidentStatus = 'all';
 
   private allResidents: Resident[] = [];
+  projectId: string = '';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private restService: RestService,
+    private authService: AuthService
+  ) {
     this.dataSource = new MatTableDataSource<Resident>([]);
   }
 
   ngOnInit() {
+    this.loadProjectData();
     this.loadResidents();
+  }
+
+  loadProjectData() {
+    const projectMemberships = this.authService.getProjectMemberships();
+    if (projectMemberships && projectMemberships.length > 0) {
+      this.projectId = projectMemberships[0].project_id;
+    }
   }
 
   ngAfterViewInit() {
@@ -135,34 +154,43 @@ export class ResidentsManagementComponent implements OnInit {
     // กำหนด filter predicate สำหรับการค้นหา
     this.dataSource.filterPredicate = (data: Resident, filter: string) => {
       return data.firstName.toLowerCase().includes(filter.toLowerCase()) ||
-             data.lastName.toLowerCase().includes(filter.toLowerCase());
+        data.lastName.toLowerCase().includes(filter.toLowerCase());
     };
   }
 
   loadResidents() {
     this.isLoading.next(true);
 
-    this.http
-      .get<APIResponse>(this.apiUrl)
+    this.restService.getResidents(this.projectId)
       .pipe(
-        map((response) => {
-          return response.data.map((item) => {
+        map((response: any) => {
+          let data: ResidentAPI[] = [];
+
+          if (response && response.data) {
+            data = response.data;
+          } else if (Array.isArray(response)) {
+            data = response;
+          }
+
+          return data.map((item) => {
+            const [firstName, ...lastNameParts] = (item.full_name || '').split(' ');
             return {
-              id: Number(item.id.replace('res', '')),
-              firstName: item.first_name,
-              lastName: item.last_name,
-              houseNumber: item.house_number,
+              id: item.membership_id,
+              firstName: firstName || '',
+              lastName: lastNameParts.join(' ') || '',
+              houseNumber: item.unit_number,
               phone: item.phone,
               email: item.email,
-              moveInDate: new Date(item.move_in_date),
+              moveInDate: new Date(item.joined_at),
               status: (item.status as StatusType) || 'active',
-              createdAt: new Date(item.created_at),
-              updatedAt: new Date(item.updated_at),
+              createdAt: item.created_at ? new Date(item.created_at) : new Date(item.joined_at),
+              updatedAt: item.updated_at ? new Date(item.updated_at) : new Date(item.joined_at),
+              role: item.unit_role
             };
           });
         }),
         catchError((error) => {
-          console.error('Error details:', error);
+          console.error('Error loading residents:', error);
           return of([] as Resident[]);
         }),
         finalize(() => {
@@ -173,55 +201,36 @@ export class ResidentsManagementComponent implements OnInit {
         next: (residents) => {
           this.allResidents = residents;
           this.dataSource.data = residents;
+          if (this.paginator) {
+            this.dataSource.paginator = this.paginator;
+          }
+          if (this.sort) {
+            this.dataSource.sort = this.sort;
+          }
         },
         error: (error) => console.error('Subscription error:', error),
       });
   }
 
   onSearch(): void {
-    this.isLoading.next(true);
+    const filterValue = this.searchTerm.trim().toLowerCase();
+    this.dataSource.filter = filterValue;
 
-    const params = new URLSearchParams();
     if (this.selectedStatus !== 'all') {
-      params.append('status', this.selectedStatus);
+      this.dataSource.data = this.allResidents.filter(
+        (item) => item.status === this.selectedStatus &&
+          (item.firstName.toLowerCase().includes(filterValue) || item.lastName.toLowerCase().includes(filterValue))
+      );
     }
-
-    this.http
-      .get<APIResponse>(`${this.apiUrl}?${params.toString()}`)
-      .pipe(
-        map((response) => {
-          return response.data.map((item) => {
-            return {
-              id: Number(item.id.replace('res', '')),
-              firstName: item.first_name,
-              lastName: item.last_name,
-              houseNumber: item.house_number,
-              phone: item.phone,
-              email: item.email,
-              moveInDate: new Date(item.move_in_date),
-              status: (item.status as StatusType) || 'active',
-              createdAt: new Date(item.created_at),
-              updatedAt: new Date(item.updated_at),
-            };
-          });
-        }),
-        catchError((error) => {
-          console.error('Error searching residents:', error);
-          return of([] as Resident[]);
-        }),
-        finalize(() => {
-          this.isLoading.next(false);
-        })
-      )
-      .subscribe((residents) => {
-        this.dataSource.data = residents;
-      });
   }
 
   onReset(): void {
     this.searchTerm = '';
     this.selectedStatus = 'all';
     this.dataSource.data = this.allResidents;
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   applyFilter(event: Event) {
@@ -230,12 +239,18 @@ export class ResidentsManagementComponent implements OnInit {
   }
 
   filterByStatus(status: string) {
+    this.selectedStatus = status as ResidentStatus;
     if (status === 'all') {
       this.dataSource.data = this.allResidents;
     } else {
       this.dataSource.data = this.allResidents.filter(
         (item) => item.status === status
       );
+    }
+
+    // Re-apply search filter if exists
+    if (this.searchTerm) {
+      this.onSearch();
     }
   }
 
@@ -244,7 +259,7 @@ export class ResidentsManagementComponent implements OnInit {
   }
 
   viewDetails(resident: Resident): void {
-    this.router.navigate(['/residents-management/detail', `res${resident.id}`]);
+    this.router.navigate(['/residents-management/detail', resident.id]);
   }
 
   handlePageEvent(event: PageEvent) {

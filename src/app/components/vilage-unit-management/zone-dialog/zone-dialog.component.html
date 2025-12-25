@@ -1,0 +1,63 @@
+<div class="dialog-container">
+    <div mat-dialog-title>
+        <h2>{{ isEditMode ? 'แก้ไขข้อมูลโซน' : 'เพิ่มโซนใหม่' }}</h2>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div mat-dialog-content>
+            <div fxLayout="column" fxLayoutGap="16px">
+                <!-- Name & Code -->
+                <div fxLayout="row" fxLayoutGap="16px">
+                    <mat-form-field appearance="outline" fxFlex>
+                        <mat-label>ชื่อโซน</mat-label>
+                        <input matInput formControlName="name" placeholder="เช่น Zone A" required>
+                        <mat-error *ngIf="form.get('name')?.hasError('required')">กรุณาระบุชื่อโซน</mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" fxFlex="30">
+                        <mat-label>รหัสโซน</mat-label>
+                        <input matInput formControlName="code" placeholder="เช่น ZA">
+                    </mat-form-field>
+                </div>
+
+                <!-- Description -->
+                <mat-form-field appearance="outline">
+                    <mat-label>รายละเอียดเพิ่มเติม</mat-label>
+                    <textarea matInput formControlName="description" rows="2"></textarea>
+                </mat-form-field>
+
+                <!-- Color Picker (Simple Input type=color) -->
+                <div class="color-picker-field" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                    <label>สีประจำโซน:</label>
+                    <input type="color" formControlName="color"
+                        style="height: 40px; width: 60px; border: none; padding: 0;">
+                </div>
+
+                <mat-divider></mat-divider>
+                <h3 style="margin: 10px 0 5px 0; font-size: 14px; color: #64748b;">ข้อมูลติดต่อป้อม รปภ.</h3>
+
+                <!-- Phone Numbers -->
+                <div fxLayout="row" fxLayoutGap="16px">
+                    <mat-form-field appearance="outline" fxFlex>
+                        <mat-label>เบอร์โทรศัพท์ 1</mat-label>
+                        <input matInput formControlName="guard_phone" placeholder="0xx-xxx-xxxx">
+                        <mat-icon matSuffix>phone</mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" fxFlex>
+                        <mat-label>เบอร์โทรศัพท์ 2</mat-label>
+                        <input matInput formControlName="guard_phone_2" placeholder="0xx-xxx-xxxx">
+                        <mat-icon matSuffix>phone</mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+
+        <div mat-dialog-actions align="end">
+            <button mat-button type="button" (click)="onCancel()" class="btn-cancel">ยกเลิก</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+                {{ isEditMode ? 'บันทึกการแก้ไข' : 'สร้างโซน' }}
+            </button>
+        </div>
+    </form>
+</div>

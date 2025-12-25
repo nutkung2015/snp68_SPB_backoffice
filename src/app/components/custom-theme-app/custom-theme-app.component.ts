@@ -13,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { environment } from '../../../environments/environment';
+import { RestService } from '../../services/rest.service';
 
 interface ThemeSettings {
   project_id: string;
@@ -55,6 +56,133 @@ export class CustomThemeAppComponent implements OnInit {
   hasExistingCustomization = false; // ตรวจสอบว่ามี customization อยู่แล้วหรือไม่
   selectedFile: File | null = null;
 
+  // Theme Style Presets - จัดกลุ่มตามสไตล์โครงการบ้านในไทย
+  themeStyleGroups = [
+    {
+      groupName: 'Luxury & Trust',
+      groupNameTH: 'หรูหรา น่าเชื่อถือ',
+      groupIcon: 'diamond',
+      description: 'เหมาะกับคอนโดหรู โครงการระดับ High-end',
+      themes: [
+        {
+          id: 'elegant-dark',
+          name: 'Elegant Dark',
+          nameTH: 'หรูหราเข้ม',
+          primary: '#0D2A4A',
+          secondary: '#C5A065',
+          preview: 'สไตล์ Sansiri / SC Asset'
+        },
+        {
+          id: 'platinum',
+          name: 'Platinum',
+          nameTH: 'แพลทินัม',
+          primary: '#1C1C1E',
+          secondary: '#A8A9AD',
+          preview: 'โทนเทาหรู ทันสมัย'
+        }
+      ]
+    },
+    {
+      groupName: 'Nature & Well-being',
+      groupNameTH: 'ธรรมชาติ ร่มรื่น',
+      groupIcon: 'park',
+      description: 'เหมาะกับบ้านเดี่ยว โครงการแนว Green Living',
+      themes: [
+        {
+          id: 'eco-life',
+          name: 'Eco Life',
+          nameTH: 'ธรรมชาติสดใส',
+          primary: '#2E5945',
+          secondary: '#E3D5CA',
+          preview: 'สไตล์ Land & Houses'
+        },
+        {
+          id: 'fresh-garden',
+          name: 'Fresh Garden',
+          nameTH: 'สวนสดใส',
+          primary: '#82BC00',
+          secondary: '#8D7B68',
+          preview: 'สไตล์ Pruksa'
+        }
+      ]
+    },
+    {
+      groupName: 'Modern & Energetic',
+      groupNameTH: 'ทันสมัย กระฉับกระเฉง',
+      groupIcon: 'bolt',
+      description: 'เหมาะกับคอนโดติดรถไฟฟ้า ทาวน์โฮมคนรุ่นใหม่',
+      themes: [
+        {
+          id: 'urban-loft',
+          name: 'Urban Loft',
+          nameTH: 'เมืองทันสมัย',
+          primary: '#A00000',
+          secondary: '#F4F4F5',
+          preview: 'สไตล์ AP Thailand'
+        },
+        {
+          id: 'sunrise-energy',
+          name: 'Sunrise Energy',
+          nameTH: 'พลังใหม่',
+          primary: '#E87D2E',
+          secondary: '#282828',
+          preview: 'สไตล์ Origin'
+        }
+      ]
+    },
+    {
+      groupName: 'Minimal & Zen',
+      groupNameTH: 'เรียบง่าย สงบ',
+      groupIcon: 'spa',
+      description: 'เหมาะกับโครงการแนว Muji / Nordic / Japanese',
+      themes: [
+        {
+          id: 'zen-minimal',
+          name: 'Zen Minimal',
+          nameTH: 'มินิมอลเซน',
+          primary: '#8D8D8D',
+          secondary: '#F5F5F0',
+          preview: 'โทนญี่ปุ่นเรียบ'
+        },
+        {
+          id: 'warm-nordic',
+          name: 'Warm Nordic',
+          nameTH: 'นอร์ดิกอบอุ่น',
+          primary: '#A69082',
+          secondary: '#F5F5F0',
+          preview: 'โทนครีมอุ่น'
+        }
+      ]
+    },
+    {
+      groupName: 'SPB Signature',
+      groupNameTH: 'SPB ซิกเนเจอร์',
+      groupIcon: 'star',
+      description: 'โทนสีประจำแบรนด์ SPB สไตล์ทันสมัย น่าเชื่อถือ',
+      themes: [
+        {
+          id: 'spb-ocean-blue',
+          name: 'SPB Ocean Blue',
+          nameTH: 'SPB โอเชี่ยนบลู',
+          primary: '#1F7EFF',
+          secondary: '#2A405E',
+          preview: 'โทนฟ้าสด ทันสมัย'
+        },
+        {
+          id: 'spb-deep-navy',
+          name: 'SPB Deep Navy',
+          nameTH: 'SPB ดีพเนวี่',
+          primary: '#2A405E',
+          secondary: '#1F7EFF',
+          preview: 'โทนน้ำเงินเข้ม มั่นคง'
+        }
+      ]
+    }
+  ];
+
+  // Selected theme ID for highlighting
+  selectedThemeId: string = '';
+
   quickActions = [
     { icon: 'receipt', label: 'บิลค่าใช้จ่าย' },
     { icon: 'chat', label: 'แชท' },
@@ -63,7 +191,7 @@ export class CustomThemeAppComponent implements OnInit {
     { icon: 'notifications', label: 'การแจ้งเตือน' },
     { icon: 'menu_book', label: 'คู่มือ' },
   ];
-  constructor(private snackBar: MatSnackBar, private http: HttpClient) { }
+  constructor(private snackBar: MatSnackBar, private http: HttpClient, private restService: RestService) { }
 
   ngOnInit() {
     console.log('ngOnInit เริ่มทำงาน');
@@ -190,6 +318,14 @@ export class CustomThemeAppComponent implements OnInit {
     this.previewTheme = { ...this.theme };
   }
 
+  // เลือก Theme Style จาก preset
+  selectThemeStyle(themeId: string, primary: string, secondary: string) {
+    this.selectedThemeId = themeId;
+    this.theme.primary_color = primary;
+    this.theme.secondary_color = secondary;
+    this.updatePreview();
+  }
+
   // ฟังก์ชันหลักที่ตรวจสอบว่าจะ create หรือ update
   saveTheme() {
     if (this.hasExistingCustomization) {
@@ -201,8 +337,6 @@ export class CustomThemeAppComponent implements OnInit {
 
   // สร้าง customization ใหม่
   createTheme() {
-    const apiUrl = `${environment.apiUrl}/api/project-customizations`;
-
     // สร้าง FormData สำหรับส่งไฟล์และข้อมูลอื่นๆ
     const formData = new FormData();
     const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
@@ -218,7 +352,7 @@ export class CustomThemeAppComponent implements OnInit {
 
     console.log('Creating new theme with FormData');
 
-    this.http.post(apiUrl, formData).subscribe({
+    this.restService.createProjectCustomization(formData).subscribe({
       next: (response: any) => {
         console.log('Create API Response:', response);
 
@@ -269,7 +403,6 @@ export class CustomThemeAppComponent implements OnInit {
   // อัปเดต customization ที่มีอยู่
   updateTheme() {
     const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
-    const apiUrl = `${environment.apiUrl}/api/project-customizations/${projectId}`;
 
     // สร้าง FormData สำหรับส่งไฟล์และข้อมูลอื่นๆ
     const formData = new FormData();
@@ -284,7 +417,7 @@ export class CustomThemeAppComponent implements OnInit {
 
     console.log('Updating theme with FormData');
 
-    this.http.put(apiUrl, formData).subscribe({
+    this.restService.updateProjectCustomization(projectId, formData).subscribe({
       next: (response: any) => {
         console.log('Update API Response:', response);
 
@@ -329,20 +462,77 @@ export class CustomThemeAppComponent implements OnInit {
   }
 
   resetToDefault() {
-    this.theme = {
-      project_id: this.theme.project_id || localStorage.getItem('project_id') || '',
+    const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
+
+    // กำหนดค่า default
+    const defaultTheme = {
       primary_color: '#3f51b5',
       secondary_color: '#ff4081',
-      logo_url: 'assets/images/logo-default.png',
+      logo_url: 'assets/livlink_logo.png',
       favicon_url: 'assets/favicon.ico',
     };
-    localStorage.removeItem('projectCustomizations');
-    this.isDefaultTheme = true;
-    this.hasExistingCustomization = false; // รีเซ็ตสถานะ
-    this.updatePreview();
 
-    this.snackBar.open('รีเซ็ตธีมเป็นค่าเริ่มต้นแล้ว', 'ปิด', {
-      duration: 3000,
-    });
+    // Fetch รูป default logo แล้วส่งไปพร้อม FormData
+    fetch(defaultTheme.logo_url)
+      .then(response => response.blob())
+      .then(blob => {
+        // สร้าง FormData สำหรับส่งค่า default ไป Backend
+        const formData = new FormData();
+        formData.append('primary_color', defaultTheme.primary_color);
+        formData.append('secondary_color', defaultTheme.secondary_color);
+
+        // สร้าง File จาก Blob และ append เข้า FormData
+        const defaultLogoFile = new File([blob], 'livlink_logo.png', { type: 'image/png' });
+        formData.append('logo', defaultLogoFile, 'livlink_logo.png');
+
+        // เรียก API เพื่ออัปเดตค่า default ไปที่ Backend
+        this.restService.updateProjectCustomization(projectId, formData).subscribe({
+          next: (response: any) => {
+            console.log('Reset to default API Response:', response);
+
+            // อัปเดต theme ใน component
+            this.theme = {
+              project_id: projectId,
+              ...defaultTheme,
+            };
+
+            // อัปเดต localStorage ด้วยค่า default
+            try {
+              const existingData = JSON.parse(localStorage.getItem('projectCustomizations') || '{}');
+              const customizationData = {
+                ...existingData,
+                primary_color: defaultTheme.primary_color,
+                secondary_color: defaultTheme.secondary_color,
+                logo_url: response.data?.logo_url || defaultTheme.logo_url,
+                updated_at: new Date().toISOString(),
+              };
+              localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));
+              console.log('Updated projectCustomizations with default:', customizationData);
+            } catch (e) {
+              console.error('Error updating localStorage:', e);
+            }
+
+            this.isDefaultTheme = true;
+            this.selectedThemeId = ''; // ล้าง theme ที่เลือก
+            this.updatePreview();
+
+            this.snackBar.open('รีเซ็ตธีมเป็นค่าเริ่มต้นแล้ว', 'ปิด', {
+              duration: 3000,
+            });
+          },
+          error: (error) => {
+            console.error('Error resetting theme:', error);
+            this.snackBar.open('เกิดข้อผิดพลาดในการรีเซ็ตธีม', 'ปิด', {
+              duration: 3000,
+            });
+          },
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching default logo:', error);
+        this.snackBar.open('เกิดข้อผิดพลาดในการโหลดรูป default', 'ปิด', {
+          duration: 3000,
+        });
+      });
   }
 }

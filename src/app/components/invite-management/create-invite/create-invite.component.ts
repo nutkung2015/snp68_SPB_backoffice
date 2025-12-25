@@ -18,6 +18,7 @@ import { BehaviorSubject } from 'rxjs';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AuthService } from '../../../services/auth.service';
 import { InvitationSuccessDialogComponent, InvitationSuccessData } from '../../dialog/invitation-success-dialog/invitation-success-dialog.component';
+import { RestService } from '../../../services/rest.service';
 
 interface ProjectMembership {
   project_id: string;
@@ -80,7 +81,8 @@ export class CreateInviteComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private restService: RestService
   ) {
     this.inviteForm = this.fb.group({
       unit_id: [''],
@@ -100,7 +102,7 @@ export class CreateInviteComponent implements OnInit {
       const firstProject = projectMemberships[0];
       this.projectId = firstProject.project_id;
       this.projectName = firstProject.project_name || 'ไม่ระบุชื่อโครงการ';
-      
+
       // ดึง uinit มาเช็ค
       this.loadUnits();
     }
@@ -108,10 +110,18 @@ export class CreateInviteComponent implements OnInit {
 
   loadUnits() {
     this.isLoading.next(true);
-    this.http.get<any>(`http://localhost:5000/api/units?project_id=${this.projectId}`)
+    // Use RestService to get units
+    this.restService.getUnits(this.projectId)
       .subscribe({
-        next: (response) => {
-          this.units = response.data || [];
+        next: (response: any) => {
+          // Adjust based on RestService return type
+          if (Array.isArray(response)) {
+            this.units = response;
+          } else if (response && response.data) {
+            this.units = response.data;
+          } else {
+            this.units = [];
+          }
           this.isLoading.next(false);
         },
         error: (error) => {
@@ -149,27 +159,28 @@ export class CreateInviteComponent implements OnInit {
 
       try {
         const formValue = this.inviteForm.value;
-        let apiUrl = '';
-        let payload: any = {};
+        let response: any;
 
         if (this.inviteType === 'resident') {
-          apiUrl = 'http://localhost:5000/api/units/invitations';
-          payload = {
+          // Use RestService for unit invitation
+          const payload: any = {
             unit_id: formValue.unit_id,
             role: formValue.role,
             invited_email: formValue.invited_email
           };
+
+          response = await this.restService.createUnitInvitation(payload).toPromise();
+
         } else {
-          apiUrl = 'http://localhost:5000/api/project_invitations/create';
-          payload = {
+          // Use RestService for project invitation
+          const payload = {
             project_id: this.projectId,
             role: formValue.role
           };
+
+          response = await this.restService.createProjectInvitation(payload).toPromise();
         }
 
-        console.log('Submitting invitation:', payload);
-
-        const response = await this.http.post(apiUrl, payload).toPromise() as any;
         console.log('Response:', response);
 
         if (response) {

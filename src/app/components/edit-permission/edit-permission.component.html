@@ -1,0 +1,212 @@
+<div class="edit-permission-page">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading$ | async">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/security.svg" title="จัดการสมาชิกนิติบุคคล"
+        subtitle="Manage Juristic Members" iconColor="invert(100%)">
+        <div class="header-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <!-- Invite New Member Button -->
+            <button mat-flat-button color="primary" class="btn-invite" (click)="inviteMember()"
+                *ngIf="isJuristicLeader">
+                <mat-icon>person_add</mat-icon>
+                <span>เชิญสมาชิกใหม่</span>
+            </button>
+            <button mat-button class="bt-outline" (click)="onReset()" *ngIf="isJuristicLeader">
+                <mat-icon>refresh</mat-icon>
+                <span>ล้างตัวกรอง</span>
+            </button>
+        </div>
+    </app-page-header>
+
+    <!-- Access Denied Message (if not JuristicLeader) -->
+    <div *ngIf="!isJuristicLeader" class="access-denied-container">
+        <mat-card class="access-denied-card">
+            <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                <mat-icon class="lock-icon">lock</mat-icon>
+                <h2>ไม่มีสิทธิ์เข้าถึง</h2>
+                <p>เฉพาะหัวหน้านิติบุคคล (JuristicLeader) เท่านั้นที่สามารถจัดการสมาชิกได้</p>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Main Content (if JuristicLeader) -->
+    <ng-container *ngIf="isJuristicLeader">
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+            <div class="search-container">
+                <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <!-- Search Input -->
+                    <div class="filter-input-group" fxFlex="300px">
+                        <div class="filter-input right">
+                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
+                                <mat-icon class="secondary">search</mat-icon>
+                                <input matInput type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()"
+                                    placeholder="ค้นหาชื่อหรือเบอร์โทร"
+                                    style="border: none; width: 100%; height: 100%" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Filter -->
+                    <div class="filter-select-group" fxFlex="180px">
+                        <div class="filter-input left">
+                            <mat-select [(ngModel)]="selectedRole" (selectionChange)="applyFilter()"
+                                placeholder="บทบาท">
+                                <mat-option value="all">บทบาททั้งหมด</mat-option>
+                                <mat-option value="juristicLeader">หัวหน้านิติบุคคล</mat-option>
+                                <mat-option value="juristicMember">นิติบุคคล</mat-option>
+                                <mat-option value="security">รปภ.</mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="filter-select-group" fxFlex="150px">
+                        <div class="filter-input left">
+                            <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()"
+                                placeholder="สถานะ">
+                                <mat-option value="all">สถานะทั้งหมด</mat-option>
+                                <mat-option value="active">ใช้งาน</mat-option>
+                                <mat-option value="inactive">ระงับ</mat-option>
+                            </mat-select>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div fxFlex fxLayoutAlign="end center">
+                        <span class="results-count">{{ dataSource.data.length }} รายการ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Table Section -->
+        <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+            fxLayoutAlign="start stretch">
+            <mat-card>
+                <ng-container *ngTemplateOutlet="dataSource.data.length > 0 ? tableContent : noData"></ng-container>
+
+                <ng-template #tableContent>
+                    <div class="div-table">
+                        <table mat-table [dataSource]="dataSource" matSort>
+                            <!-- Sequence Column -->
+                            <ng-container matColumnDef="sequence">
+                                <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+                                <td mat-cell *matCellDef="let element; let i = index">
+                                    {{ paginator ? (paginator.pageIndex * paginator.pageSize) + i + 1 : i + 1 }}
+                                </td>
+                            </ng-container>
+
+                            <!-- Full Name Column -->
+                            <ng-container matColumnDef="fullName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>ชื่อ-นามสกุล</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <mat-icon>person</mat-icon>
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name">{{ element.full_name }}</span>
+                                            <span class="user-email">{{ element.email || '-' }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </ng-container>
+
+                            <!-- Phone Column -->
+                            <ng-container matColumnDef="phone">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>เบอร์โทร</th>
+                                <td mat-cell *matCellDef="let element">{{ element.phone || '-' }}</td>
+                            </ng-container>
+
+                            <!-- Role Column -->
+                            <ng-container matColumnDef="role">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>บทบาท</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span [ngClass]="getRoleBadgeClass(element.role_in_project)" class="role-badge">
+                                        {{ getRoleDisplayName(element.role_in_project) }}
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <!-- COMMENTED: Permissions Column (FOR FUTURE USE)
+                            <ng-container matColumnDef="permissions">
+                                <th mat-header-cell *matHeaderCellDef>สิทธิ์การใช้งาน</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <div class="permissions-preview">
+                                        <mat-chip-set>
+                                            <mat-chip *ngFor="let perm of getActivePermissions(element.permissions)"
+                                                class="permission-chip">
+                                                {{ perm }}
+                                            </mat-chip>
+                                        </mat-chip-set>
+                                        <span class="permission-count" *ngIf="getPermissionCount(element.permissions) > 3">
+                                            +{{ getPermissionCount(element.permissions) - 3 }} อื่นๆ
+                                        </span>
+                                    </div>
+                                </td>
+                            </ng-container>
+                            -->
+
+                            <!-- Status Column -->
+                            <ng-container matColumnDef="status">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span [ngClass]="{
+                                        'status-active': element.status === 'active' || !element.status,
+                                        'status-inactive': element.status === 'inactive'
+                                    }">
+                                        {{ (element.status === 'active' || !element.status) ? 'ใช้งาน' : 'ระงับ' }}
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <!-- Actions Column - Changed to invite/remove -->
+                            <ng-container matColumnDef="actions">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center;">จัดการ</th>
+                                <td mat-cell *matCellDef="let element" style="text-align: center;">
+                                    <!-- COMMENTED: Edit Permission Button (FOR FUTURE USE)
+                                    <button mat-icon-button 
+                                        [color]="canEditMember(element) ? 'primary' : 'default'"
+                                        [disabled]="!canEditMember(element)"
+                                        (click)="openEditDialog(element)"
+                                        [matTooltip]="canEditMember(element) ? 'แก้ไขสิทธิ์' : 'ไม่สามารถแก้ไขได้'">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    -->
+
+                                    <!-- Remove Member Button -->
+                                    <button mat-icon-button color="warn" [disabled]="!canRemoveMember(element)"
+                                        (click)="removeMember(element)"
+                                        [matTooltip]="canRemoveMember(element) ? 'นำออกจากโปรเจค' : 'ไม่สามารถนำออกได้'">
+                                        <mat-icon>person_remove</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns"
+                                [class.self-row]="row.user_id === currentUserId"></tr>
+                        </table>
+
+                        <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+                    </div>
+                </ng-template>
+
+                <ng-template #noData>
+                    <div class="no-data-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                        <mat-icon class="no-data-icon">people_outline</mat-icon>
+                        <span class="no-data-text">ไม่พบข้อมูลนิติบุคคล</span>
+                        <button mat-flat-button color="primary" (click)="inviteMember()">
+                            <mat-icon>person_add</mat-icon>
+                            เชิญสมาชิกใหม่
+                        </button>
+                    </div>
+                </ng-template>
+            </mat-card>
+        </div>
+    </ng-container>
+</div>

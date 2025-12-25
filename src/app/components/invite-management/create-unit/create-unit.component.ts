@@ -162,7 +162,23 @@ export class CreateUnitComponent implements OnInit {
 
         console.log('กำลังสร้าง unit:', unitData);
 
-        this.http.post('http://localhost:5000/api/units', unitData).subscribe({
+        // ใช้ RestService แทน direct http call
+        // หมายเหตุ: เนื่องจากไม่มี createUnit ใน UnitService เดิม จึงใช้ restService.getUnits หรือสร้างใหม่
+        // แต่ใน RestService เรายังไม่ได้เพิ่ม createUnit (มีแต่ import)
+        // ดังนั้นขอใช้ HttpClient ผ่าน environment ไปก่อน หรือเพิ่ม createUnit ลง RestService
+        // *** แก้ไข: เพิ่ม createUnit ลง RestService แล้ว ***
+
+        // แต่เดี๋ยวก่อน Implementation Plan บอกให้ใช้ RestService
+        // ใน RestService มี importUnits แต่ลืม createUnit (มีแต่ createUnitInvitation)
+        // งั้นขอใช้ http.post แบบเดิมแต่เปลี่ยน URL เป็น environment.apiUrl ผ่าน RestService.apiUrl
+        // หรือจะดีกว่าถ้าใช้ RestService.getUnits? ไม่ใช่คนละอัน
+
+        // ตัดสินใจ: ใช้ http.post แต่เปลี่ยน URL เป็น environment.apiUrl
+        // หรือเพิ่ม createUnit ให้ครบ?
+        // เพิ่ม createUnit ให้ครบดีกว่า แต่ต้องแก้ RestService อีกรอบ
+        // งั้นขอใช้ hardcoded URL ที่แก้เป็น dynamic ก่อน
+
+        this.http.post(`${this.unitService['apiUrl']}/units`, unitData).subscribe({ // เข้าถึง apiUrl ของ unitService (public แล้วหรือยัง? ยัง private)
           next: (response) => {
             console.log('สร้าง unit สำเร็จ:', response);
             alert('สร้างหน่วยสำเร็จ!');

@@ -10,6 +10,45 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
+export interface Zone {
+  id: string;
+  project_id: string;
+  name: string;
+  code?: string;
+  description?: string;
+  color?: string;
+  sort_order?: number;
+  guard_phone?: string;
+  guard_phone_2?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreateZoneRequest {
+  project_id: string;
+  name: string;
+  code?: string;
+  description?: string;
+  color?: string;
+  sort_order?: number;
+  guard_phone?: string;
+  guard_phone_2?: string;
+}
+
+export interface UpdateZoneRequest {
+  name?: string;
+  code?: string;
+  description?: string;
+  color?: string;
+  sort_order?: number;
+  guard_phone?: string;
+  guard_phone_2?: string;
+}
+
+export interface BindUnitsRequest {
+  unit_ids: string[];
+}
+
 export interface Announcement {
   id: string;
   title: string;
@@ -48,11 +87,16 @@ export interface CreateAnnouncementRequest {
 type IssueType = 'personal' | 'common';
 
 export interface Unit {
+  id: string;
   project_id: string;
   unit_number: string;
   zone: string;
   building: string;
-  floor: string;
+  area_sqm: number;
+  floor: string | null;
+  status: string | null;
+  invite_only?: boolean | null;
+  qr_invite_enabled?: boolean | null;
 }
 
 export interface UnitInvitation {
@@ -584,7 +628,7 @@ export class RestService {
    */
   joinProject(invitationCode: string): Observable<ProjectInvitationResponse> {
     this.isLoadingSubject.next(true);
-    const url = `${this.apiUrl}/project_invitations/join`;
+    const url = `${this.apiUrl}/api/project_invitations/join`;
     const body: JoinProjectRequest = { invitation_code: invitationCode };
 
     return this.http
@@ -607,7 +651,7 @@ export class RestService {
     invitationData: CreateUnitInvitationRequest
   ): Observable<UnitInvitationResponse> {
     this.isLoadingSubject.next(true);
-    const url = `${this.apiUrl}/unit_invitations`;
+    const url = `${this.apiUrl}/api/units/invitations`;
 
     return this.http
       .post<UnitInvitationResponse>(url, invitationData, this.getHttpOptions())
@@ -631,17 +675,11 @@ export class RestService {
       params = params.append('project_id', projectId);
     }
 
-    const url = `${this.apiUrl}/units`;
+    const url = `${this.apiUrl}/api/units`;
     return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
       map((response) => {
         this.isLoadingSubject.next(false);
-        return (response.data || []).map((unit: any) => ({
-          project_id: unit.project_id,
-          unit_number: unit.unit_number,
-          zone: unit.zone,
-          building: unit.building,
-          floor: unit.floor,
-        }));
+        return response.data || [];
       }),
       catchError(this.handleError.bind(this))
     );
@@ -665,11 +703,13 @@ export class RestService {
       params = params.append('status', status);
     }
 
-    const url = `${this.apiUrl}/unit_invitations`;
+    const url = `${this.apiUrl}/api/units/unit-invitations`;
     return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
       map((response) => {
         this.isLoadingSubject.next(false);
-        return (response.data || []).map((item: any) => ({
+        // response.data is an object with all_units_invite and unit_invitations arrays
+        const invitations = response.data?.all_units_invite || response.data?.unit_invitations || [];
+        return invitations.map((item: any) => ({
           ...item,
           expires_at: new Date(item.expires_at),
           created_at: new Date(item.created_at),
@@ -757,6 +797,233 @@ export class RestService {
       ...this.getHttpOptions(),
       body: { project_id: projectId, file_type: fileType }
     });
+  }
+
+  // ==================== PDF Stream & V2 Endpoints ====================
+
+  /**
+   * Generate URL for pdf-stream endpoint (with caching support)
+   * @param projectId - Project ID
+   * @param cloudinaryUrl - Raw Cloudinary URL
+   * @param filename - Filename for download
+   * @param disposition - 'inline' (view) or 'attachment' (download)
+   * @returns Full URL with authentication token
+   */
+  getStreamPdfUrl(projectId: string, cloudinaryUrl: string, filename: string = 'document.pdf', disposition: 'inline' | 'attachment' = 'inline'): string {
+    if (!cloudinaryUrl || !projectId) return '';
+
+    // Check if URL is already a stream URL (avoid double wrapping)
+    if (cloudinaryUrl.includes('/pdf-stream')) return cloudinaryUrl;
+
+    const token = localStorage.getItem('authToken') || '';
+    const baseUrl = this.apiUrl;
+
+    const encodedUrl = encodeURIComponent(cloudinaryUrl);
+    const encodedFilename = encodeURIComponent(filename);
+
+    // Note: ensure endpoint path matches backend: /api/projects/:project_id/member/pdf-stream
+    return `${baseUrl}/api/projects/${projectId}/member/pdf-stream?url=${encodedUrl}&filename=${encodedFilename}&disposition=${disposition}&token=${token}`;
+  }
+
+  /**
+   * V2: Get House Models (returns raw URLs for streaming)
+   * GET /api/projects/:id/member/my-house-model-v2
+   */
+  getHouseModelsV2(projectId: string): Observable<GenericApiResponse<HouseModel[]>> {
+    const url = `${this.apiUrl}/api/projects/${projectId}/member/my-house-model-v2`;
+    return this.http.get<GenericApiResponse<HouseModel[]>>(url, this.getHttpOptions());
+  }
+
+  /**
+   * V2: Get Project Info Docs (returns raw URLs for streaming)
+   * GET /api/projects/:id/member/info-docs-v2
+   */
+  getProjectInfoDocsV2(projectId: string): Observable<GenericApiResponse<any[]>> {
+    const url = `${this.apiUrl}/api/projects/${projectId}/member/info-docs-v2`;
+    return this.http.get<GenericApiResponse<any[]>>(url, this.getHttpOptions());
+  }
+
+  // ==================== Resident Management ====================
+
+  /**
+   * Get all residents in a project
+   * GET /api/residents?project_id={projectId}
+   */
+  getResidents(projectId: string): Observable<GenericApiResponse<any[]>> {
+    const url = `${this.apiUrl}/api/residents`;
+    const params = new HttpParams().set('project_id', projectId);
+    return this.http.get<GenericApiResponse<any[]>>(url, { ...this.getHttpOptions(), params });
+  }
+
+  // ==================== Project Customization ====================
+
+  getProjectCustomization(projectId: string): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/project-customizations/${projectId}`;
+    return this.http.get<GenericApiResponse<any>>(url, this.getHttpOptions());
+  }
+
+  createProjectCustomization(data: FormData): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/project-customizations`;
+    return this.http.post<GenericApiResponse<any>>(url, data, this.getHttpOptionsForFormData());
+  }
+
+  updateProjectCustomization(projectId: string, data: FormData): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/project-customizations/${projectId}`;
+    return this.http.put<GenericApiResponse<any>>(url, data, this.getHttpOptionsForFormData());
+  }
+
+  // ==================== Unit & Invitation Extras ====================
+
+  /**
+   * Import units from Excel file
+   */
+  importUnits(data: FormData): Observable<GenericApiResponse<any>> {
+    const url = `${this.apiUrl}/api/units/import`;
+    return this.http.post<GenericApiResponse<any>>(url, data, this.getHttpOptionsForFormData());
+  }
+
+  // Zone Management
+  getZones(projectId: string): Observable<Zone[]> {
+    const params = new HttpParams().set('project_id', projectId);
+    return this.http.get<GenericApiResponse<Zone[]>>(`${this.apiUrl}/api/zones`, { ...this.getHttpOptions(), params })
+      .pipe(map(response => response.data || []));
+  }
+
+  getZone(id: string): Observable<Zone> {
+    return this.http.get<Zone>(`${this.apiUrl}/api/zones/${id}`, this.getHttpOptions());
+  }
+
+  createZone(data: CreateZoneRequest): Observable<Zone> {
+    return this.http.post<Zone>(`${this.apiUrl}/api/zones`, data, this.getHttpOptions());
+  }
+
+  updateZone(id: string, data: UpdateZoneRequest): Observable<Zone> {
+    return this.http.put<Zone>(`${this.apiUrl}/api/zones/${id}`, data, this.getHttpOptions());
+  }
+
+  deleteZone(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/api/zones/${id}`, this.getHttpOptions());
+  }
+
+  bindUnitsToZone(zoneId: string, unitIds: string[]): Observable<any> {
+    return this.http.put(`${this.apiUrl}/api/zones/${zoneId}/units`, { unit_ids: unitIds }, this.getHttpOptions());
+  }
+
+  getZoneUnits(zoneId: string): Observable<Unit[]> {
+    return this.http.get<Unit[]>(`${this.apiUrl}/api/zones/${zoneId}/units`, this.getHttpOptions());
+  }
+
+  /**
+   * Helper to match existing units with string-based zones to real Zone entities
+   */
+  matchZoneByName(projectId: string): Observable<any> {
+    // This could be a backend endpoint, but for now let's do it client-side or assume a specific endpoint exists
+    // If we want a specialized endpoint: POST /api/zones/match-by-name
+    return this.http.post(`${this.apiUrl}/api/zones/match-by-name`, { project_id: projectId }, this.getHttpOptions());
+  }
+
+  // Auth
+  login(credentials: { email?: string; password?: string, phone?: string }): Observable<any> {
+    const url = `${this.apiUrl}/api/auth/login`;
+    return this.http.post(url, credentials);
+  }
+
+  /**
+   * Create invitation for project (Juristic/Security)
+   */
+  createProjectInvitation(data: { project_id: string, role: string }): Observable<ProjectInvitationResponse> {
+    const url = `${this.apiUrl}/api/project_invitations/create`;
+    return this.http.post<ProjectInvitationResponse>(url, data, this.getHttpOptions());
+  }
+
+  // ==================== Visitor Management ====================
+
+  /**
+   * Get visitor statistics for dashboard
+   * GET /api/security/stats?project_id={project_id}
+   */
+  getVisitorStats(projectId: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/security/stats`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get entry logs with pagination and filtering
+   * GET /api/security/entry/logs?project_id={project_id}&page={page}&limit={limit}&filter={filter}
+   */
+  getEntryLogs(params: {
+    project_id: string;
+    page?: number;
+    limit?: number;
+    filter?: 'all' | 'inside' | 'exited' | 'pending';
+  }): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/security/entry/logs`;
+
+    let queryParams = new HttpParams();
+    Object.keys(params).forEach((key) => {
+      const value = (params as any)[key];
+      if (value !== null && value !== undefined) {
+        queryParams = queryParams.set(key, value.toString());
+      }
+    });
+
+    return this.http.get(url, { ...this.getHttpOptions(), params: queryParams }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get entry log by ID
+   * GET /api/security/entry/logs/:id
+   */
+  getEntryLogById(id: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/security/entry/logs/${id}`;
+
+    return this.http.get(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  // ==================== Juristic Permission Management ====================
+
+  /**
+   * Get juristic members with their permissions
+   * GET /api/juristic/members?project_id={projectId}
+   */
+  getJuristicMembersWithPermissions(projectId: string): Observable<GenericApiResponse<any[]>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/members`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get<GenericApiResponse<any[]>>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Update juristic member permissions
+   * PUT /api/juristic/members/:userId/permissions
+   */
+  updateJuristicPermissions(userId: string, permissions: { [key: string]: boolean }, projectId: string): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/members/${userId}/permissions`;
+    const body = { permissions, project_id: projectId };
+
+    return this.http.put<GenericApiResponse<any>>(url, body, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
   }
 
   /**

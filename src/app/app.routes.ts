@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthenLayoutComponent } from './layouts/authen-layout/authen-layout.component';
 import { AnonymousLayoutComponent } from './layouts/anonymous-layout/anonymous-layout.component';
 import { LoginComponent } from './components/login/login.component';
+import { RegisterJuristicComponent } from './components/register-juristic/register-juristic.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AuthGuard } from './services/auth.guard';
 import { AnnouncementComponent } from './components/announcement/announcement.component';
@@ -23,6 +24,10 @@ export const routes: Routes = [
         path: 'login',
         component: LoginComponent,
       },
+      {
+        path: 'register',
+        component: RegisterJuristicComponent,
+      },
     ],
   },
   {
@@ -40,7 +45,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/announcement',
+        redirectTo: '/dashboard',
         pathMatch: 'full',
       },
       {
@@ -73,10 +78,13 @@ export const routes: Routes = [
           },
         ],
       },
-      // {
-      //   path: 'dashboard',
-      //   component: DashboardComponent
-      // },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./components/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent
+          ),
+      },
       {
         path: 'users',
         loadComponent: () =>
@@ -228,27 +236,18 @@ export const routes: Routes = [
                 (m) => m.ResidentsManagementComponent
               ),
           },
-          // {
-          //   path: 'create',
-          //   loadComponent: () =>
-          //     import('./components/residents-management/create-resident/create-resident.component').then(
-          //       (m) => m.CreateResidentComponent
-          //     ),
-          // },
-          // {
-          //   path: 'detail/:id',
-          //   loadComponent: () =>
-          //     import('./components/residents-management/detail-resident/detail-resident.component').then(
-          //       (m) => m.DetailResidentComponent
-          //     ),
-          // },
-          // {
-          //   path: 'edit/:id',
-          //   loadComponent: () =>
-          //     import('./components/residents-management/edit-resident/edit-resident.component').then(
-          //       (m) => m.EditResidentComponent
-          //     ),
-          // },
+        ],
+      },
+      {
+        path: 'unit-management',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/unit-management/unit-management.component').then(
+                (m) => m.UnitManagementComponent
+              ),
+          },
         ],
       },
       {
@@ -256,6 +255,39 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/infomation-home-project-management/infomation-home-project-management.component').then(
             (m) => m.InfomationHomeProjectManagementComponent
+          ),
+      },
+      {
+        path: 'vistor-management',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/vistor-management/vistor-management.component').then(
+                (m) => m.VistorManagementComponent
+              ),
+          },
+          {
+            path: 'detail/:id',
+            loadComponent: () =>
+              import('./components/vistor-management/vistor-management-detail/vistor-management-detail.component').then(
+                (m) => m.VistorManagementDetailComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'edit-permission',
+        loadComponent: () =>
+          import('./components/edit-permission/edit-permission.component').then(
+            (m) => m.EditPermissionComponent
+          ),
+      },
+      {
+        path: 'village',
+        loadComponent: () =>
+          import('./components/vilage-unit-management/vilage-unit-management.component').then(
+            (m) => m.VilageUnitManagementComponent
           ),
       },
     ],
