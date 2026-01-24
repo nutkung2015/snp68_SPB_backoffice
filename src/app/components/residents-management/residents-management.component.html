@@ -5,24 +5,15 @@
   </div>
 
   <!-- Page Header -->
-  <app-page-header
-    iconSrc="assets/icons/residents.svg"
-    title="จัดการผู้อยู่อาศัย"
-    subtitle="Residents Management"
-    iconColor="invert(100%)"
-  >
-    <div
-      class="detail-detail"
-      fxLayout="row"
-      fxLayoutAlign="start center"
-      fxLayoutGap="10px"
-    >
-      <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
+  <app-page-header iconSrc="assets/icons/residents.svg" title="จัดการผู้อยู่อาศัย" subtitle="Residents Management"
+    iconColor="invert(100%)">
+    <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <!-- <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
         <div style="display: flex; align-items: center; gap: 5px">
           <mat-icon>add</mat-icon>
           <span>เพิ่มผู้อยู่อาศัย</span>
         </div>
-      </button>
+      </button> -->
     </div>
   </app-page-header>
 
@@ -32,27 +23,12 @@
       <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
         <!-- Search Section -->
         <div fxFlex fxLayout="row" fxLayoutGap="10px">
-          <div
-            fxLayout="row"
-            fxFlex
-            fxLayoutAlign="start center"
-            fxLayoutGap="0"
-          >
+          <div fxLayout="row" fxFlex fxLayoutAlign="start center" fxLayoutGap="0">
             <div class="filter-input right" fxFlex="350px">
-              <div
-                fxLayout="row"
-                fxLayoutAlign="start center"
-                fxLayoutGap="5px"
-                style="height: 100%"
-              >
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
                 <mat-icon class="secondary">search</mat-icon>
-                <input
-                  matInput
-                  type="text"
-                  (keyup)="applyFilter($event)"
-                  placeholder="ค้นหาชื่อหรือนามสกุล"
-                  style="border: none; width: 100%; height: 100%"
-                />
+                <input matInput type="text" (keyup)="applyFilter($event)" placeholder="ค้นหาชื่อหรือนามสกุล"
+                  style="border: none; width: 100%; height: 100%" />
               </div>
             </div>
             <!-- Status Section -->
@@ -61,10 +37,7 @@
                 <span>สถานะ</span>
               </div>
               <div class="filter-input left" fxFlex style="height: 100%">
-                <mat-select
-                  [(ngModel)]="selectedStatus"
-                  (selectionChange)="filterByStatus($event.value)"
-                >
+                <mat-select [(ngModel)]="selectedStatus" (selectionChange)="filterByStatus($event.value)">
                   <mat-option value="all">ทั้งหมด</mat-option>
                   <mat-option value="active">อยู่อาศัย</mat-option>
                   <mat-option value="inactive">ย้ายออก</mat-option>
@@ -82,9 +55,7 @@
           </button>
           <button mat-stroked-button class="search-btn" (click)="onSearch()">
             <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
-              <mat-icon style="width: 14px; height: 14px; font-size: 14px"
-                >search</mat-icon
-              >
+              <mat-icon style="width: 14px; height: 14px; font-size: 14px">search</mat-icon>
               <span>ค้นหา</span>
             </div>
           </button>
@@ -94,19 +65,9 @@
   </div>
 
   <!-- Residents Table Section -->
-  <div
-    id="box-content"
-    style="padding: 10px"
-    ngStyle.gt-sm="padding: 24px"
-    fxLayout="column"
-    fxLayoutAlign="start stretch"
-    fxLayoutGap.gt-sm="20px"
-  >
-    <mat-card
-      fxLayout="column"
-      fxLayoutAlign="start stretch"
-      fxLayoutGap="20px"
-    >
+  <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+    fxLayoutAlign="start stretch" fxLayoutGap.gt-sm="20px">
+    <mat-card fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
       <!-- <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="10px">
         <div fxLayout="row" fxLayoutAlign="space-between center">
           <span>{{ dataSource.data.length }} รายการ</span>
@@ -114,18 +75,11 @@
         <mat-divider></mat-divider>
       </div> -->
 
-      <ng-container
-        *ngTemplateOutlet="dataSource.data.length > 0 ? tableContent : noData"
-      >
+      <ng-container *ngTemplateOutlet="dataSource.data.length > 0 ? tableContent : noData">
       </ng-container>
 
       <ng-template #tableContent>
-        <div
-          fxLayout="column"
-          fxLayoutAlign="space-between stretch"
-          fxLayoutGap="10px"
-          class="div-table"
-        >
+        <div fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="10px" class="div-table">
           <table mat-table [dataSource]="dataSource" matSort>
             <!-- Sequence Column -->
             <ng-container matColumnDef="sequence">
@@ -190,21 +144,19 @@
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
               <td mat-cell *matCellDef="let element">
-                <span
-                  [ngClass]="{
+                <span [ngClass]="{
                     'status-active': element.status === 'active',
                     'status-inactive': element.status === 'inactive',
                     'status-pending': element.status === 'pending'
-                  }"
-                >
+                  }">
                   {{
-                    element.status === "active"
-                      ? "อยู่อาศัย"
-                      : element.status === "inactive"
-                      ? "ย้ายออก"
-                      : element.status === "pending"
-                      ? "รอดำเนินการ"
-                      : element.status
+                  element.status === "active"
+                  ? "อยู่อาศัย"
+                  : element.status === "inactive"
+                  ? "ย้ายออก"
+                  : element.status === "pending"
+                  ? "รอดำเนินการ"
+                  : element.status
                   }}
                 </span>
               </td>
@@ -214,11 +166,7 @@
             <ng-container matColumnDef="details">
               <th mat-header-cell *matHeaderCellDef>รายละเอียด</th>
               <td mat-cell *matCellDef="let element">
-                <button
-                  mat-icon-button
-                  (click)="viewDetails(element)"
-                  matTooltip="ดูรายละเอียด"
-                >
+                <button mat-icon-button (click)="viewDetails(element)" matTooltip="ดูรายละเอียด">
                   <mat-icon>visibility</mat-icon>
                 </button>
               </td>
@@ -229,31 +177,16 @@
           </table>
 
           <!-- Paginator -->
-          <mat-paginator
-            [length]="pageEvent.length"
-            [pageSize]="pageEvent.pageSize"
-            [pageSizeOptions]="[5, 10, 20, 50, 100]"
-            (page)="handlePageEvent($event)"
-            showFirstLastButtons
-          >
+          <mat-paginator [length]="pageEvent.length" [pageSize]="pageEvent.pageSize"
+            [pageSizeOptions]="[5, 10, 20, 50, 100]" (page)="handlePageEvent($event)" showFirstLastButtons>
           </mat-paginator>
         </div>
       </ng-template>
 
       <ng-template #noData>
-        <div
-          fxLayout="column"
-          fxLayoutAlign="center center"
-          fxLayoutGap="20px"
-          style="padding: 40px"
-        >
-          <mat-icon
-            style="font-size: 64px; width: 64px; height: 64px; color: #ccc"
-            >people_outline</mat-icon
-          >
-          <span style="color: #666; font-size: 16px"
-            >ไม่มีข้อมูลผู้อยู่อาศัย</span
-          >
+        <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px" style="padding: 40px">
+          <mat-icon style="font-size: 64px; width: 64px; height: 64px; color: #ccc">people_outline</mat-icon>
+          <span style="color: #666; font-size: 16px">ไม่มีข้อมูลผู้อยู่อาศัย</span>
         </div>
       </ng-template>
     </mat-card>
