@@ -1,6 +1,6 @@
 <div class="theme-customization">
   <div class="theme-customization">
-    <app-page-header iconSrc="assets/icons/announcement.svg" title="ตั้งค่าธีม" subtitle="Theme Customization"
+    <app-page-header iconSrc="assets/icons/mdi--theme.svg" title="ตั้งค่าธีม" subtitle="Theme Customization"
       iconColor="invert(100%)">
     </app-page-header>
 
@@ -21,7 +21,7 @@
               <!-- Theme Style Selector -->
               <div class="form-group theme-style-section">
                 <label class="section-label">
-                  <mat-icon>palette</mat-icon>
+                  <mat-icon [style.color]="'#2A405E'">palette</mat-icon>
                   เลือกสไตล์ธีม
                 </label>
 
@@ -147,9 +147,8 @@
 
               <!-- App Container -->
               <div class="app-container">
-                <!-- Header -->
-                <div class="gradient-header"
-                  [style.background]="'linear-gradient(to right, ' + (previewTheme.primary_color || '#143D60') + ', ' + (previewTheme.secondary_color || '#A0C878') + ')'">
+                <!-- Header - Solid Color -->
+                <div class="solid-header" [style.background-color]="previewTheme.primary_color || '#2D8B75'">
 
                   <!-- Top Row -->
                   <div class="header-row-top">
@@ -164,12 +163,14 @@
                     </div>
                   </div>
 
-                  <!-- Bottom Row -->
-                  <div class="header-row-bottom">
-                    <mat-icon class="house-icon">home</mat-icon>
-                    <div class="user-info">
-                      <div class="user-greeting">สวัสดีคุณ User</div>
-                      <div class="user-address">123/45 The Project</div>
+                  <!-- User Info Card -->
+                  <div class="user-card">
+                    <div class="user-card-icon">
+                      <mat-icon [style.color]="'white'">home</mat-icon>
+                    </div>
+                    <div class="user-card-info">
+                      <div class="user-greeting">สวัสดีคุณ ผู้ใช้งาน</div>
+                      <div class="user-address">43 หมู่บ้านของฉัน</div>
                     </div>
                   </div>
                 </div>
@@ -179,14 +180,18 @@
                   <!-- Village & Home -->
                   <div class="section">
                     <h3 class="section-title">ข้อมูลหมู่บ้านและบ้าน</h3>
-                    <div class="menu-grid">
-                      <div class="menu-btn" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
-                        <mat-icon>home</mat-icon>
-                        <span>บ้านของฉัน</span>
+                    <div class="menu-grid-new">
+                      <div class="menu-btn-new">
+                        <div class="menu-icon-circle">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#2D8B75'">home</mat-icon>
+                        </div>
+                        <span [style.color]="previewTheme.primary_color || '#2D8B75'">บ้านของฉัน</span>
                       </div>
-                      <div class="menu-btn" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
-                        <mat-icon>people</mat-icon>
-                        <span>หมู่บ้านของฉัน</span>
+                      <div class="menu-btn-new">
+                        <div class="menu-icon-circle">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#2D8B75'">people</mat-icon>
+                        </div>
+                        <span [style.color]="previewTheme.primary_color || '#2D8B75'">หมู่บ้านของฉัน</span>
                       </div>
                     </div>
                   </div>
@@ -196,37 +201,42 @@
                     <div class="section-header">
                       <h3 class="section-title">บริการทั้งหมด</h3>
                     </div>
-                    <div class="services-grid">
-                      <div class="service-item">
-                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
-                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">campaign</mat-icon>
+                    <div class="services-grid-new">
+                      <div class="service-item-new">
+                        <div class="icon-circle"
+                          [style.background-color]="(previewTheme.primary_color || '#2D8B75') + '20'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#2D8B75'">campaign</mat-icon>
                         </div>
                         <span>ข่าวสาร</span>
                       </div>
-                      <div class="service-item">
-                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
-                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">report_problem</mat-icon>
+                      <div class="service-item-new">
+                        <div class="icon-circle"
+                          [style.background-color]="(previewTheme.primary_color || '#2D8B75') + '20'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#2D8B75'">report_problem</mat-icon>
                         </div>
                         <span>แจ้งปัญหา</span>
                       </div>
-                      <div class="service-item">
-                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
-                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">directions_car</mat-icon>
+                      <div class="service-item-new">
+                        <div class="icon-circle"
+                          [style.background-color]="(previewTheme.primary_color || '#2D8B75') + '20'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#2D8B75'">directions_car</mat-icon>
                         </div>
                         <span>ผู้มาเยี่ยม</span>
                       </div>
-                      <div class="service-item">
-                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
+                      <div class="service-item-new">
+                        <div class="icon-circle"
+                          [style.background-color]="(previewTheme.primary_color || '#2D8B75') + '20'">
                           <mat-icon
-                            [style.color]="previewTheme.primary_color || '#4BB59F'">chat_bubble_outline</mat-icon>
+                            [style.color]="previewTheme.primary_color || '#2D8B75'">chat_bubble_outline</mat-icon>
                         </div>
-                        <span>ช่วยเหลือ</span>
+                        <span>ขอความช่วยเหลือ</span>
                       </div>
-                      <div class="service-item">
-                        <div class="icon-box" [style.border-color]="previewTheme.primary_color || '#4BB59F'">
-                          <mat-icon [style.color]="previewTheme.primary_color || '#4BB59F'">call</mat-icon>
+                      <div class="service-item-new">
+                        <div class="icon-circle"
+                          [style.background-color]="(previewTheme.primary_color || '#2D8B75') + '20'">
+                          <mat-icon [style.color]="previewTheme.primary_color || '#2D8B75'">call</mat-icon>
                         </div>
-                        <span>ฉุกเฉิน</span>
+                        <span>เบอร์ฉุกเฉิน</span>
                       </div>
                     </div>
                   </div>
@@ -235,64 +245,47 @@
                   <div class="section">
                     <div class="section-header">
                       <h3 class="section-title">ข่าวสารและประกาศ</h3>
-                      <span class="see-all">ดูทั้งหมด ></span>
+                      <span class="see-all" [style.color]="previewTheme.primary_color || '#2D8B75'">ดูทั้งหมด ></span>
                     </div>
-                    <div class="news-list">
+                    <div class="news-list-new">
                       <!-- Mock Item 1 -->
-                      <div class="news-card">
-                        <div class="news-image">
-                          <div class="image-placeholder" style="background: #e0e0e0; height: 100%; width: 100%;"></div>
-                          <div class="image-gradient"></div>
-                          <div class="type-badge" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
-                            <span>ประกาศ</span>
+                      <div class="news-card-new">
+                        <div class="news-image-new">
+                          <div class="image-placeholder"
+                            style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); height: 100%; width: 100%;">
+                          </div>
+                          <div class="type-badge-new" style="background-color: #EF4444;">
+                            <span>หยุดจุดเสีย</span>
                           </div>
                         </div>
-                        <div class="news-content">
-                          <div class="news-title">แจ้งซ่อมถนนในหมู่บ้าน</div>
-                          <div class="news-date">
-                            <mat-icon>access_time</mat-icon> 10 ต.ค. 66
+                        <div class="news-content-new">
+                          <div class="news-title-new">ระวังบุคคลอันตราย</div>
+                          <div class="news-date-new">
+                            <mat-icon>access_time</mat-icon> 24 ธันวาคม 2568
                           </div>
                         </div>
                       </div>
                       <!-- Mock Item 2 -->
-                      <div class="news-card">
-                        <div class="news-image">
-                          <div class="image-placeholder" style="background: #e0e0e0; height: 100%; width: 100%;"></div>
-                          <div class="image-gradient"></div>
-                          <div class="type-badge" [style.background-color]="previewTheme.primary_color || '#4BB59F'">
-                            <span>กิจกรรม</span>
+                      <div class="news-card-new">
+                        <div class="news-image-new">
+                          <div class="image-placeholder"
+                            style="background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%); height: 100%; width: 100%;">
+                          </div>
+                          <div class="news-badge-icon">
+                            <mat-icon>article</mat-icon>
+                            <span>ราชงา</span>
                           </div>
                         </div>
-                        <div class="news-content">
-                          <div class="news-title">กิจกรรมวันเด็ก</div>
-                          <div class="news-date">
-                            <mat-icon>access_time</mat-icon> 12 ม.ค. 67
+                        <div class="news-content-new">
+                          <div class="news-title-new">แจ้งมาตรฐานสำหรับผู้มิ</div>
+                          <div class="news-date-new">
+                            <mat-icon>access_time</mat-icon> 20 ธันวาคม 2568
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <!-- Bottom Navigation -->
-                <!-- <div class="bottom-nav">
-                  <div class="nav-item active" [style.color]="previewTheme.primary_color || '#4BB59F'">
-                    <mat-icon>home</mat-icon>
-                    <span>หน้าแรก</span>
-                  </div>
-                  <div class="nav-item">
-                    <mat-icon>receipt</mat-icon>
-                    <span>บิล</span>
-                  </div>
-                  <div class="nav-item">
-                    <mat-icon>chat</mat-icon>
-                    <span>แชท</span>
-                  </div>
-                  <div class="nav-item">
-                    <mat-icon>person</mat-icon>
-                    <span>ฉัน</span>
-                  </div>
-                </div> -->
 
               </div>
             </div>

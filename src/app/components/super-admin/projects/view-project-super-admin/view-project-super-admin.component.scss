@@ -1,0 +1,304 @@
+.header {
+    font-style: normal;
+    background-color: #ffffff;
+    padding: 24px;
+    height: 120px;
+    border-radius: 12px;
+
+    .sub-header {
+        font-weight: 400;
+        font-size: 14px;
+        color: #171a1e;
+    }
+
+    .sub-body {
+        font-weight: 600;
+        font-size: 28px;
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
+
+    .back-icon {
+        cursor: pointer;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+
+        &:hover {
+            color: #2084FC;
+        }
+    }
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    gap: 16px;
+    color: #666;
+}
+
+.detail-container {
+    padding: 0 24px;
+}
+
+.info-card {
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background-color: #f8f9fa;
+
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        mat-icon {
+            color: #2084FC;
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #171a1e;
+        }
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+}
+
+// Logo Section
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+    background-color: #fafbfc;
+
+    .project-logo-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 16px;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        // When image has light/white background, add contrasting dark background
+        &.light-bg {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            padding: 8px;
+
+            .project-logo {
+                border-radius: 10px;
+            }
+        }
+
+        .project-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-logo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #07354E 0%, #0a4d6e 100%);
+
+            mat-icon {
+                font-size: 48px;
+                width: 48px;
+                height: 48px;
+                color: white;
+            }
+        }
+    }
+
+    .logo-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .logo-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .logo-status {
+            font-size: 13px;
+            color: #16a34a;
+            font-weight: 500;
+
+            &.no-logo {
+                color: #9fa9b6;
+            }
+        }
+    }
+}
+
+.info-content {
+    padding: 24px;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 180px;
+        color: #666;
+        font-weight: 500;
+
+        mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: #9fa9b6;
+        }
+    }
+
+    .info-value {
+        flex: 1;
+        color: #171a1e;
+        font-weight: 400;
+
+        &.text-warn {
+            color: #f44336;
+        }
+    }
+}
+
+// Variables (same as house-guard)
+$primary: #2A405E;
+$white: #ffffff;
+$black: #1a1a1a;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-500: #6c757d;
+
+// Stats Bar - Same as house-guard
+.stats-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 24px 0;
+    background: $white;
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, $gray-100 0%, $white 100%);
+        border: 1px solid $gray-200;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba($primary, 0.1);
+            border-color: rgba($primary, 0.3);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: $primary;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            mat-icon {
+                color: $white;
+                font-size: 24px;
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: $primary;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: $gray-500;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+    }
+}
+
+mat-divider {
+    margin: 0 !important;
+}
+
+// Material Overrides
+::ng-deep {
+    mat-card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .stats-bar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .info-row {
+        flex-direction: column;
+        gap: 8px;
+
+        .info-label {
+            min-width: unset;
+        }
+    }
+}

@@ -11,6 +11,7 @@ import { MatLabel } from '@angular/material/form-field';
 import { RestService, PersonalRepair } from '../../../services/rest.service';
 import { IssuePersonalConfirmDeleteComponent } from '../../dialog/issue-personal-confirm-delete/issue-personal-confirm-delete.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface ImageUrl {
   url: string;
@@ -43,7 +44,8 @@ export class DetailIssuePersonalComponent implements OnInit {
     private rest: RestService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private toast: ToastService
   ) { }
 
   ngOnInit() {
@@ -63,6 +65,7 @@ export class DetailIssuePersonalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading issue:', error);
+        this.toast.error('ไม่สามารถโหลดข้อมูลแจ้งซ่อมได้');
         this.isLoading.next(false);
       }
     });
@@ -126,10 +129,12 @@ export class DetailIssuePersonalComponent implements OnInit {
           if (!this.issue?.id) { return; }
           this.rest.deletePersonalRepair(this.issue.id).subscribe({
             next: () => {
+              this.toast.success('ลบรายการแจ้งซ่อมเรียบร้อยแล้ว');
               this.router.navigate(['/issue']);
             },
             error: (error) => {
               console.error('Error deleting issue:', error);
+              this.toast.error('ไม่สามารถลบรายการแจ้งซ่อมได้');
             }
           });
         }

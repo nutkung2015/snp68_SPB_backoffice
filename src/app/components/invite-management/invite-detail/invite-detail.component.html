@@ -1,0 +1,98 @@
+<div class="invite-detail-page">
+    <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+        <div class="breadcrumb">
+            <span class="sub-header" style="color: #9fa9b6">จัดการคำเชิญ / </span>
+            <span class="sub-header" style="color: #171a1e">รายละเอียดคำเชิญ</span>
+        </div>
+        <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon (click)="onBack()">arrow_back</mat-icon>
+            <span class="sub-body">รายละเอียดคำเชิญ</span>
+        </div>
+    </div>
+
+    <div class="content-container" *ngIf="isLoading">
+        <div class="loading-shade">
+            <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        </div>
+    </div>
+
+    <div class="content-container" *ngIf="!isLoading && invitation">
+        <mat-card class="detail-card">
+            <div class="card-content">
+                <!-- Left Column: Info -->
+                <div class="info-column">
+                    <h2 class="section-title">ข้อมูลคำเชิญ</h2>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>ยูนิต (Unit):</label>
+                            <span>{{ invitation.unit_number || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>สถานะ (Status):</label>
+                            <span [class]="'status-badge ' + invitation.status">
+                                {{ getStatusLabel(invitation.status) }}
+                            </span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>บทบาท (Role):</label>
+                            <span>{{ invitation.role | titlecase }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>อีเมลที่เชิญ (Invited Email):</label>
+                            <span>{{ invitation.invited_email || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>เบอร์โทรศัพท์ (Phone):</label>
+                            <span>{{ invitation.invited_phone || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>ผู้เชิญ (Invited By):</label>
+                            <span>{{ invitation.invited_by_name || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>วันที่สร้าง (Created At):</label>
+                            <span>{{ formatDate(invitation.created_at) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>วันหมดอายุ (Expires At):</label>
+                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+                                <span>{{ formatDate(invitation.expires_at) }}</span>
+                                <span class="badge-remaining"
+                                    [class.expired]="getRemainingDays(invitation.expires_at).includes('หมดอายุ')">
+                                    {{ getRemainingDays(invitation.expires_at) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <mat-divider [vertical]="true" class="vertical-divider"></mat-divider>
+
+                <!-- Right Column: QR Code -->
+                <div class="qr-column">
+                    <h2 class="section-title center">QR Code & Code</h2>
+
+                    <div class="qr-wrapper" *ngIf="invitation.code">
+                        <qrcode [qrdata]="invitation.code" [width]="256" [errorCorrectionLevel]="'M'" [margin]="1">
+                        </qrcode>
+                    </div>
+
+                    <div class="code-display">
+                        <label>Invitation Code:</label>
+                        <div class="code-box">
+                            {{ invitation.code }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>

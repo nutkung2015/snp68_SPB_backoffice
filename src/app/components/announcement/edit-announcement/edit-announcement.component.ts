@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.component';
 import { RestService, Announcement as ApiAnnouncement } from '../../../services/rest.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface AttachmentUrl {
   url: string;
@@ -57,7 +58,7 @@ interface AnnouncementDetail {
 export class EditAnnouncementComponent implements OnInit {
   isLoading = new BehaviorSubject<boolean>(true);
   isLoading$ = this.isLoading.asObservable();
-  
+
   editForm: FormGroup;
   announcement?: AnnouncementDetail;
   attachmentUrls: AttachmentUrl[] = [];
@@ -82,7 +83,8 @@ export class EditAnnouncementComponent implements OnInit {
     private http: HttpClient,
     private rest: RestService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.editForm = this.fb.group({
       title: ['', Validators.required],
@@ -141,6 +143,7 @@ export class EditAnnouncementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading announcement:', error);
+          this.toast.error('ไม่สามารถโหลดข้อมูลประกาศได้');
         },
         complete: () => {
           this.isLoading.next(false);
@@ -181,10 +184,12 @@ export class EditAnnouncementComponent implements OnInit {
       this.rest.updateAnnouncement(this.announcement.id, updatePayload)
         .subscribe({
           next: () => {
+            this.toast.success('บันทึกการแก้ไขเรียบร้อยแล้ว');
             this.router.navigate(['/announcement']);
           },
           error: (error) => {
             console.error('Error updating announcement:', error);
+            this.toast.error('เกิดข้อผิดพลาดในการแก้ไขประกาศ');
           }
         });
     }

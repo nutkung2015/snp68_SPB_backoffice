@@ -23,13 +23,8 @@
   <nav class="sidebar-nav">
     <ul class="nav-list">
       <li *ngFor="let item of menuItems" class="nav-item">
-        <a 
-          [routerLink]="item.route" 
-          class="nav-link"
-          [class.active]="item.active"
-          (click)="setActiveItem(item)"
-          [title]="isCollapsed ? item.title : ''"
-        >
+        <a [routerLink]="item.route" class="nav-link" [class.active]="item.active" (click)="setActiveItem(item)"
+          [title]="isCollapsed ? item.title : ''">
           <img [src]="item.icon" [alt]="item.title" class="nav-icon">
           <span class="nav-text" *ngIf="!isCollapsed">{{ item.title }}</span>
         </a>
@@ -41,7 +36,7 @@
   <div class="sidebar-footer">
     <div class="version-info" *ngIf="!isCollapsed">
       <span>เวอร์ชัน</span>
-      <span class="version-number">0.0</span>
+      <span class="version-number">0.4</span>
     </div>
   </div>
 </div>

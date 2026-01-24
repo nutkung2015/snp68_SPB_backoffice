@@ -107,3 +107,30 @@ body {
   background-color: #ffffff;
   color: #000000;
 }
+
+// ============================================
+// Toast Notification Styles (MatSnackBar)
+// ============================================
+.toast-success {
+  --mdc-snackbar-container-color: #10b981;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.toast-error {
+  --mdc-snackbar-container-color: #ef4444;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.toast-warning {
+  --mdc-snackbar-container-color: #f59e0b;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.toast-info {
+  --mdc-snackbar-container-color: #2A405E;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}

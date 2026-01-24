@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>จัดการพื้นที่ดูแล (Zones)</h2>
+<div mat-dialog-content>
+    <div *ngIf="isLoading" fxLayout="row" fxLayoutAlign="center center" style="height: 200px;">
+        <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+    </div>
+
+    <div *ngIf="!isLoading" class="zone-list">
+        <p style="margin-bottom: 16px;">เลือกโซนที่ต้องการให้ป้อม "{{ data.guardPost.post_name }}" ดูแล:</p>
+
+        <div *ngFor="let zone of allZones" class="zone-item" [class.disabled]="isZoneDisabled(zone)">
+            <mat-checkbox [checked]="isZoneSelected(zone.id)" (change)="toggleZone(zone.id)"
+                [disabled]="isZoneDisabled(zone)" color="primary">
+                <span class="zone-name">{{ zone.name }}</span>
+                <span *ngIf="zone.code" class="zone-code">Code: {{ zone.code }}</span>
+            </mat-checkbox>
+
+            <!-- Show linked guard post info if zone is linked to another post -->
+            <div *ngIf="zone.linkedGuardPostName" class="linked-info">
+                <mat-icon class="warning-icon" matTooltip="โซนนี้ถูกเชื่อมกับป้อมอื่นแล้ว">link</mat-icon>
+                <span class="linked-text">เชื่อมกับ "{{ zone.linkedGuardPostName }}"</span>
+            </div>
+        </div>
+
+        <div *ngIf="allZones.length === 0" style="text-align: center; padding: 20px; color: #777;">
+            ไม่พบข้อมูลโซน
+        </div>
+    </div>
+</div>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">ยกเลิก</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="isLoading">บันทึก</button>
+</mat-dialog-actions>

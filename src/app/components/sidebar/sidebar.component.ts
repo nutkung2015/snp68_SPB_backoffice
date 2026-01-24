@@ -20,7 +20,7 @@ export class SidebarComponent implements OnInit {
   menuItems = [
     {
       title: 'ภาพรวม',
-      icon: 'assets/icons/village.svg',
+      icon: 'assets/icons/pajamas--overview.svg',
       route: '/dashboard',
       active: false
     },
@@ -50,28 +50,34 @@ export class SidebarComponent implements OnInit {
     },
     {
       title: 'ผู้มาเยี่ยม',
-      icon: 'assets/icons/visitor.svg',
+      icon: 'assets/icons/bxs--car-garage.svg',
       route: '/vistor-management',
       active: false
     },
     {
-      title: 'ขอความช่วยเหลือ',
-      icon: 'assets/icons/help.svg',
-      route: '/help-request',
+      title: 'จัดการยานพาหนะ',
+      icon: 'assets/icons/material-symbols--car-gear-rounded.svg',
+      route: '/vehicle-management',
       active: false
     },
     {
-      title: 'จัดการรปภ.',
-      icon: 'assets/icons/security.svg',
-      route: '/security',
+      title: 'จัดการเบอร์โทรป้อมยาม',
+      icon: 'assets/icons/mdi--security-home.svg',
+      route: '/house-guard',
       active: false
     },
-    {
-      title: 'จัดการเบอร์',
-      icon: 'assets/icons/phone.svg',
-      route: '/phone-management',
-      active: false
-    },
+    // {
+    //   title: 'จัดการรปภ.',
+    //   icon: 'assets/icons/security.svg',
+    //   route: '/security',
+    //   active: false
+    // },
+    // {
+    //   title: 'จัดการเบอร์',
+    //   icon: 'assets/icons/phone.svg',
+    //   route: '/phone-management',
+    //   active: false
+    // },
     {
       title: 'จัดการลูกบ้าน',
       icon: 'assets/icons/residents.svg',
@@ -92,7 +98,7 @@ export class SidebarComponent implements OnInit {
     },
     {
       title: 'ธีม',
-      icon: 'assets/icons/theme.svg',
+      icon: 'assets/icons/mdi--theme.svg',
       route: '/custom-theme-app',
       active: false
     },
@@ -104,8 +110,47 @@ export class SidebarComponent implements OnInit {
     },
     {
       title: 'จัดการสิทธิ์นิติ',
-      icon: 'assets/icons/security.svg',
+      icon: 'assets/icons/icon-park-solid--permissions.svg',
       route: '/edit-permission',
+      active: false
+    }
+  ];
+
+  superAdminMenuItems = [
+    {
+      title: 'ภาพรวม',
+      icon: 'assets/icons/pajamas--overview.svg',
+      route: '/super-admin/dashboard',
+      active: false
+    },
+    {
+      title: 'โครงการ',
+      icon: 'assets/icons/village.svg',
+      route: '/super-admin/projects',
+      active: false
+    },
+    {
+      title: 'ผู้ใช้งาน',
+      icon: 'assets/icons/residents.svg',
+      route: '/super-admin/users',
+      active: false
+    },
+    {
+      title: 'ประกาศ',
+      icon: 'assets/icons/announcement.svg',
+      route: '/super-admin/announcements',
+      active: false
+    },
+    // {
+    //   title: 'ตั้งค่าระบบ',
+    //   icon: 'assets/icons/theme.svg',
+    //   route: '/super-admin/config',
+    //   active: false
+    // },
+    {
+      title: 'ประวัติการใช้งาน',
+      icon: 'assets/icons/common-problem.svg',
+      route: '/super-admin/logs',
       active: false
     }
   ];
@@ -127,10 +172,16 @@ export class SidebarComponent implements OnInit {
   }
 
   loadProjectName(): void {
-    const projectMemberships = this.authService.getProjectMemberships();
-    if (projectMemberships && projectMemberships.length > 0) {
-      const firstProject = projectMemberships[0];
-      this.projectName = firstProject.project_name || 'ผู้ดูแลระบบนิติบุคคล';
+    const role = this.authService.getUserRole();
+    if (role === 'super-admin') {
+      this.projectName = 'Super Admin Console';
+      this.menuItems = this.superAdminMenuItems;
+    } else {
+      const projectMemberships = this.authService.getProjectMemberships();
+      if (projectMemberships && projectMemberships.length > 0) {
+        const firstProject = projectMemberships[0];
+        this.projectName = firstProject.project_name || 'ผู้ดูแลระบบนิติบุคคล';
+      }
     }
   }
 

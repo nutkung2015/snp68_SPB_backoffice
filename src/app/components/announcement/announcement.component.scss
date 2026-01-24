@@ -183,10 +183,12 @@
   }
 }
 
+
 // Material Design Overrides
 ::ng-deep {
   .mat-table {
     background: white !important;
+    // border-radius: 24px !important;
     // font-family: 'LINE Seed Sans TH', sans-serif !important;
 
     th.mat-header-cell {
@@ -195,7 +197,7 @@
       font-size: 14px;
       // font-family: 'LINE Seed Sans TH', sans-serif !important;
       padding: 0px 16px;
-      border-radius: 24px !important;
+      // border-radius: 24px !important;
     }
 
     td.mat-cell {
@@ -219,6 +221,9 @@
   .div-table {
     background: white !important;
     border: none !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    overflow-x: auto;
 
     .mat-mdc-table {
       .mat-column-status {
@@ -268,6 +273,10 @@
   border: none !important;
   // background-color: #2084fc !important;
   border-radius: 24px !important;
+
+  .div-table {
+    border-radius: 10px !important;
+  }
 }
 
 .no-data {

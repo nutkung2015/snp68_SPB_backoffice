@@ -1,0 +1,263 @@
+<app-page-header iconSrc="assets/icons/material-symbols--car-gear-rounded.svg" title="จัดการยานพาหนะ"
+    subtitle="Vehicle Management" iconColor="invert(100%)">
+    <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+    </div>
+</app-page-header>
+
+<div class="dashboard-container">
+    <!-- Stats Summary -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>directions_car</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.total_vehicles }}</span>
+                <span class="stat-label">ยานพาหนะทั้งหมด</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.active_vehicles }}</span>
+                <span class="stat-label">เปิดใช้งาน</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>home</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.units_with_vehicles }}</span>
+                <span class="stat-label">ยูนิตที่มียานพาหนะ</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>add_circle</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ stats.recent_vehicles_7_days }}</span>
+                <span class="stat-label">เพิ่มใหม่ 7 วัน</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <mat-card class="table-section">
+        <!-- Toolbar Row -->
+        <div class="table-toolbar">
+            <!-- Title -->
+            <div class="toolbar-title">
+                <mat-icon class="title-icon">directions_car</mat-icon>
+                <span>รายการยานพาหนะ</span>
+            </div>
+
+            <!-- Controls -->
+            <div class="toolbar-controls">
+                <!-- Search -->
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput placeholder="ค้นหาทะเบียน, ยี่ห้อ, สี, ยูนิต..." [(ngModel)]="searchQuery"
+                        (keyup.enter)="onSearchChange()">
+                    <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()" type="button">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <!-- Zone Filter -->
+                <mat-form-field appearance="outline" class="zone-filter">
+                    <mat-select [(value)]="selectedZoneId" (selectionChange)="onZoneChange($event.value)"
+                        placeholder="ทุกโซน">
+                        <mat-option value="">ทุกโซน</mat-option>
+                        <mat-option *ngFor="let zone of zones" [value]="zone.id">
+                            {{ zone.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Filter Buttons Group -->
+                <div class="filter-btn-group">
+                    <button mat-flat-button [class.active]="activeFilter === 'all'" (click)="onFilterChange('all')"
+                        class="filter-btn">
+                        ทั้งหมด
+                    </button>
+                    <button mat-flat-button [class.active]="activeFilter === 'active'"
+                        (click)="onFilterChange('active')" class="filter-btn filter-active">
+                        <mat-icon>check_circle</mat-icon>
+                        เปิดใช้งาน
+                    </button>
+                    <button mat-flat-button [class.active]="activeFilter === 'inactive'"
+                        (click)="onFilterChange('inactive')" class="filter-btn filter-inactive">
+                        <mat-icon>cancel</mat-icon>
+                        ปิดใช้งาน
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-btns">
+                    <!-- Bulk Actions (show when items selected) -->
+                    <button mat-stroked-button [matMenuTriggerFor]="bulkMenu" *ngIf="!selection.isEmpty()"
+                        class="bulk-action-btn">
+                        <mat-icon>checklist</mat-icon>
+                        {{ selection.selected.length }} รายการ
+                    </button>
+                    <mat-menu #bulkMenu="matMenu">
+                        <button mat-menu-item (click)="bulkSetActive(true)">
+                            <mat-icon class="menu-icon-green">check_circle</mat-icon>
+                            <span>เปิดใช้งาน</span>
+                        </button>
+                        <button mat-menu-item (click)="bulkSetActive(false)">
+                            <mat-icon class="menu-icon-gray">cancel</mat-icon>
+                            <span>ปิดใช้งาน</span>
+                        </button>
+                    </mat-menu>
+
+                    <button mat-flat-button class="add-btn" (click)="openAddDialog()">
+                        <mat-icon>add</mat-icon>
+                        เพิ่มยานพาหนะ
+                    </button>
+
+                    <button mat-icon-button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading"
+                        matTooltip="รีเฟรชข้อมูล">
+                        <mat-icon [class.spin]="isLoading">sync</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-spinner" fxLayout="column" fxLayoutAlign="center center">
+            <mat-spinner diameter="40"></mat-spinner>
+            <span>กำลังโหลดข้อมูล...</span>
+        </div>
+
+        <!-- Table Content -->
+        <ng-container *ngIf="!isLoading">
+            <ng-container *ngIf="dataSource.data.length > 0; else noData">
+                <div class="div-table">
+                    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z1">
+                        <!-- Checkbox Column -->
+                        <ng-container matColumnDef="select">
+                            <th mat-header-cell *matHeaderCellDef>
+                                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                                </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)">
+                                </mat-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <!-- Sequence Column -->
+                        <ng-container matColumnDef="sequence">
+                            <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+                            <td mat-cell *matCellDef="let element; let i = index">
+                                {{ i + 1 + (pageEvent.pageIndex * pageEvent.pageSize) }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Plate Number Column -->
+                        <ng-container matColumnDef="plate_number">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ทะเบียน</th>
+                            <td mat-cell *matCellDef="let element">
+                                <div class="plate-badge">
+                                    {{ element.plate_number }}
+                                </div>
+                                <div class="province-text" *ngIf="element.province">{{ element.province }}</div>
+                            </td>
+                        </ng-container>
+
+                        <!-- Brand Column -->
+                        <ng-container matColumnDef="brand">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ยี่ห้อ</th>
+                            <td mat-cell *matCellDef="let element">{{ element.brand || '-' }}</td>
+                        </ng-container>
+
+                        <!-- Color Column -->
+                        <ng-container matColumnDef="color">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>สี</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="color-chip" *ngIf="element.color">{{ element.color }}</span>
+                                <span *ngIf="!element.color">-</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Unit Number Column -->
+                        <ng-container matColumnDef="unit_number">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>บ้านเลขที่</th>
+                            <td mat-cell *matCellDef="let element">{{ element.unit_number || '-' }}</td>
+                        </ng-container>
+
+                        <!-- Zone Name Column -->
+                        <ng-container matColumnDef="zone_name">
+                            <th mat-header-cell *matHeaderCellDef>โซน</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="zone-chip" *ngIf="element.zone_name">{{ element.zone_name }}</span>
+                                <span *ngIf="!element.zone_name">-</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Status Column -->
+                        <ng-container matColumnDef="is_active">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="status-badge" [ngClass]="getStatusBadgeClass(element.is_active)">
+                                    {{ getStatusText(element.is_active) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Created At Column -->
+                        <ng-container matColumnDef="created_at">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>วันที่เพิ่ม</th>
+                            <td mat-cell *matCellDef="let element">{{ formatDateTime(element.created_at) }}</td>
+                        </ng-container>
+
+                        <!-- Actions Column -->
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef>จัดการ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <button mat-icon-button color="primary" (click)="openEditDialog(element)"
+                                    matTooltip="แก้ไข">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" (click)="deleteVehicle(element)" matTooltip="ลบ">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                    </table>
+                </div>
+
+                <!-- Paginator -->
+                <mat-paginator [length]="pageEvent.length" [pageSize]="pageEvent.pageSize"
+                    [pageIndex]="pageEvent.pageIndex" [pageSizeOptions]="[10, 20, 50, 100]"
+                    (page)="handlePageEvent($event)" showFirstLastButtons aria-label="Select page">
+                </mat-paginator>
+            </ng-container>
+
+            <!-- No Data Template -->
+            <ng-template #noData>
+                <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                    <mat-icon>directions_car</mat-icon>
+                    <p>ไม่มีข้อมูลยานพาหนะ</p>
+                    <span class="empty-hint">ยังไม่มีข้อมูลยานพาหนะในระบบ</span>
+                    <button mat-raised-button color="primary" (click)="openAddDialog()">
+                        <mat-icon>add</mat-icon>
+                        เพิ่มยานพาหนะใหม่
+                    </button>
+                </div>
+            </ng-template>
+        </ng-container>
+    </mat-card>
+</div>

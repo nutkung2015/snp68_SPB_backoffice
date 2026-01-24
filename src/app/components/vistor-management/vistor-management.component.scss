@@ -4,112 +4,107 @@
     min-height: calc(100vh - 64px);
 }
 
-// Stats Row
-.stats-row {
+// Variables (same as house-guard)
+$primary: #2A405E;
+$white: #ffffff;
+$black: #1a1a1a;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-500: #6c757d;
+
+// Stats Bar - Same as house-guard
+.stats-bar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 16px;
     margin-bottom: 24px;
+    background: $white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid $gray-200;
+    box-shadow: 0 2px 8px rgba($black, 0.04);
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, $gray-100 0%, $white 100%);
+        border: 1px solid $gray-200;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba($primary, 0.1);
+            border-color: rgba($primary, 0.3);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: $primary;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            mat-icon {
+                color: $white;
+                font-size: 24px;
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: $primary;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: $gray-500;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+    }
 
     @media (max-width: 1200px) {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 576px) {
+    @media (max-width: 768px) {
         grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 12px;
+
+        .stat-item {
+            padding: 12px;
+            gap: 12px;
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .stat-number {
+                font-size: 22px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+        }
     }
-}
-
-.stat-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(180deg, transparent, transparent);
-        transition: background 0.3s ease;
-    }
-
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    }
-
-    &:has(.stat-icon.blue)::before {
-        background: linear-gradient(180deg, #003049, #001622);
-    }
-
-    &:has(.stat-icon.orange)::before {
-        background: linear-gradient(180deg, #003049, #0079bb);
-    }
-
-    &:has(.stat-icon.green)::before {
-        background: linear-gradient(180deg, #003049, #454b4e);
-    }
-
-    &:has(.stat-icon.purple)::before {
-        background: linear-gradient(180deg, #003049, #cbe5f3);
-    }
-}
-
-.stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-    &.blue {
-        background: linear-gradient(135deg, #003049, #001622);
-    }
-
-    &.orange {
-        background: linear-gradient(135deg, #003049, #0079bb);
-    }
-
-    &.green {
-        background: linear-gradient(135deg, #003049, #454b4e);
-    }
-
-    &.purple {
-        background: linear-gradient(135deg, #003049, #cbe5f3);
-    }
-}
-
-.stat-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1F2937;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 14px;
-    color: #6B7280;
-    margin-top: 6px;
 }
 
 // Table Section
@@ -358,17 +353,5 @@
         button {
             flex-shrink: 0;
         }
-    }
-
-    .stat-card {
-        padding: 16px;
-    }
-
-    .stat-value {
-        font-size: 24px;
-    }
-
-    .stat-label {
-        font-size: 12px;
     }
 }

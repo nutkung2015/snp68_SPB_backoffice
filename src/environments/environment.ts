@@ -9,7 +9,7 @@ export const environment = {
     appId: '1:58142314237:web:3330e67fd38c87147db894',
     measurementId: 'G-B12DN0C3YQ',
   },
-  apiUrl: 'http://localhost:5000',
+  apiUrl: 'http://localhost:5000', /* Uses API_URL */
   auth: {
     tokenKey: 'auth_token',
     refreshTokenKey: 'refresh_token',

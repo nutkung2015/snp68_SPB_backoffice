@@ -37,10 +37,11 @@
         <!-- Search and Filter Section -->
         <div class="search-filter-section">
             <div class="search-container">
-                <div fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="16px">
-                    <!-- Search Input -->
-                    <div class="filter-input-group" fxFlex="300px">
-                        <div class="filter-input right">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+                    <!-- Search Section -->
+                    <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                        <!-- Search Input -->
+                        <div class="filter-input right" fxFlex="350px">
                             <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
                                 <mat-icon class="secondary">search</mat-icon>
                                 <input matInput type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()"
@@ -48,35 +49,39 @@
                                     style="border: none; width: 100%; height: 100%" />
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Role Filter -->
-                    <div class="filter-select-group" fxFlex="180px">
-                        <div class="filter-input left">
-                            <mat-select [(ngModel)]="selectedRole" (selectionChange)="applyFilter()"
-                                placeholder="บทบาท">
-                                <mat-option value="all">บทบาททั้งหมด</mat-option>
-                                <mat-option value="juristicLeader">หัวหน้านิติบุคคล</mat-option>
-                                <mat-option value="juristicMember">นิติบุคคล</mat-option>
-                                <mat-option value="security">รปภ.</mat-option>
-                            </mat-select>
+                        <!-- Role Filter -->
+                        <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                            <div fxFlex="60px" fxLayoutAlign="end center">
+                                <span>บทบาท</span>
+                            </div>
+                            <div class="filter-input left" fxFlex style="height: 100%">
+                                <mat-select [(ngModel)]="selectedRole" (selectionChange)="applyFilter()">
+                                    <mat-option value="all">ทั้งหมด</mat-option>
+                                    <mat-option value="juristicLeader">หัวหน้านิติบุคคล</mat-option>
+                                    <mat-option value="juristicMember">นิติบุคคล</mat-option>
+                                    <mat-option value="security">รปภ.</mat-option>
+                                </mat-select>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Status Filter -->
-                    <div class="filter-select-group" fxFlex="150px">
-                        <div class="filter-input left">
-                            <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()"
-                                placeholder="สถานะ">
-                                <mat-option value="all">สถานะทั้งหมด</mat-option>
-                                <mat-option value="active">ใช้งาน</mat-option>
-                                <mat-option value="inactive">ระงับ</mat-option>
-                            </mat-select>
+                        <!-- Status Filter -->
+                        <div fxLayout="row" fxLayoutGap="10px" style="min-width: 200px">
+                            <div fxFlex="50px" fxLayoutAlign="end center">
+                                <span>สถานะ</span>
+                            </div>
+                            <div class="filter-input left" fxFlex style="height: 100%">
+                                <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()">
+                                    <mat-option value="all">ทั้งหมด</mat-option>
+                                    <mat-option value="active">ใช้งาน</mat-option>
+                                    <mat-option value="inactive">ระงับ</mat-option>
+                                </mat-select>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Summary -->
-                    <div fxFlex fxLayoutAlign="end center">
+                    <div fxLayoutAlign="end center">
                         <span class="results-count">{{ dataSource.data.length }} รายการ</span>
                     </div>
                 </div>
@@ -181,7 +186,7 @@
                                     <!-- Remove Member Button -->
                                     <button mat-icon-button color="warn" [disabled]="!canRemoveMember(element)"
                                         (click)="removeMember(element)"
-                                        [matTooltip]="canRemoveMember(element) ? 'นำออกจากโปรเจค' : 'ไม่สามารถนำออกได้'">
+                                        [matTooltip]="canRemoveMember(element) ? 'นำออกจากโครงการ' : 'ไม่สามารถนำออกได้'">
                                         <mat-icon>person_remove</mat-icon>
                                     </button>
                                 </td>

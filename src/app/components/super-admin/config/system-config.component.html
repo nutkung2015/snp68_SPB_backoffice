@@ -1,0 +1,106 @@
+<div class="config-page">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/settings.svg" title="System Configuration" subtitle="การตั้งค่าระบบ"
+        iconColor="invert(100%)">
+    </app-page-header>
+
+    <!-- Content Section -->
+    <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+        fxLayoutAlign="start stretch" fxLayoutGap.gt-sm="20px" *ngIf="!isLoading">
+
+        <div class="config-grid">
+            <!-- Maintenance Mode Card -->
+            <mat-card class="config-card maintenance">
+                <div class="card-header">
+                    <div class="title-section">
+                        <div class="icon-wrapper warning">
+                            <mat-icon>build</mat-icon>
+                        </div>
+                        <div class="title-text">
+                            <h3>โหมดปิดปรับปรุง</h3>
+                            <span class="subtitle">Maintenance Mode</span>
+                        </div>
+                    </div>
+                    <mat-slide-toggle [(ngModel)]="config.maintenance_mode.value" color="warn">
+                    </mat-slide-toggle>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="card-content">
+                    <p class="description">
+                        เมื่อเปิดใช้งาน ระบบจะไม่สามารถเข้าถึงได้สำหรับผู้ใช้ทั่วไป ยกเว้น Super Admin
+                        ใช้สำหรับการอัปเดตหรือการบำรุงรักษาระบบ
+                    </p>
+                    <div class="status-indicator" [class.active]="config.maintenance_mode.value">
+                        <mat-icon>{{ config.maintenance_mode.value ? 'warning' : 'check_circle' }}</mat-icon>
+                        <span>{{ config.maintenance_mode.value ? 'ระบบอยู่ในโหมดปิดปรับปรุง' : 'ระบบทำงานปกติ' }}</span>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Theme Configuration Card -->
+            <mat-card class="config-card">
+                <div class="card-header">
+                    <div class="title-section">
+                        <div class="icon-wrapper primary">
+                            <mat-icon>palette</mat-icon>
+                        </div>
+                        <div class="title-text">
+                            <h3>สีธีมเริ่มต้น</h3>
+                            <span class="subtitle">Default Theme Color</span>
+                        </div>
+                    </div>
+                    <div class="current-color" [style.background-color]="config.default_theme_color.value"></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="card-content">
+                    <p class="description">เลือกสีหลักเริ่มต้นสำหรับโปรเจคใหม่</p>
+                    <div class="color-grid">
+                        <div class="color-item" *ngFor="let color of themes" [style.background-color]="color"
+                            [class.selected]="config.default_theme_color.value === color" (click)="selectTheme(color)">
+                            <mat-icon *ngIf="config.default_theme_color.value === color">check</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Rate Limiting Card -->
+            <mat-card class="config-card">
+                <div class="card-header">
+                    <div class="title-section">
+                        <div class="icon-wrapper success">
+                            <mat-icon>speed</mat-icon>
+                        </div>
+                        <div class="title-text">
+                            <h3>จำกัดอัตราการเรียก API</h3>
+                            <span class="subtitle">Global Rate Limit</span>
+                        </div>
+                    </div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="card-content">
+                    <p class="description">จำนวนคำขอ API สูงสุดที่อนุญาตต่อนาทีต่อ IP address</p>
+                    <mat-form-field appearance="outline" class="rate-limit-field">
+                        <mat-label>Requests per minute</mat-label>
+                        <input matInput type="number" [(ngModel)]="config.rate_limit_requests.value" min="10"
+                            max="1000">
+                        <span matSuffix>req/min</span>
+                    </mat-form-field>
+                </div>
+            </mat-card>
+        </div>
+
+        <!-- Save Button -->
+        <div class="actions-section">
+            <button mat-flat-button color="primary" class="save-btn" (click)="saveConfig()" [disabled]="isSaving">
+                <mat-spinner diameter="20" *ngIf="isSaving"></mat-spinner>
+                <mat-icon *ngIf="!isSaving">save</mat-icon>
+                <span>{{ isSaving ? 'กำลังบันทึก...' : 'บันทึกการตั้งค่า' }}</span>
+            </button>
+        </div>
+    </div>
+</div>

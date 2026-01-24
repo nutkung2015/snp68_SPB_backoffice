@@ -1,0 +1,593 @@
+// ==================== Variables ====================
+$primary-color: #07354E;
+$primary-light: #0a4a6e;
+$primary-gradient: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+
+$bg-page: #f8fafc;
+$bg-card: #ffffff;
+$bg-section: #f1f5f9;
+
+$border-color: #e2e8f0;
+$border-radius-sm: 8px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// ==================== Base Styles ====================
+.detail-container {
+    background-color: $bg-page;
+    min-height: 100vh;
+    // padding: $spacing-lg;
+
+    @media (max-width: 768px) {
+        padding: $spacing-md;
+    }
+}
+
+// ==================== Header ====================
+.header {
+    background-color: #ffffff;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-lg;
+    border-radius: $border-radius-lg;
+
+    .sub-header {
+        font-weight: 400;
+        font-size: 14px;
+    }
+
+    .sub-body {
+        font-weight: 600;
+        font-size: 28px;
+        color: #333;
+
+        @media (max-width: 480px) {
+            font-size: 22px;
+        }
+    }
+
+    .title-row {
+        mat-icon {
+            color: #333;
+            cursor: pointer;
+            transition: color 0.2s;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+    }
+
+    .back-icon {
+        cursor: pointer;
+    }
+}
+
+// ==================== Main Content ====================
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    padding: 24px;
+}
+
+// ==================== Content Section ====================
+.content-section {
+    background: $bg-card;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        padding: $spacing-lg;
+        border-bottom: 1px solid $border-color;
+        background-color: #ffffff;
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: $border-radius-sm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba($primary-color, 0.1);
+
+            mat-icon {
+                color: $primary-color;
+                font-size: 22px;
+            }
+
+            &.residents {
+                background: rgba(#8b5cf6, 0.1);
+
+                mat-icon {
+                    color: #8b5cf6;
+                }
+            }
+
+            &.house {
+                background: rgba(#10b981, 0.1);
+
+                mat-icon {
+                    color: #10b981;
+                }
+            }
+
+            &.invitation {
+                background: rgba(#f59e0b, 0.1);
+
+                mat-icon {
+                    color: #f59e0b;
+                }
+            }
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+            flex: 1;
+        }
+
+        .count-badge {
+            background: $primary-gradient;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+    }
+
+    .section-body {
+        padding: $spacing-lg;
+    }
+}
+
+// ==================== Info Grid ====================
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: $spacing-md;
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.info-card {
+    background: $bg-section;
+    padding: $spacing-md;
+    border-radius: $border-radius-md;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+
+    &.highlight {
+        background: $primary-gradient;
+
+        .info-label {
+            color: rgba(white, 0.8);
+        }
+
+        .info-value {
+            color: white;
+        }
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: $text-secondary;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: $text-primary;
+    }
+
+    .unit-badge {
+        font-size: 18px;
+        letter-spacing: 0.5px;
+    }
+}
+
+// ==================== Status & Role Chips ====================
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+
+    &.status-active {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    &.status-inactive {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    &.status-default {
+        background: $bg-section;
+        color: $text-secondary;
+    }
+
+    &.badge-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    &.badge-yellow {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    &.badge-gray {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    &.badge-red {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+}
+
+.role-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &.role-owner {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    &.role-tenant {
+        background: #fce7f3;
+        color: #be185d;
+    }
+
+    &.role-family {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+
+    &.role-default {
+        background: $bg-section;
+        color: $text-secondary;
+    }
+}
+
+// ==================== Empty State ====================
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xl * 2;
+    text-align: center;
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: $bg-section;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: $spacing-md;
+
+        mat-icon {
+            font-size: 40px;
+            width: 40px;
+            height: 40px;
+            color: $text-muted;
+        }
+    }
+
+    .empty-text {
+        font-size: 14px;
+        color: $text-secondary;
+    }
+}
+
+// ==================== Data Table ====================
+.data-table-wrapper {
+    border-radius: $border-radius-md;
+    border: 1px solid $border-color;
+    overflow: hidden;
+
+    &.scrollable {
+        overflow-x: auto;
+    }
+}
+
+.data-table {
+    width: 100%;
+    background: transparent;
+
+    th {
+        background: #f8fafc;
+        color: $text-secondary;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: $spacing-md $spacing-lg;
+        white-space: nowrap;
+        border-bottom: 1px solid $border-color;
+    }
+
+    td {
+        padding: $spacing-md $spacing-lg;
+        font-size: 14px;
+        color: $text-primary;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover td {
+        background: #fafbfc;
+    }
+
+    .cell-with-avatar {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: $primary-gradient;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+    }
+
+    .date-cell {
+        color: $text-secondary;
+        font-size: 13px;
+    }
+
+    .invite-code {
+        font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: $primary-color;
+        letter-spacing: 1px;
+    }
+}
+
+// ==================== House Model ====================
+.house-model-container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    .model-info {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+
+        .model-label {
+            font-size: 12px;
+            color: $text-secondary;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .model-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: $text-primary;
+        }
+    }
+
+    .model-actions {
+        display: flex;
+        gap: $spacing-md;
+        flex-wrap: wrap;
+
+        .file-action-btn {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: $primary-color;
+            border-radius: $border-radius-sm;
+            padding: $spacing-sm $spacing-lg;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-xs;
+            transition: all 0.2s ease;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+            }
+
+            &:hover {
+                background: $primary-gradient;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: $shadow-md;
+            }
+        }
+
+        .no-files-message {
+            display: flex;
+            align-items: center;
+            gap: $spacing-xs;
+            color: $text-muted;
+            font-size: 14px;
+
+            mat-icon {
+                font-size: 20px;
+            }
+        }
+    }
+}
+
+// ==================== Page Actions ====================
+.page-actions {
+    display: flex;
+    gap: $spacing-md;
+    padding-top: $spacing-md;
+
+    .action-btn {
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $border-radius-sm;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        transition: all 0.2s ease;
+
+        mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+        }
+
+        &.back {
+            border: 2px solid $primary-color;
+            color: $primary-color;
+
+            &:hover {
+                background: $primary-gradient;
+                color: white;
+                border-color: transparent;
+            }
+        }
+    }
+}
+
+// ==================== No Data State ====================
+.no-data-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+
+    .no-data-content {
+        background: $bg-card;
+        padding: $spacing-xl * 2;
+        border-radius: $border-radius-lg;
+        text-align: center;
+        max-width: 400px;
+        box-shadow: $shadow-lg;
+
+        .no-data-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: $bg-section;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto $spacing-lg;
+
+            mat-icon {
+                font-size: 50px;
+                width: 50px;
+                height: 50px;
+                color: $text-muted;
+            }
+        }
+
+        h3 {
+            margin: 0 0 $spacing-sm;
+            font-size: 20px;
+            color: $text-primary;
+        }
+
+        p {
+            margin: 0 0 $spacing-lg;
+            font-size: 14px;
+            color: $text-secondary;
+            line-height: 1.6;
+        }
+
+        .primary-btn {
+            background: $primary-gradient;
+            color: white;
+            padding: $spacing-sm $spacing-lg;
+            border-radius: $border-radius-sm;
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-xs;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+}
+
+// ==================== Material Overrides ====================
+::ng-deep {
+    .mat-mdc-table {
+        background: transparent !important;
+    }
+
+    .mat-mdc-row:hover {
+        background: #fafbfc !important;
+    }
+
+    .mdc-data-table__cell,
+    .mdc-data-table__header-cell {
+        border-bottom-color: #f1f5f9 !important;
+    }
+}

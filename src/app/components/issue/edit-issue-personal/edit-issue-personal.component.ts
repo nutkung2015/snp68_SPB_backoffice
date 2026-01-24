@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.component';
 import { RestService, PersonalRepair } from '../../../services/rest.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface AttachmentUrl {
   url: string;
@@ -93,7 +94,8 @@ export class EditIssuePersonalComponent implements OnInit {
     private fb: FormBuilder,
     private rest: RestService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.editForm = this.fb.group({
       repair_area: [{ value: '', disabled: true }, Validators.required],
@@ -156,6 +158,7 @@ export class EditIssuePersonalComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading issue:', error);
+          this.toast.error('ไม่สามารถโหลดข้อมูลแจ้งซ่อมได้');
         },
         complete: () => {
           this.isLoading.next(false);
@@ -224,10 +227,12 @@ export class EditIssuePersonalComponent implements OnInit {
       this.rest.updatePersonalRepair(this.issue.id, updatePayload)
         .subscribe({
           next: () => {
+            this.toast.success('บันทึกการแก้ไขเรียบร้อยแล้ว');
             this.router.navigate(['/issue']);
           },
           error: (error) => {
             console.error('Error updating issue:', error);
+            this.toast.error('เกิดข้อผิดพลาดในการแก้ไขรายการแจ้งซ่อม');
           }
         });
     }

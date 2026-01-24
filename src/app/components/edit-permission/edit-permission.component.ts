@@ -17,15 +17,18 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
 // Service
 import { RestService } from '../../services/rest.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 // Shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
+import { InviteOptionDialogComponent } from '../dialog/invite-option-dialog/invite-option-dialog.component';
 // import { EditPermissionDialogComponent } from './edit-permission-dialog.component';
 
 // Interface for Juristic Member
@@ -124,7 +127,8 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
     private restService: RestService,
     private authService: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private toast: ToastService,
+    private router: Router
   ) {
     this.dataSource = new MatTableDataSource<JuristicMember>([]);
   }
@@ -174,7 +178,7 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
         }),
         catchError((error) => {
           console.error('Error loading juristic members:', error);
-          this.snackBar.open('ไม่สามารถโหลดข้อมูลได้', 'ปิด', { duration: 3000 });
+          this.toast.error('ไม่สามารถโหลดข้อมูลได้');
           return of({ status: 'error', data: [] });
         })
       )
@@ -340,7 +344,7 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
   // Remove member from project
   removeMember(member: JuristicMember): void {
     if (!this.canRemoveMember(member)) {
-      this.snackBar.open('คุณไม่มีสิทธิ์นำผู้ใช้รายนี้ออก', 'ปิด', { duration: 3000 });
+      this.toast.warning('คุณไม่มีสิทธิ์นำผู้ใช้รายนี้ออก');
       return;
     }
 
@@ -351,30 +355,36 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
 
     this.isLoading.next(true);
 
-    // TODO: Call API to remove member from project
-    // this.restService.removeMemberFromProject(member.user_id, this.projectId)
-    //   .pipe(finalize(() => this.isLoading.next(false)))
-    //   .subscribe({
-    //     next: (response) => {
-    //       this.snackBar.open('นำผู้ใช้ออกจากโปรเจคสำเร็จ', 'ปิด', { duration: 3000 });
-    //       this.loadMembers();
-    //     },
-    //     error: (err) => {
-    //       this.snackBar.open('เกิดข้อผิดพลาด', 'ปิด', { duration: 3000 });
-    //     }
-    //   });
-
-    // Temp: Show success message (remove this when API is ready)
-    setTimeout(() => {
-      this.isLoading.next(false);
-      this.snackBar.open('ฟีเจอร์นี้กำลังพัฒนา - API ยังไม่พร้อม', 'ปิด', { duration: 3000 });
-    }, 500);
+    this.restService.removeJuristicMember(member.user_id, this.projectId)
+      .pipe(finalize(() => this.isLoading.next(false)))
+      .subscribe({
+        next: (response) => {
+          this.toast.success('นำผู้ใช้ออกจากโปรเจคสำเร็จ');
+          this.loadMembers();
+        },
+        error: (err) => {
+          console.error('Error removing member:', err);
+          this.toast.error('เกิดข้อผิดพลาดในการนำผู้ใช้ออก');
+        }
+      });
   }
 
   // Navigate to invite page
   inviteMember(): void {
-    // Navigate to invite-management page
-    window.location.href = '/invite-management/create';
+    const dialogRef = this.dialog.open(InviteOptionDialogComponent, {
+      width: '400px',
+      panelClass: 'invite-option-dialog-panel'
+    });
+
+    dialogRef.afterClosed().subscribe((result: 'create' | 'invite' | null) => {
+      if (result === 'create') {
+        // Navigate to register-juristic page
+        this.router.navigate(['/register-juristic']);
+      } else if (result === 'invite') {
+        // Navigate to invite-management/create page
+        this.router.navigate(['/invite-management/create']);
+      }
+    });
   }
 
   // ============ Permission Edit Functions (COMMENTED - FOR FUTURE USE) ============
@@ -395,7 +405,7 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
   //     maxHeight: '90vh',
   //     data: {
   //       member: { ...member },
-  //       permissionLabels: PERMISSION_LABELS,
+  //       permissionLabels: PERMISหSION_LABELS,
   //     },
   //     panelClass: 'permission-dialog'
   //   });

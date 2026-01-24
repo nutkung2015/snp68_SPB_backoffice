@@ -1,0 +1,265 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div class="detail-container" *ngIf="!(isLoading$ | async)">
+    <!-- Header Section -->
+    <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
+        <div class="breadcrumb">
+            <span class="sub-header" style="color: #9fa9b6">จัดการยูนิต / </span>
+            <span class="sub-header" style="color: #171a1e">รายละเอียด</span>
+        </div>
+        <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon (click)="onBack()" class="back-icon">arrow_back</mat-icon>
+            <span class="sub-body">รายละเอียดยูนิต</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" *ngIf="unitInfo">
+        <!-- Unit Info Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <mat-icon>home</mat-icon>
+                </div>
+                <h2 class="section-title">ข้อมูลยูนิต</h2>
+            </div>
+            <div class="section-body">
+                <div class="info-grid">
+                    <div class="info-card highlight">
+                        <span class="info-label">เลขที่ยูนิต</span>
+                        <span class="info-value unit-badge">{{ unitInfo.unit_number }}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">โซน</span>
+                        <span class="info-value">{{ unitInfo.zone || '-' }}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">อาคาร/แบบบ้าน</span>
+                        <span class="info-value">{{ unitInfo.building || '-' }}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">ชั้น</span>
+                        <span class="info-value">{{ unitInfo.floor ?? '-' }}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">พื้นที่ (ตร.ม.)</span>
+                        <span class="info-value">{{ unitInfo.area_sqm || '-' }}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">โครงการ</span>
+                        <span class="info-value">{{ unitInfo.project_name || '-' }}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">สถานะ</span>
+                        <span class="status-chip" [ngClass]="getStatusClass(unitInfo.status)">
+                            {{ getStatusText(unitInfo.status) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Residents Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <div class="section-icon residents">
+                    <mat-icon>people</mat-icon>
+                </div>
+                <h2 class="section-title">ผู้อยู่อาศัย</h2>
+                <span class="count-badge" *ngIf="residents.length > 0">{{ residents.length }}</span>
+            </div>
+            <div class="section-body">
+                <!-- Empty State -->
+                <div *ngIf="residents.length === 0" class="empty-state">
+                    <div class="empty-icon">
+                        <mat-icon>person_off</mat-icon>
+                    </div>
+                    <span class="empty-text">ไม่มีผู้อยู่อาศัยในยูนิตนี้</span>
+                </div>
+
+                <!-- Residents Table -->
+                <div *ngIf="residents.length > 0" class="data-table-wrapper">
+                    <table mat-table [dataSource]="residents" class="data-table">
+                        <ng-container matColumnDef="full_name">
+                            <th mat-header-cell *matHeaderCellDef>ชื่อ-นามสกุล</th>
+                            <td mat-cell *matCellDef="let resident">
+                                <div class="cell-with-avatar">
+                                    <div class="avatar">{{ resident.full_name?.charAt(0) || 'U' }}</div>
+                                    <span>{{ resident.full_name }}</span>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="email">
+                            <th mat-header-cell *matHeaderCellDef>อีเมล</th>
+                            <td mat-cell *matCellDef="let resident">{{ resident.email || '-' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="phone">
+                            <th mat-header-cell *matHeaderCellDef>เบอร์โทร</th>
+                            <td mat-cell *matCellDef="let resident">{{ resident.phone || '-' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="role">
+                            <th mat-header-cell *matHeaderCellDef>บทบาท</th>
+                            <td mat-cell *matCellDef="let resident">
+                                <span class="role-chip" [ngClass]="getRoleClass(resident.role)">
+                                    {{ getRoleText(resident.role) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="joined_at">
+                            <th mat-header-cell *matHeaderCellDef>เข้าร่วมเมื่อ</th>
+                            <td mat-cell *matCellDef="let resident" class="date-cell">
+                                {{ formatDateTime(resident.joined_at) }}
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="residentColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: residentColumns;"></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- House Model Section -->
+        <section class="content-section" *ngIf="houseModel">
+            <div class="section-header">
+                <div class="section-icon house">
+                    <mat-icon>architecture</mat-icon>
+                </div>
+                <h2 class="section-title">แบบบ้าน</h2>
+            </div>
+            <div class="section-body">
+                <div class="house-model-container">
+                    <div class="model-info">
+                        <span class="model-label">ชื่อแบบบ้าน</span>
+                        <span class="model-value">{{ houseModel.model_name }}</span>
+                    </div>
+                    <div class="model-actions">
+                        <button mat-flat-button class="file-action-btn" *ngIf="houseModel.plan_file_url"
+                            (click)="openPlanFile()">
+                            <mat-icon>description</mat-icon>
+                            ผังบ้าน
+                        </button>
+                        <button mat-flat-button class="file-action-btn" *ngIf="houseModel.detail_file_url"
+                            (click)="openDetailFile()">
+                            <mat-icon>article</mat-icon>
+                            รายละเอียดแบบ
+                        </button>
+                        <div *ngIf="!houseModel.plan_file_url && !houseModel.detail_file_url" class="no-files-message">
+                            <mat-icon>folder_off</mat-icon>
+                            <span>ไม่มีไฟล์แนบ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Invitation History Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <div class="section-icon invitation">
+                    <mat-icon>mail</mat-icon>
+                </div>
+                <h2 class="section-title">ประวัติคำเชิญ</h2>
+                <span class="count-badge" *ngIf="invitationHistory.length > 0">{{ invitationHistory.length }}</span>
+            </div>
+            <div class="section-body">
+                <!-- Empty State -->
+                <div *ngIf="invitationHistory.length === 0" class="empty-state">
+                    <div class="empty-icon">
+                        <mat-icon>mail_outline</mat-icon>
+                    </div>
+                    <span class="empty-text">ไม่มีประวัติคำเชิญ</span>
+                </div>
+
+                <!-- Invitation Table -->
+                <div *ngIf="invitationHistory.length > 0" class="data-table-wrapper scrollable">
+                    <table mat-table [dataSource]="invitationHistory" class="data-table invitation-table">
+                        <ng-container matColumnDef="code">
+                            <th mat-header-cell *matHeaderCellDef>รหัสเชิญ</th>
+                            <td mat-cell *matCellDef="let inv">
+                                <code class="invite-code">{{ inv.code }}</code>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>สถานะ</th>
+                            <td mat-cell *matCellDef="let inv">
+                                <span class="status-chip" [ngClass]="getInvitationStatusClass(inv.status)">
+                                    {{ getInvitationStatusText(inv.status) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="role">
+                            <th mat-header-cell *matHeaderCellDef>บทบาท</th>
+                            <td mat-cell *matCellDef="let inv">
+                                <span class="role-chip" [ngClass]="getRoleClass(inv.role)">
+                                    {{ getRoleText(inv.role) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="invited_email">
+                            <th mat-header-cell *matHeaderCellDef>อีเมลที่เชิญ</th>
+                            <td mat-cell *matCellDef="let inv">{{ inv.invited_email || '-' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="invited_phone">
+                            <th mat-header-cell *matHeaderCellDef>เบอร์ที่เชิญ</th>
+                            <td mat-cell *matCellDef="let inv">{{ inv.invited_phone || '-' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="invited_by_name">
+                            <th mat-header-cell *matHeaderCellDef>เชิญโดย</th>
+                            <td mat-cell *matCellDef="let inv">{{ inv.invited_by_name || '-' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="created_at">
+                            <th mat-header-cell *matHeaderCellDef>สร้างเมื่อ</th>
+                            <td mat-cell *matCellDef="let inv" class="date-cell">
+                                {{ formatDateTime(inv.created_at) }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expires_at">
+                            <th mat-header-cell *matHeaderCellDef>หมดอายุ</th>
+                            <td mat-cell *matCellDef="let inv" class="date-cell">
+                                {{ formatDateTime(inv.expires_at) }}
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="invitationColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: invitationColumns;"></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <div class="page-actions">
+            <button mat-stroked-button class="action-btn back" (click)="onBack()">
+                <mat-icon>arrow_back</mat-icon>
+                กลับ
+            </button>
+        </div>
+    </div>
+
+    <!-- No Data State -->
+    <div class="no-data-state" *ngIf="!unitInfo">
+        <div class="no-data-content">
+            <div class="no-data-icon">
+                <mat-icon>search_off</mat-icon>
+            </div>
+            <h3>ไม่พบข้อมูลยูนิต</h3>
+            <p>ไม่สามารถโหลดข้อมูลยูนิตได้ หรือยูนิตนี้ไม่มีอยู่ในระบบ</p>
+            <button mat-flat-button class="primary-btn" (click)="onBack()">
+                <mat-icon>arrow_back</mat-icon>
+                กลับไปหน้าจัดการยูนิต
+            </button>
+        </div>
+    </div>
+</div>

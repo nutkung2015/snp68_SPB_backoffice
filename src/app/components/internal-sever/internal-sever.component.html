@@ -1,0 +1,98 @@
+<div class="cloudflare-error-container">
+    <!-- Top Dark Bar -->
+    <header class="top-bar">
+        <div class="community-logo">
+            <div class="logo-icon"></div>
+            <span>Cloudflare Community</span>
+        </div>
+        <div class="window-controls">
+            <mat-icon>chevron_left</mat-icon>
+            <mat-icon>chevron_right</mat-icon>
+            <mat-icon>more_vert</mat-icon>
+            <mat-icon>close</mat-icon>
+        </div>
+    </header>
+
+    <!-- Content Section -->
+    <div class="main-wrapper">
+        <!-- Title Section -->
+        <section class="title-section">
+            <div class="title-row">
+                <h1 class="error-code">Error 500</h1>
+                <div class="ray-info">
+                    Ray ID: {{ rayId }} <span class="dot">•</span> {{ timestamp }}
+                </div>
+            </div>
+            <h2 class="error-message">Internal server error</h2>
+        </section>
+
+        <!-- Diagram Section (Gray Background) -->
+        <section class="diagram-section">
+            <div class="diagram-grid">
+                <!-- Node: You -->
+                <div class="node">
+                    <div class="icon-box">
+                        <mat-icon class="base-icon">important_devices</mat-icon>
+                        <div class="badge badge-success">
+                            <mat-icon>check</mat-icon>
+                        </div>
+                    </div>
+                    <div class="node-name">You</div>
+                    <div class="node-role">Browser</div>
+                    <div class="node-status text-success">Working</div>
+                </div>
+
+                <!-- Node: Paris -->
+                <div class="node">
+                    <div class="icon-box">
+                        <mat-icon class="base-icon">cloud</mat-icon>
+                        <div class="badge badge-error">
+                            <mat-icon>close</mat-icon>
+                        </div>
+                    </div>
+                    <div class="node-name">Paris</div>
+                    <div class="node-role">Cloudflare</div>
+                    <div class="node-status text-danger">Error</div>
+                </div>
+
+                <!-- Node: Host -->
+                <div class="node">
+                    <div class="icon-box">
+                        <mat-icon class="base-icon">dns</mat-icon>
+                        <div class="badge badge-success">
+                            <mat-icon>check</mat-icon>
+                        </div>
+                    </div>
+                    <div class="node-name">{{ hostName }}</div>
+                    <div class="node-role">Host</div>
+                    <div class="node-status text-success">Working</div>
+                </div>
+            </div>
+            <!-- Triangle Indicator -->
+            <div class="triangle-indicator"></div>
+        </section>
+
+        <!-- Details Section -->
+        <section class="details-section">
+            <div class="info-grid">
+                <div class="info-col">
+                    <h3>What happened?</h3>
+                    <p>There is an internal server error on Cloudflare's network.</p>
+                </div>
+                <div class="info-col">
+                    <h3>What can I do?</h3>
+                    <p>Please try again in a few minutes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-section">
+            <p>
+                Cloudflare Ray ID: <span class="bold">{{ rayId }}</span>
+                <span class="dot">•</span> Your IP: {{ clientIp }}
+                <span class="dot">•</span> Performance & security by <span class="link">Cloudflare</span>
+            </p>
+        </footer>
+    </div>
+</div>

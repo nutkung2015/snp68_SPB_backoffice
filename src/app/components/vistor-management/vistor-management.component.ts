@@ -131,8 +131,18 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
     // Load stats
     this.restService.getVisitorStats(this.projectId).subscribe({
       next: (res: any) => {
+        console.log('=== Visitor Stats API Response ===', res);
+        console.log('=== res.data ===', res?.data);
         if (res.status === 'success' && res.data) {
-          this.stats = res.data;
+          // Map snake_case from API to camelCase for template
+          const data = res.data;
+          this.stats = {
+            totalEntryToday: data.total_entry_today ?? data.totalEntryToday ?? 0,
+            walkInCount: data.walk_in_count ?? data.walkInCount ?? 0,
+            stampedCount: data.stamped_count ?? data.stampedCount ?? 0,
+            insideCount: data.inside_count ?? data.insideCount ?? 0
+          };
+          console.log('=== Mapped Stats ===', this.stats);
         }
       },
       error: (err) => {

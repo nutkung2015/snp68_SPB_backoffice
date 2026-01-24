@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -17,12 +17,14 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
 import { AuthService } from '../../services/auth.service';
-import { RestService } from '../../services/rest.service'; // Added RestService import
+import { RestService } from '../../services/rest.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 type InvitationStatus = StatusType | 'all';
 type StatusType = 'pending' | 'sent' | 'accepted' | 'declined' | 'expired';
@@ -76,6 +78,7 @@ interface APIResponse {
     MatProgressSpinnerModule,
     HttpClientModule,
     PageHeaderComponent,
+    MatTooltipModule,
   ],
   templateUrl: './invite-management.component.html',
   styleUrls: ['./invite-management.component.scss'],
@@ -116,11 +119,43 @@ export class InviteManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+  get paginatedData(): UnitInvitation[] {
+    const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+    const endIndex = startIndex + this.pageEvent.pageSize;
+    return this.sortedData.slice(startIndex, endIndex);
+  }
+
+  // Getter สำหรับข้อมูลที่ sort แล้ว
+  get sortedData(): UnitInvitation[] {
+    const data = this.dataSource.filteredData.slice();
+    if (!this.sort || !this.sort.active || this.sort.direction === '') {
+      return data;
+    }
+    return data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'unit_number': return this.compare(a.unit_number, b.unit_number, isAsc);
+        case 'invited_email': return this.compare(a.invited_email || '', b.invited_email || '', isAsc);
+        case 'role': return this.compare(a.role, b.role, isAsc);
+        case 'status': return this.compare(a.status, b.status, isAsc);
+        case 'invited_by_name': return this.compare(a.invited_by_name || '', b.invited_by_name || '', isAsc);
+        case 'expires_at': return this.compare(a.expires_at?.getTime() || 0, b.expires_at?.getTime() || 0, isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+  compare(a: string | number, b: string | number, isAsc: boolean): number {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
   constructor(
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
-    private restService: RestService // Injected RestService
+    private restService: RestService,
+    private toast: ToastService
   ) {
     this.dataSource = new MatTableDataSource<UnitInvitation>([]);
   }
@@ -130,8 +165,16 @@ export class InviteManagementComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // เชื่อมต่อ sort หลังจาก view init
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+        // Subscribe to sort changes to reset to first page
+        this.sort.sortChange.subscribe(() => {
+          this.pageEvent.pageIndex = 0;
+        });
+      }
+    });
 
     this.dataSource.filterPredicate = (data: UnitInvitation, filter: string) => {
       const searchLower = filter.toLowerCase();
@@ -198,7 +241,7 @@ export class InviteManagementComponent implements OnInit {
 
     const projectMemberships = this.authService.getProjectMemberships();
     if (!projectMemberships || projectMemberships.length === 0) {
-      alert('ไม่พบการเป็นสมาชิกโครงการ กรุณาติดต่อผู้ดูแลระบบ');
+      this.toast.error('ไม่พบการเป็นสมาชิกโครงการ กรุณาติดต่อผู้ดูแลระบบ', 5000);
       this.isLoading.next(false);
       return;
     }
@@ -224,7 +267,7 @@ export class InviteManagementComponent implements OnInit {
         catchError((error) => {
           console.error('Error loading unit invitations:', error);
           if (error.error?.message) {
-            alert(`เกิดข้อผิดพลาด: ${error.error.message}`);
+            this.toast.error(`เกิดข้อผิดพลาด: ${error.error.message}`);
           }
           return of([] as UnitInvitation[]);
         }),
@@ -235,6 +278,12 @@ export class InviteManagementComponent implements OnInit {
         this.allInvitations = invitations;
         this.dataSource.data = invitations;
         this.pageEvent.length = invitations.length;
+        this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
+
+        // เชื่อมต่อ sort หลังจากโหลดข้อมูล
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
       });
   }
 
@@ -246,11 +295,16 @@ export class InviteManagementComponent implements OnInit {
     this.searchTerm = '';
     this.selectedStatus = 'all';
     this.dataSource.data = this.allInvitations;
+    this.dataSource.filter = '';
+    this.pageEvent.length = this.allInvitations.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.pageEvent.length = this.dataSource.filteredData.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   filterByStatus(status: InvitationStatus) {

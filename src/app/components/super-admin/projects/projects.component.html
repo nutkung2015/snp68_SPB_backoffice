@@ -1,0 +1,241 @@
+<div class="projects-page">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/village.svg" title="จัดการโปรเจค" subtitle="Projects Management"
+        iconColor="invert(100%)">
+        <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <button mat-flat-button class="bt-primary" (click)="onCreateProject()">
+                <div style="display: flex; align-items: center; gap: 5px">
+                    <mat-icon>add</mat-icon>
+                    <span>สร้างโปรเจค</span>
+                </div>
+            </button>
+        </div>
+    </app-page-header>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-container">
+            <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="24px">
+                <!-- Search Section -->
+                <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                    <div fxLayout="row" fxFlex fxLayoutAlign="start center" fxLayoutGap="10px">
+                        <!-- Search Input -->
+                        <div class="filter-input right" fxFlex="350px">
+                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
+                                <mat-icon class="secondary">search</mat-icon>
+                                <input matInput type="text" [(ngModel)]="searchTerm" (keyup.enter)="applyFilter()"
+                                    placeholder="ค้นหาชื่อโปรเจค..." style="border: none; width: 100%; height: 100%" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Toggle & Buttons Section -->
+                <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="16px">
+                    <!-- View Mode Toggle -->
+                    <mat-button-toggle-group [value]="viewMode" (change)="toggleViewMode($event.value)"
+                        class="view-toggle">
+                        <mat-button-toggle value="table" matTooltip="Table View">
+                            <mat-icon>view_list</mat-icon>
+                        </mat-button-toggle>
+                        <mat-button-toggle value="card" matTooltip="Card View">
+                            <mat-icon>grid_view</mat-icon>
+                        </mat-button-toggle>
+                    </mat-button-toggle-group>
+
+                    <!-- Action Buttons -->
+                    <button mat-stroked-button class="reset-btn" (click)="clearFilters()">
+                        Reset
+                    </button>
+                    <button mat-stroked-button class="search-btn" (click)="applyFilter()">
+                        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
+                            <mat-icon style="width: 14px; height: 14px; font-size: 14px">search</mat-icon>
+                            <span>Search</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Content Section -->
+    <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+        fxLayoutAlign="start stretch" fxLayoutGap.gt-sm="20px">
+
+        <ng-container *ngIf="dataSource.data.length > 0; else noData">
+            <!-- Table View -->
+            <mat-card *ngIf="viewMode === 'table'" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+                <div class="div-table">
+                    <table mat-table [dataSource]="dataSource" matSort>
+                        <!-- Sequence Column (ลำดับ) -->
+                        <ng-container matColumnDef="sequence">
+                            <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="sequence-text">{{ row.sequence }}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Project Name Column -->
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ชื่อโปรเจค</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="project-name">{{ row.name }}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Units Column -->
+                        <ng-container matColumnDef="unit_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>จำนวนยูนิต</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="count-badge">{{ row.unit_count || 0 }}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Members Column -->
+                        <ng-container matColumnDef="member_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>สมาชิก</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="count-badge">{{ row.member_count || 0 }}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Created At Column -->
+                        <ng-container matColumnDef="created_at">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>วันที่สร้าง</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="date-text">{{ formatDate(row.created_at) }}</span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Actions Column -->
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef style="padding-left: 24px">จัดการ</th>
+                            <td mat-cell *matCellDef="let row" style="padding-left: 24px">
+                                <button mat-icon-button [matMenuTriggerFor]="menu" class="action-menu-btn">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <mat-menu #menu="matMenu">
+                                    <button mat-menu-item (click)="onViewProject(row)">
+                                        <mat-icon>visibility</mat-icon>
+                                        <span>ดูรายละเอียด</span>
+                                    </button>
+                                    <button mat-menu-item (click)="onEditProject(row)">
+                                        <mat-icon>edit</mat-icon>
+                                        <span>แก้ไข</span>
+                                    </button>
+                                    <button mat-menu-item (click)="onManageFeatures(row)">
+                                        <mat-icon>toggle_on</mat-icon>
+                                        <span>จัดการ Features</span>
+                                    </button>
+                                    <button mat-menu-item class="text-warn" (click)="onDeactivateProject(row)">
+                                        <mat-icon color="warn">block</mat-icon>
+                                        <span>ปิดใช้งาน</span>
+                                    </button>
+                                </mat-menu>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                    [pageIndex]="currentPage - 1" (page)="onPageChange($event)" showFirstLastButtons
+                    aria-label="Select page of projects">
+                </mat-paginator>
+            </mat-card>
+
+            <!-- Card View -->
+            <div *ngIf="viewMode === 'card'" class="cards-container">
+                <div class="project-cards-grid">
+                    <mat-card *ngFor="let project of dataSource.data" class="project-card">
+                        <!-- Card Header -->
+                        <div class="card-header">
+                            <div class="project-icon">
+                                <img *ngIf="project.logo_url" [src]="project.logo_url" [alt]="project.name"
+                                    class="project-logo" />
+                                <mat-icon *ngIf="!project.logo_url">apartment</mat-icon>
+                            </div>
+                            <div class="project-info">
+                                <h3 class="project-title">{{ project.name }}</h3>
+                                <span class="project-date">สร้างเมื่อ {{ formatDate(project.created_at) }}</span>
+                            </div>
+                            <button mat-icon-button [matMenuTriggerFor]="cardMenu" class="card-menu-btn">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #cardMenu="matMenu">
+                                <button mat-menu-item (click)="onViewProject(project)">
+                                    <mat-icon>visibility</mat-icon>
+                                    <span>ดูรายละเอียด</span>
+                                </button>
+                                <button mat-menu-item (click)="onEditProject(project)">
+                                    <mat-icon>edit</mat-icon>
+                                    <span>แก้ไข</span>
+                                </button>
+                                <button mat-menu-item (click)="onManageFeatures(project)">
+                                    <mat-icon>toggle_on</mat-icon>
+                                    <span>จัดการ Features</span>
+                                </button>
+                                <button mat-menu-item class="text-warn" (click)="onDeactivateProject(project)">
+                                    <mat-icon color="warn">block</mat-icon>
+                                    <span>ปิดใช้งาน</span>
+                                </button>
+                            </mat-menu>
+                        </div>
+
+                        <!-- Card Body - Stats Bar -->
+                        <div class="stats-bar">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <mat-icon>home</mat-icon>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-number">{{ project.unit_count || 0 }}</span>
+                                    <span class="stat-label">ยูนิต</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <mat-icon>people</mat-icon>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-number">{{ project.member_count || 0 }}</span>
+                                    <span class="stat-label">สมาชิก</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer">
+                            <button mat-stroked-button class="view-btn" (click)="onViewProject(project)">
+                                <mat-icon>visibility</mat-icon>
+                                ดูรายละเอียด
+                            </button>
+                        </div>
+                    </mat-card>
+                </div>
+
+                <!-- Paginator for Card View -->
+                <mat-paginator [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                    [pageIndex]="currentPage - 1" (page)="onPageChange($event)" showFirstLastButtons
+                    aria-label="Select page of projects">
+                </mat-paginator>
+            </div>
+        </ng-container>
+
+        <!-- No Data Template -->
+        <ng-template #noData>
+            <mat-card fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+                <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                    <mat-icon>domain_disabled</mat-icon>
+                    <p>ไม่พบข้อมูลโปรเจค</p>
+                </div>
+            </mat-card>
+        </ng-template>
+    </div>
+</div>

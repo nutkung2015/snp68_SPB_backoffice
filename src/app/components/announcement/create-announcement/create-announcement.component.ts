@@ -27,6 +27,7 @@ import { HttpEventType } from '@angular/common/http'; // เพิ่ม import 
 import { FlexLayoutModule } from '@angular/flex-layout'; // เพิ่ม import
 import { AuthService } from '../../../services/auth.service';
 import { RestService, CreateAnnouncementRequest } from '../../../services/rest.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface Announcement {
   id: string; // เปลี่ยนจาก id?: string เป็น id: string
@@ -82,7 +83,8 @@ export class CreateAnnouncementComponent {
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
-    private rest: RestService
+    private rest: RestService,
+    private toast: ToastService
   ) {
     this.announcementForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -119,13 +121,13 @@ export class CreateAnnouncementComponent {
       // ตรวจสอบประเภทไฟล์
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!validTypes.includes(file.type)) {
-        alert('รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
+        this.toast.error('รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
         return;
       }
 
       // ตรวจสอบขนาดไฟล์
       if (file.size > maxSize) {
-        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
+        this.toast.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
         return;
       }
 
@@ -142,12 +144,12 @@ export class CreateAnnouncementComponent {
       try {
         const formValue = this.announcementForm.value;
         console.log('Form value:', formValue);
-        
+
         // ดึง User ID จาก token (ไม่ใช่ชื่อ เพราะ database ต้องการ foreign key ไปที่ users.id)
         const userId = this.authService.getUserId();
         if (!userId) {
           console.error('User ID not found in token');
-          alert('ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่');
+          this.toast.error('ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่');
           this.isLoading.next(false);
           return;
         }
@@ -190,9 +192,11 @@ export class CreateAnnouncementComponent {
           });
         });
 
+        this.toast.success('สร้างประกาศสำเร็จ');
         this.router.navigate(['/announcement']);
       } catch (error) {
         console.error('Error creating announcement:', error);
+        this.toast.error('เกิดข้อผิดพลาดในการสร้างประกาศ');
         this.uploadProgress = 0;
       } finally {
         this.isLoading.next(false);

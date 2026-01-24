@@ -18,8 +18,7 @@ export interface Zone {
   description?: string;
   color?: string;
   sort_order?: number;
-  guard_phone?: string;
-  guard_phone_2?: string;
+  guard_post_id?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -31,8 +30,7 @@ export interface CreateZoneRequest {
   description?: string;
   color?: string;
   sort_order?: number;
-  guard_phone?: string;
-  guard_phone_2?: string;
+  guard_post_id?: string;
 }
 
 export interface UpdateZoneRequest {
@@ -41,12 +39,44 @@ export interface UpdateZoneRequest {
   description?: string;
   color?: string;
   sort_order?: number;
-  guard_phone?: string;
-  guard_phone_2?: string;
+  guard_post_id?: string;
 }
+
 
 export interface BindUnitsRequest {
   unit_ids: string[];
+}
+
+export interface GuardPost {
+  id: string;
+  project_id: string;
+  post_name: string;
+  phone_1?: string;
+  phone_2?: string | null;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+  zone_count?: number;
+  zones?: Zone[];
+}
+
+export interface CreateGuardPostRequest {
+  project_id: string;
+  post_name: string;
+  phone_1?: string;
+  phone_2?: string | null;
+  status?: string;
+}
+
+export interface UpdateGuardPostRequest {
+  post_name?: string;
+  phone_1?: string;
+  phone_2?: string | null;
+  status?: string;
+}
+
+export interface BindZonesToGuardPostRequest {
+  zone_ids: string[];
 }
 
 export interface Announcement {
@@ -91,6 +121,7 @@ export interface Unit {
   project_id: string;
   unit_number: string;
   zone: string;
+  zone_id?: string | null;
   building: string;
   area_sqm: number;
   floor: string | null;
@@ -102,14 +133,19 @@ export interface Unit {
 export interface UnitInvitation {
   id: string;
   unit_id: string;
+  unit_number?: string;
+  project_id?: string;
   invited_by: string;
+  invited_by_name?: string;
   code: string;
+  qr_code_url?: string | null;
   status: string;
   role: string;
   invited_email?: string;
   invited_phone?: string;
-  expires_at: Date;
-  created_at: Date;
+  expires_at: Date | string;
+  created_at: Date | string;
+  updated_at?: Date | string;
   unit_name?: string;
   project_name?: string;
 }
@@ -196,6 +232,269 @@ export interface GenericApiResponse<T> {
   status: 'success' | 'error';
   message?: string;
   data?: T;
+}
+
+// ==================== Vehicle Management Interfaces ====================
+export interface Vehicle {
+  id: string;
+  project_id: string;
+  unit_id: string;
+  plate_number: string;
+  province: string | null;
+  brand: string | null;
+  color: string | null;
+  is_active: boolean;
+  created_at: string;
+  unit_number: string;
+  zone_id: string | null;
+  zone_name: string | null;
+}
+
+export interface VehicleSearchResult {
+  id: string;
+  unit_id: string;
+  plate_number: string;
+  province: string | null;
+  brand: string | null;
+  color: string | null;
+  is_active: boolean;
+  unit_number: string;
+  zone_name: string | null;
+}
+
+export interface VehiclePagination {
+  current_page: number;
+  total_pages: number;
+  total_items: number;
+  items_per_page: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+export interface GetAllVehiclesResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: Vehicle[];
+  pagination: VehiclePagination;
+}
+
+export interface GetUnitVehiclesResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: Vehicle[];
+  unit: {
+    id: string;
+    unit_number: string;
+  };
+  count: number;
+}
+
+export interface GetVehicleByIdResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: Vehicle;
+}
+
+export interface AddVehicleRequest {
+  project_id: string;
+  unit_id: string;
+  plate_number: string;
+  province?: string;
+  brand?: string;
+  color?: string;
+  is_active?: boolean;
+}
+
+export interface AddVehicleResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: {
+    vehicle_id: string;
+    plate_number: string;
+  };
+}
+
+export interface UpdateVehicleRequest {
+  project_id: string;
+  plate_number?: string;
+  province?: string;
+  brand?: string;
+  color?: string;
+  is_active?: boolean;
+}
+
+export interface SearchVehiclesResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: VehicleSearchResult[];
+  count: number;
+}
+
+export interface ZoneVehicleCount {
+  zone_id: string;
+  zone_name: string;
+  vehicle_count: number;
+}
+
+export interface VehicleStats {
+  total_vehicles: number;
+  active_vehicles: number;
+  inactive_vehicles: number;
+  units_with_vehicles: number;
+  total_units: number;
+  units_without_vehicles: number;
+  vehicles_by_zone: ZoneVehicleCount[];
+  recent_vehicles_7_days: number;
+}
+
+export interface VehicleStatsResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: VehicleStats;
+}
+
+export interface BulkUpdateVehicleRequest {
+  project_id: string;
+  vehicle_ids: string[];
+  is_active: boolean;
+}
+
+export interface BulkUpdateVehicleResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: {
+    updated_count: number;
+  };
+}
+
+export interface GetVehiclesParams {
+  project_id: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  unit_id?: string;
+  zone_id?: string;
+  is_active?: boolean;
+  sort_by?: 'plate_number' | 'created_at' | 'unit_number' | 'brand' | 'color' | 'is_active';
+  sort_order?: 'asc' | 'desc';
+}
+
+// ==================== Unit Detail Interfaces ====================
+export interface UnitDetailInfo {
+  id: string;
+  unit_number: string;
+  zone: string;
+  status: string;
+  area_sqm: number;
+  building: string;
+  floor: number | null;
+  project_name: string;
+}
+
+export interface UnitResident {
+  full_name: string;
+  email: string;
+  phone: string;
+  role: string;
+  joined_at: string;
+}
+
+export interface UnitHouseModel {
+  id: string;
+  model_name: string;
+  plan_file_url: string | null;
+  detail_file_url: string | null;
+}
+
+export interface UnitInvitationHistory {
+  id: string;
+  code: string;
+  status: string;
+  role: string;
+  invited_email: string | null;
+  invited_phone: string | null;
+  created_at: string;
+  expires_at: string;
+  invited_by_name: string;
+}
+
+export interface UnitDetailData {
+  unit_info: UnitDetailInfo;
+  residents: UnitResident[];
+  house_model: UnitHouseModel | null;
+  invitation_history: UnitInvitationHistory[];
+}
+
+export interface UnitDetailResponse {
+  status: 'success' | 'error';
+  message?: string;
+  data: UnitDetailData;
+}
+
+// ==========================================
+// Super Admin Interfaces
+// ==========================================
+
+export interface SuperAdminDashboardStats {
+  projects: number;
+  units: number;
+  users: {
+    resident: number;
+    security: number;
+    juristic: number;
+    "super-admin": number;
+  };
+  timestamp: string;
+}
+
+export interface ActivityLog {
+  id: number;
+  admin_user_id: string;
+  admin_name: string;
+  admin_email: string;
+  action_type: 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'LOGIN' | 'LOGOUT' | 'OTHER';
+  target_type: string;
+  target_id: string | null;
+  details: any | null;
+  ip_address: string;
+  user_agent: string;
+  created_at: string;
+}
+
+export interface SystemConfig {
+  maintenance_mode: {
+    value: boolean;
+    description: string;
+    updated_at: string;
+  };
+  default_theme_color: {
+    value: string;
+    description: string;
+    updated_at: string;
+  };
+  rate_limit_requests: {
+    value: number;
+    description: string;
+    updated_at: string;
+  };
+}
+
+export interface GlobalAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  type: 'info' | 'warning' | 'maintenance' | 'update' | 'emergency';
+  target_projects: number[] | null;
+  is_active: boolean;
+  start_date: string | null;
+  end_date: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+export interface FeatureFlag {
+  feature_name: string;
+  is_enabled: boolean;
 }
 
 @Injectable({
@@ -598,6 +897,21 @@ export class RestService {
   }
 
   /**
+   * Remove a juristic member from a project
+   * DELETE /api/juristic/members/:member_id?project_id=:project_id
+   */
+  removeJuristicMember(memberId: string, projectId: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/members/${memberId}`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.delete(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
    * Get common issue by ID
    */
   getCommonIssueById(id: string): Observable<any> {
@@ -719,6 +1033,52 @@ export class RestService {
     );
   }
 
+  /**
+   * Get residents/members in a unit
+   * GET /api/resident-management/units/:unitId/members
+   */
+  getUnitResidents(unitId: string): Observable<GenericApiResponse<any[]>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/resident-management/units/${unitId}/members`;
+
+    return this.http.get<GenericApiResponse<any[]>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Delete a unit
+   * DELETE /api/units/:unitId
+   * Returns error if unit has residents
+   */
+  deleteUnit(unitId: string): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/units/${unitId}`;
+
+    return this.http.delete<GenericApiResponse<any>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Delete multiple units
+   * DELETE /api/units/bulk
+   */
+  deleteUnits(unitIds: string[]): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/units/bulk`;
+
+    return this.http.request<GenericApiResponse<any>>('delete', url, {
+      ...this.getHttpOptions(),
+      body: { unit_ids: unitIds }
+    }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
   // ==================== House Project Management ====================
 
   /**
@@ -726,6 +1086,7 @@ export class RestService {
    * GET /api/projects/:id/house-models
    */
   getHouseModels(projectId: string): Observable<GenericApiResponse<HouseModel[]>> {
+    // curl -X GET http://localhost:3000/api/projects/1/house-models
     const url = `${this.apiUrl}/api/projects/${projectId}/house-models`;
     return this.http.get<GenericApiResponse<HouseModel[]>>(url, this.getHttpOptions());
   }
@@ -757,6 +1118,7 @@ export class RestService {
    * GET /api/projects/info-docs?project_id={project_id}
    */
   getProjectInfoDocs(projectId: string): Observable<GenericApiResponse<any>> {
+    // curl -X GET "http://localhost:3000/api/projects/info-docs?project_id=1"
     const url = `${this.apiUrl}/api/projects/info-docs`;
     const params = new HttpParams().set('project_id', projectId);
     return this.http.get<GenericApiResponse<any>>(url, { ...this.getHttpOptions(), params });
@@ -1026,9 +1388,487 @@ export class RestService {
     );
   }
 
+  // ==================== Guard Post Management ====================
+
+  /**
+   * Get all guard posts
+   * GET /api/guard-posts?project_id={projectId}
+   */
+  getGuardPosts(projectId: string): Observable<GenericApiResponse<GuardPost[]>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get<GenericApiResponse<GuardPost[]>>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get guard post by ID
+   * GET /api/guard-posts/:id
+   */
+  getGuardPostById(id: string): Observable<GenericApiResponse<GuardPost>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts/${id}`;
+
+    return this.http.get<GenericApiResponse<GuardPost>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Create new guard post
+   * POST /api/guard-posts
+   */
+  createGuardPost(data: CreateGuardPostRequest): Observable<GenericApiResponse<GuardPost>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts`;
+
+    return this.http.post<GenericApiResponse<GuardPost>>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Update guard post
+   * PUT /api/guard-posts/:id
+   */
+  updateGuardPost(id: string, data: UpdateGuardPostRequest): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts/${id}`;
+
+    return this.http.put<GenericApiResponse<any>>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Delete guard post
+   * DELETE /api/guard-posts/:id
+   */
+  deleteGuardPost(id: string): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts/${id}`;
+
+    return this.http.delete<GenericApiResponse<any>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Bind zones to guard post (Bulk)
+   * PUT /api/guard-posts/:id/zones
+   */
+  bindZonesToGuardPost(id: string, zoneIds: string[]): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts/${id}/zones`;
+    const body: BindZonesToGuardPostRequest = { zone_ids: zoneIds };
+
+    return this.http.put<GenericApiResponse<any>>(url, body, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Unbind all zones from guard post
+   * DELETE /api/guard-posts/:id/zones
+   */
+  unbindZonesFromGuardPost(id: string): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts/${id}/zones`;
+
+    return this.http.delete<GenericApiResponse<any>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get zones linked to guard post
+   * GET /api/guard-posts/:id/zones
+   */
+  getGuardPostZones(id: string): Observable<GenericApiResponse<Zone[]>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/guard-posts/${id}/zones`;
+
+    return this.http.get<GenericApiResponse<Zone[]>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  // ==================== Unit Detail ====================
+
+  /**
+   * Get unit detail by ID
+   * GET /api/units/:unitId
+   * Returns unit info, residents, house model, and invitation history
+   */
+  getUnitDetail(unitId: string): Observable<UnitDetailResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/units/${unitId}`;
+
+    return this.http.get<UnitDetailResponse>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get unit invitation detail by ID
+   * GET /api/units/invitations/:id
+   */
+  getUnitInvitationById(id: string): Observable<GenericApiResponse<UnitInvitation>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/units/invitations/${id}`;
+
+    return this.http.get<GenericApiResponse<UnitInvitation>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
   /**
    * Handle HTTP errors
    */
+  // ==========================================
+  // Super Admin APIs
+  // ==========================================
+
+  // 1. Dashboard Stats
+  getSuperAdminDashboard(): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/dashboard`;
+    return this.http.get<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // 2. Activity Logs
+  getSuperAdminLogs(params: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/logs`;
+    return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // 3. System Configuration
+  getSystemConfig(): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/config`;
+    return this.http.get<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  updateSystemConfig(data: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/config`;
+    return this.http.put<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // 4. Global Announcements
+  getGlobalAnnouncements(params: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/announcements`;
+    return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  createGlobalAnnouncement(data: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/announcements`;
+    return this.http.post<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  updateGlobalAnnouncement(id: number, data: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/announcements/${id}`;
+    return this.http.put<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  deleteGlobalAnnouncement(id: number): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/announcements/${id}`;
+    return this.http.delete<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // 5. Feature Flags
+  getProjectFeatures(projectId: number): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/features/${projectId}`;
+    return this.http.get<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  updateFeatureFlag(data: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/features`;
+    return this.http.post<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // 6. Projects & Users Lists
+  getSuperAdminProjects(params?: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/projects`;
+    return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  getSuperAdminUsers(params?: any): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/users`;
+    return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  /**
+   * Get all projects (Super Admin only)
+   * GET /api/projects
+   * Supports pagination: page, limit
+   * Supports search by project name
+   */
+  getProjects(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/projects`;
+
+    let httpParams = new HttpParams();
+    if (params) {
+      if (params.page) httpParams = httpParams.set('page', params.page.toString());
+      if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
+      if (params.search) httpParams = httpParams.set('search', params.search);
+      if (params.status) httpParams = httpParams.set('status', params.status);
+    }
+
+    return this.http.get<any>(url, { ...this.getHttpOptions(), params: httpParams }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Create a new project
+   */
+  createProject(data: { name: string; address?: string }): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/projects`;
+    return this.http.post<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Update an existing project
+   */
+  updateProject(id: string, data: { name?: string; address?: string }): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/projects/${id}`;
+    return this.http.put<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Soft delete a project
+   */
+  deleteProject(id: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/projects/${id}`;
+    return this.http.delete<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Restore a soft-deleted project
+   */
+  restoreProject(id: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/projects/${id}/restore`;
+    return this.http.post<any>(url, {}, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get a single project by ID
+   */
+  getProjectById(id: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/projects/${id}`;
+    return this.http.get<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  // ==================== Juristic Vehicle Management ====================
+
+  /**
+   * Get all vehicles in project with pagination
+   * GET /api/juristic/vehicles
+   */
+  getVehicles(params: GetVehiclesParams): Observable<GetAllVehiclesResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles`;
+
+    let httpParams = new HttpParams().set('project_id', params.project_id);
+
+    if (params.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    if (params.unit_id) httpParams = httpParams.set('unit_id', params.unit_id);
+    if (params.zone_id) httpParams = httpParams.set('zone_id', params.zone_id);
+    if (params.is_active !== undefined) httpParams = httpParams.set('is_active', params.is_active.toString());
+    if (params.sort_by) httpParams = httpParams.set('sort_by', params.sort_by);
+    if (params.sort_order) httpParams = httpParams.set('sort_order', params.sort_order);
+
+    return this.http.get<GetAllVehiclesResponse>(url, { ...this.getHttpOptions(), params: httpParams }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get vehicles by unit ID
+   * GET /api/juristic/vehicles/unit/:unitId
+   */
+  getVehiclesByUnit(unitId: string, projectId: string): Observable<GetUnitVehiclesResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/unit/${unitId}`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get<GetUnitVehiclesResponse>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get vehicle by ID
+   * GET /api/juristic/vehicles/:vehicleId
+   */
+  getVehicleById(vehicleId: string, projectId: string): Observable<GetVehicleByIdResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/${vehicleId}`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get<GetVehicleByIdResponse>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Add new vehicle
+   * POST /api/juristic/vehicles
+   */
+  addVehicle(data: AddVehicleRequest): Observable<AddVehicleResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles`;
+
+    return this.http.post<AddVehicleResponse>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Update vehicle by ID
+   * PUT /api/juristic/vehicles/:vehicleId
+   */
+  updateVehicle(vehicleId: string, data: UpdateVehicleRequest): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/${vehicleId}`;
+
+    return this.http.put<GenericApiResponse<any>>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Delete vehicle by ID
+   * DELETE /api/juristic/vehicles/:vehicleId
+   */
+  deleteVehicle(vehicleId: string, projectId: string): Observable<GenericApiResponse<any>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/${vehicleId}`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.delete<GenericApiResponse<any>>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Quick search vehicles
+   * GET /api/juristic/vehicles/search
+   */
+  searchVehicles(projectId: string, query: string, limit: number = 10): Observable<SearchVehiclesResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/search`;
+    let params = new HttpParams()
+      .set('project_id', projectId)
+      .set('q', query)
+      .set('limit', limit.toString());
+
+    return this.http.get<SearchVehiclesResponse>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get vehicle statistics
+   * GET /api/juristic/vehicles/stats
+   */
+  getVehicleStats(projectId: string): Observable<VehicleStatsResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/stats`;
+    const params = new HttpParams().set('project_id', projectId);
+
+    return this.http.get<VehicleStatsResponse>(url, { ...this.getHttpOptions(), params }).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Bulk update vehicles (active/inactive)
+   * PATCH /api/juristic/vehicles/bulk-update
+   */
+  bulkUpdateVehicles(data: BulkUpdateVehicleRequest): Observable<BulkUpdateVehicleResponse> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/juristic/vehicles/bulk-update`;
+
+    return this.http.patch<BulkUpdateVehicleResponse>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     this.isLoadingSubject.next(false);
 

@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { environment } from '../../../environments/environment';
 import { RestService } from '../../services/rest.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 interface ThemeSettings {
   project_id: string;
@@ -191,7 +192,7 @@ export class CustomThemeAppComponent implements OnInit {
     { icon: 'notifications', label: 'การแจ้งเตือน' },
     { icon: 'menu_book', label: 'คู่มือ' },
   ];
-  constructor(private snackBar: MatSnackBar, private http: HttpClient, private restService: RestService) { }
+  constructor(private toast: ToastService, private http: HttpClient, private restService: RestService) { }
 
   ngOnInit() {
     console.log('ngOnInit เริ่มทำงาน');
@@ -267,13 +268,7 @@ export class CustomThemeAppComponent implements OnInit {
         }
       } catch (e) {
         console.error('Error parsing project memberships:', e);
-        this.snackBar.open(
-          'เกิดข้อผิดพลาดในการโหลดข้อมูล Project Memberships',
-          'ปิด',
-          {
-            duration: 3000,
-          }
-        );
+        this.toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล Project Memberships');
         this.projectName = 'Unknown Project';
       }
     } else {
@@ -290,13 +285,13 @@ export class CustomThemeAppComponent implements OnInit {
       // ตรวจสอบประเภทไฟล์
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!validTypes.includes(file.type)) {
-        alert('รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
+        this.toast.error('รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
         return;
       }
 
       // ตรวจสอบขนาดไฟล์
       if (file.size > maxSize) {
-        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
+        this.toast.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
         return;
       }
 
@@ -381,21 +376,15 @@ export class CustomThemeAppComponent implements OnInit {
           this.hasExistingCustomization = true; // อัปเดตสถานะ
           console.log('Saved to projectCustomizations:', customizationData);
 
-          this.snackBar.open('สร้างธีมเรียบร้อยแล้ว', 'ปิด', {
-            duration: 3000,
-          });
+          this.toast.success('สร้างธีมเรียบร้อยแล้ว');
         } catch (e) {
           console.error('Error saving to localStorage:', e);
-          this.snackBar.open('บันทึกไปยัง API สำเร็จ แต่เกิดข้อผิดพลาดในการบันทึกลง localStorage', 'ปิด', {
-            duration: 3000,
-          });
+          this.toast.warning('บันทึกไปยัง API สำเร็จ แต่เกิดข้อผิดพลาดในการบันทึกลง localStorage');
         }
       },
       error: (error) => {
         console.error('Error creating theme:', error);
-        this.snackBar.open('เกิดข้อผิดพลาดในการสร้างธีม', 'ปิด', {
-          duration: 3000,
-        });
+        this.toast.error('เกิดข้อผิดพลาดในการสร้างธีม');
       },
     });
   }
@@ -442,21 +431,15 @@ export class CustomThemeAppComponent implements OnInit {
           localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));
           console.log('Updated projectCustomizations:', customizationData);
 
-          this.snackBar.open('อัปเดตธีมเรียบร้อยแล้ว', 'ปิด', {
-            duration: 3000,
-          });
+          this.toast.success('อัปเดตธีมเรียบร้อยแล้ว');
         } catch (e) {
           console.error('Error updating localStorage:', e);
-          this.snackBar.open('อัปเดตไปยัง API สำเร็จ แต่เกิดข้อผิดพลาดในการบันทึกลง localStorage', 'ปิด', {
-            duration: 3000,
-          });
+          this.toast.warning('อัปเดตไปยัง API สำเร็จ แต่เกิดข้อผิดพลาดในการบันทึกลง localStorage');
         }
       },
       error: (error) => {
         console.error('Error updating theme:', error);
-        this.snackBar.open('เกิดข้อผิดพลาดในการอัปเดตธีม', 'ปิด', {
-          duration: 3000,
-        });
+        this.toast.error('เกิดข้อผิดพลาดในการอัปเดตธีม');
       },
     });
   }
@@ -516,23 +499,17 @@ export class CustomThemeAppComponent implements OnInit {
             this.selectedThemeId = ''; // ล้าง theme ที่เลือก
             this.updatePreview();
 
-            this.snackBar.open('รีเซ็ตธีมเป็นค่าเริ่มต้นแล้ว', 'ปิด', {
-              duration: 3000,
-            });
+            this.toast.success('รีเซ็ตธีมเป็นค่าเริ่มต้นแล้ว');
           },
           error: (error) => {
             console.error('Error resetting theme:', error);
-            this.snackBar.open('เกิดข้อผิดพลาดในการรีเซ็ตธีม', 'ปิด', {
-              duration: 3000,
-            });
+            this.toast.error('เกิดข้อผิดพลาดในการรีเซ็ตธีม');
           },
         });
       })
       .catch(error => {
         console.error('Error fetching default logo:', error);
-        this.snackBar.open('เกิดข้อผิดพลาดในการโหลดรูป default', 'ปิด', {
-          duration: 3000,
-        });
+        this.toast.error('เกิดข้อผิดพลาดในการโหลดรูป default');
       });
   }
 }

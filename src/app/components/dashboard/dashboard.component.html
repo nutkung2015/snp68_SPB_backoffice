@@ -1,129 +1,233 @@
 <div class="dashboard-container">
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-overlay" fxLayout="column" fxLayoutAlign="center center">
+  <div *ngIf="isLoading" class="loading-overlay">
     <mat-spinner diameter="50"></mat-spinner>
     <p>กำลังโหลดข้อมูล...</p>
   </div>
 
-  <!-- Main Grid -->
-  <div class="bento-grid" *ngIf="!isLoading">
+  <!-- Main Dashboard -->
+  <div class="dashboard-content" *ngIf="!isLoading">
 
-    <!-- Area 1: Header / Welcome -->
-    <div class="grid-item welcome-card">
-      <div class="welcome-content">
-        <div class="greeting-text">
-          <h1>{{ getGreeting() }}, ฝ่ายนิติบุคคล</h1>
-          <p>วันนี้ {{ today | date:'fullDate' }}</p>
-        </div>
-        <div class="weather-widget">
-          <!-- Placeholder for weather or quick highlight -->
-          <mat-icon>wb_sunny</mat-icon>
-          <span>32°C</span>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <h1 class="page-title">ภาพรวมของโครงการ</h1>
+        <span class="date-range">{{ today | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <div class="header-right">
+        <div class="greeting-badge">
+          <span>{{ getGreeting() }}, ฝ่ายนิติบุคคล</span>
         </div>
       </div>
     </div>
 
-    <!-- Area 2: Visitor Stats (Summary) -->
-    <div class="grid-item stats-card visitor-stats" (click)="navigateTo('/vistor-management')">
-      <div class="card-header">
-        <h3><mat-icon>local_parking</mat-icon> ผู้มาเยี่ยมวันนี้</h3>
-        <span class="highlight-value">{{ visitorStats.totalEntryToday }}</span>
-      </div>
-      <div class="mini-stats-row">
-        <div class="stat-item">
-          <span class="label">Walk-in</span>
-          <span class="value">{{ visitorStats.walkInCount }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="label">ในโครงการ</span>
-          <span class="value">{{ visitorStats.insideCount }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="label">ประทับตรา</span>
-          <span class="value">{{ visitorStats.stampedCount }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Area 3: Units / Residents Stats -->
-    <div class="grid-item stats-card units-stats" (click)="navigateTo('/residents-management')">
-      <div class="card-header">
-        <h3><mat-icon>home</mat-icon> จำนวนยูนิต</h3>
-      </div>
-      <div class="center-value">
-        <span class="big-number">{{ unitsCount }}</span>
-        <span class="sub-label">ทั้งหมด</span>
-      </div>
-    </div>
-
-    <!-- Area 4: Quick Actions -->
-    <div class="grid-item actions-card">
-      <h3>Quick Actions</h3>
-      <div class="action-buttons">
-        <button mat-flat-button color="primary" (click)="navigateTo('/announcement/create')">
-          <mat-icon>campaign</mat-icon> ประกาศใหม่
-        </button>
-        <button mat-stroked-button (click)="navigateTo('/invite-management/create')">
-          <mat-icon>person_add</mat-icon> เชิญลูกบ้าน
-        </button>
-        <button mat-stroked-button (click)="navigateTo('/issue-common')">
-          <mat-icon>report_problem</mat-icon> แจ้งปัญหา
-        </button>
-        <button mat-stroked-button (click)="navigateTo('/vistor-management')">
-          <mat-icon>directions_car</mat-icon> ผู้มาเยี่ยม
-        </button>
-      </div>
-    </div>
-
-    <!-- Area 5: Recent Announcements -->
-    <div class="grid-item announcements-card">
-      <div class="card-header-row">
-        <h3>ประกาศล่าสุด</h3>
-        <button mat-icon-button (click)="navigateTo('/announcement')">
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
-      </div>
-      <div class="list-container">
-        <div class="list-item" *ngFor="let item of recentAnnouncements"
-          (click)="navigateTo('/announcement/detail/' + item.id)">
-          <div class="item-icon announcement">
-            <mat-icon>notifications</mat-icon>
-          </div>
-          <div class="item-content">
-            <span class="item-title">{{ item.title }}</span>
-            <span class="item-date">{{ item.created_at | date:'mediumDate' }}</span>
+    <!-- Stats Cards Row -->
+    <div class="stats-grid">
+      <!-- Visitors Today -->
+      <div class="stat-card" (click)="navigateTo('/vistor-management')">
+        <div class="stat-header">
+          <span class="stat-label">ผู้มาเยี่ยมวันนี้</span>
+          <div class="stat-icon blue">
+            <mat-icon>directions_car</mat-icon>
           </div>
         </div>
-        <div *ngIf="recentAnnouncements.length === 0" class="empty-state">
-          <p>ยังไม่มีประกาศ</p>
+        <div class="stat-value">{{ visitorStats.totalEntryToday || 0 }}</div>
+        <div class="stat-footer">
+          <span class="change positive" *ngIf="getPercentageChange(visitorStats.totalEntryToday, 'visitors') > 0">
+            <mat-icon>trending_up</mat-icon>
+            +{{ getPercentageChange(visitorStats.totalEntryToday, 'visitors') }}%
+          </span>
+          <span class="period">จากเมื่อวาน</span>
         </div>
       </div>
-    </div>
 
-    <!-- Area 6: Pending Issues -->
-    <div class="grid-item issues-card">
-      <div class="card-header-row">
-        <h3>แจ้งซ่อมคงค้าง</h3>
-        <button mat-icon-button (click)="navigateTo('/issue-common')">
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
+      <!-- Inside Project -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">อยู่ในโครงการ</span>
+          <div class="stat-icon green">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+        <div class="stat-value">{{ visitorStats.insideCount || 0 }}</div>
+        <div class="stat-footer">
+          <span class="sub-stat">Walk-in: {{ visitorStats.walkInCount || 0 }}</span>
+        </div>
       </div>
-      <div class="list-container">
-        <div class="list-item" *ngFor="let issue of recentIssues"
-          (click)="navigateTo('/issue-common/detail/' + issue.id)">
-          <div class="item-icon issue">
+
+      <!-- Total Units -->
+      <div class="stat-card" (click)="navigateTo('/village')">
+        <div class="stat-header">
+          <span class="stat-label">จำนวนยูนิต</span>
+          <div class="stat-icon purple">
+            <mat-icon>home</mat-icon>
+          </div>
+        </div>
+        <div class="stat-value">{{ unitsCount }}</div>
+        <div class="stat-footer">
+          <span class="sub-stat">ทั้งหมด</span>
+        </div>
+      </div>
+
+      <!-- Pending Issues -->
+      <div class="stat-card" (click)="navigateTo('/issue-common')">
+        <div class="stat-header">
+          <span class="stat-label">แจ้งซ่อมคงค้าง</span>
+          <div class="stat-icon orange">
             <mat-icon>build</mat-icon>
           </div>
-          <div class="item-content">
-            <span class="item-title">{{ issue.title || issue.topic || 'แจ้งซ่อม' }}</span>
-            <span class="item-subtitle">{{ issue.status }}</span>
-          </div>
         </div>
-        <div *ngIf="recentIssues.length === 0" class="empty-state">
-          <p>ไม่มีงานแจ้งซ่อมคงค้าง</p>
+        <div class="stat-value">{{ pendingIssuesCount }}</div>
+        <div class="stat-footer">
+          <span class="change negative" *ngIf="pendingIssuesCount > 0">
+            <mat-icon>priority_high</mat-icon>
+            รอดำเนินการ
+          </span>
         </div>
       </div>
     </div>
 
+    <!-- Bento Grid - Charts & Lists -->
+    <div class="bento-grid">
+
+      <!-- Monthly Issues Chart (Bar Chart) -->
+      <div class="grid-item chart-card monthly-chart">
+        <div class="card-header">
+          <h3>อัตราการแจ้งปัญหาส่วนกลาง</h3>
+          <span class="period-badge">6 เดือนล่าสุด</span>
+        </div>
+        <div class="chart-container">
+          <ngx-charts-bar-vertical *ngIf="issueMonthlyData.length > 0" [results]="issueMonthlyData" [xAxis]="true"
+            [yAxis]="true" [showXAxisLabel]="false" [showYAxisLabel]="false" [gradient]="true" [scheme]="colorScheme"
+            [barPadding]="16" [roundEdges]="true">
+          </ngx-charts-bar-vertical>
+          <div *ngIf="issueMonthlyData.length === 0" class="no-data">
+            <mat-icon>bar_chart</mat-icon>
+            <span>ยังไม่มีข้อมูล</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Types (Donut Chart) -->
+      <div class="grid-item chart-card donut-chart">
+        <div class="card-header">
+          <h3>ประเภทผู้เข้าออก</h3>
+        </div>
+        <div class="chart-container donut">
+          <ngx-charts-pie-chart *ngIf="vehicleTypeChartData.length > 0" [results]="vehicleTypeChartData"
+            [scheme]="pieColorScheme" [doughnut]="true" [arcWidth]="0.4" [labels]="true" [trimLabels]="true"
+            [maxLabelLength]="10">
+          </ngx-charts-pie-chart>
+          <div *ngIf="vehicleTypeChartData.length === 0" class="no-data">
+            <mat-icon>pie_chart</mat-icon>
+            <span>ยังไม่มีข้อมูล</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Issue Status Distribution -->
+      <div class="grid-item chart-card issue-status-chart">
+        <div class="card-header">
+          <h3>สถานะการแจ้งซ่อม</h3>
+        </div>
+        <div class="chart-container donut">
+          <ngx-charts-pie-chart *ngIf="issueStatusChartData.length > 0" [results]="issueStatusChartData"
+            [scheme]="pieColorScheme" [doughnut]="true" [arcWidth]="0.4" [labels]="true" [trimLabels]="true"
+            [legend]="false">
+          </ngx-charts-pie-chart>
+          <div *ngIf="issueStatusChartData.length === 0" class="no-data">
+            <mat-icon>donut_small</mat-icon>
+            <span>ยังไม่มีข้อมูล</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid-item actions-card">
+        <div class="card-header">
+          <h3>Quick Actions</h3>
+        </div>
+        <div class="action-buttons">
+          <button class="action-btn" (click)="navigateTo('/announcement/create')">
+            <mat-icon>campaign</mat-icon>
+            <span>ประกาศใหม่</span>
+          </button>
+          <button class="action-btn" (click)="navigateTo('/invite-management/create')">
+            <mat-icon>person_add</mat-icon>
+            <span>เชิญลูกบ้าน</span>
+          </button>
+          <button class="action-btn" (click)="navigateTo('/issue-common')">
+            <mat-icon>report_problem</mat-icon>
+            <span>แจ้งปัญหา</span>
+          </button>
+          <button class="action-btn" (click)="navigateTo('/vistor-management')">
+            <mat-icon>directions_car</mat-icon>
+            <span>ผู้มาเยี่ยม</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Announcements -->
+      <div class="grid-item list-card announcements-list">
+        <div class="card-header">
+          <h3>ประกาศล่าสุด</h3>
+          <button mat-icon-button (click)="navigateTo('/announcement')">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let item of recentAnnouncements"
+            (click)="navigateTo('/announcement/detail/' + item.id)">
+            <div class="item-avatar blue">
+              <mat-icon>notifications</mat-icon>
+            </div>
+            <div class="item-content">
+              <span class="item-title">{{ item.title }}</span>
+              <span class="item-meta">{{ item.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <mat-icon class="item-arrow">chevron_right</mat-icon>
+          </div>
+          <div *ngIf="recentAnnouncements.length === 0" class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>ยังไม่มีประกาศ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Issues List -->
+      <div class="grid-item list-card issues-list">
+        <div class="card-header">
+          <h3>แจ้งซ่อมล่าสุด</h3>
+          <button mat-icon-button (click)="navigateTo('/issue-common')">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let issue of recentIssues.slice(0, 5)"
+            (click)="navigateTo('/issue-common/detail/' + issue.id)">
+            <div class="item-avatar" [ngClass]="{
+              'orange': issue.status === 'pending',
+              'blue': issue.status === 'in_progress',
+              'green': issue.status === 'completed'
+            }">
+              <mat-icon>build</mat-icon>
+            </div>
+            <div class="item-content">
+              <span class="item-title">{{ issue.description || issue.repair_area || 'แจ้งซ่อม' }}</span>
+              <span class="item-meta">
+                <span class="status-dot" [ngClass]="issue.status"></span>
+                {{ translateStatus(issue.status) }}
+              </span>
+            </div>
+            <mat-icon class="item-arrow">chevron_right</mat-icon>
+          </div>
+          <div *ngIf="recentIssues.length === 0" class="empty-state">
+            <mat-icon>check_circle</mat-icon>
+            <p>ไม่มีงานแจ้งซ่อมคงค้าง</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

@@ -19,6 +19,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { AuthService } from '../../../services/auth.service';
 import { InvitationSuccessDialogComponent, InvitationSuccessData } from '../../dialog/invitation-success-dialog/invitation-success-dialog.component';
 import { RestService } from '../../../services/rest.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface ProjectMembership {
   project_id: string;
@@ -82,7 +83,8 @@ export class CreateInviteComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private dialog: MatDialog,
-    private restService: RestService
+    private restService: RestService,
+    private toast: ToastService
   ) {
     this.inviteForm = this.fb.group({
       unit_id: [''],
@@ -202,17 +204,17 @@ export class CreateInviteComponent implements OnInit {
             this.router.navigate(['/invite-management']);
           });
         } else {
-          alert('ไม่สามารถสร้างคำเชิญได้');
+          this.toast.error('ไม่สามารถสร้างคำเชิญได้');
           this.router.navigate(['/invite-management']);
         }
       } catch (error) {
         console.error('Error creating invitation:', error);
-        alert('เกิดข้อผิดพลาดในการส่งคำเชิญ');
+        this.toast.error('เกิดข้อผิดพลาดในการส่งคำเชิญ');
       } finally {
         this.isLoading.next(false);
       }
     } else {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      this.toast.warning('กรุณากรอกข้อมูลให้ครบถ้วน');
     }
   }
 

@@ -1,0 +1,178 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div ngClass="header" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="10px">
+    <div>
+        <span ngClass="sub-header" style="color: #9fa9b6">Global Announcements / </span>
+        <span ngClass="sub-header" style="color: #171a1e">สร้างประกาศ</span>
+    </div>
+    <span ngClass="sub-body" fxLayoutGap="20px">
+        <mat-icon (click)="onCancel()" class="back-icon">arrow_back</mat-icon>
+        <span>สร้างประกาศ Global</span>
+    </span>
+</div>
+
+<div style="padding-top: 24px; padding-bottom: 120px">
+    <mat-card>
+        <div fxLayout="column" fxLayoutAlign="center stretch" style="
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 24px;
+        padding-right: 24px;
+      ">
+            <form [formGroup]="announcementForm">
+                <div class="form-content">
+                    <div fxLayout="row" fxLayoutGap="60px" fxLayout.lt-md="column">
+                        <!-- ส่วนแรก: Type Preview -->
+                        <!-- <div class="preview-section">
+                            <div class="section-label">ตัวอย่าง Type</div>
+                            <div class="type-preview-container">
+                                <div class="type-preview-item" *ngFor="let type of types" [ngClass]="type.value"
+                                    [class.selected]="announcementForm.get('type')?.value === type.value"
+                                    (click)="selectType(type.value)">
+                                    <mat-icon *ngIf="type.value === 'info'">info</mat-icon>
+                                    <mat-icon *ngIf="type.value === 'warning'">warning</mat-icon>
+                                    <mat-icon *ngIf="type.value === 'maintenance'">build</mat-icon>
+                                    <mat-icon *ngIf="type.value === 'update'">system_update</mat-icon>
+                                    <mat-icon *ngIf="type.value === 'emergency'">error</mat-icon>
+                                    <span>{{ type.label }}</span>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <!-- ส่วนที่สอง: รายละเอียด -->
+                        <div class="detail-section" fxLayout="column" fxLayoutGap="16px"
+                            style="width: 100%; max-width: 600px">
+                            <!-- หัวข้อประกาศ -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>หัวข้อประกาศ
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <input matInput formControlName="title" placeholder="หัวข้อประกาศ" required />
+                                    <mat-error *ngIf="announcementForm.get('title')?.hasError('required')">
+                                        กรุณาระบุหัวข้อประกาศ
+                                    </mat-error>
+                                    <mat-error *ngIf="announcementForm.get('title')?.hasError('minlength')">
+                                        หัวข้อต้องมีอย่างน้อย 3 ตัวอักษร
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- ประเภท -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>ประเภท
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <mat-select formControlName="type" required>
+                                        <mat-option *ngFor="let type of types" [value]="type.value">
+                                            {{ type.label }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="announcementForm.get('type')?.hasError('required')">
+                                        กรุณาเลือกประเภท
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- เนื้อหา -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>เนื้อหา
+                                </span>
+                                <mat-form-field appearance="outline">
+                                    <textarea matInput formControlName="content" rows="6"
+                                        placeholder="เนื้อหาประกาศ..."></textarea>
+                                    <mat-error *ngIf="announcementForm.get('content')?.hasError('required')">
+                                        กรุณาระบุเนื้อหา
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- กลุ่มเป้าหมาย -->
+                            <div fxLayout="column" fxLayoutGap="10px">
+                                <span class="field-label">
+                                    <span class="required">*</span>กลุ่มเป้าหมาย
+                                </span>
+
+                                <div class="select-projects-section">
+                                    <div class="select-projects-btn" fxLayout="row" fxLayoutAlign="start center"
+                                        fxLayoutGap="12px">
+                                        <button mat-stroked-button color="primary" type="button"
+                                            (click)="openProjectSelectionDialog()">
+                                            <mat-icon>add_business</mat-icon>
+                                            {{ selectedProjectIds.length > 0 ? 'แก้ไขโครงการ' : 'เลือกโครงการ' }}
+                                        </button>
+                                        <span class="selected-count" *ngIf="selectedProjectIds.length > 0">
+                                            เลือกแล้ว {{ selectedProjectIds.length }} โครงการ
+                                        </span>
+                                        <span class="hint-text" *ngIf="selectedProjectIds.length === 0">
+                                            (เลือกทั้งหมดได้ใน dialog)
+                                        </span>
+                                    </div>
+
+                                    <!-- แสดงรายการโครงการที่เลือก -->
+                                    <div class="selected-projects-list" *ngIf="selectedProjects.length > 0">
+                                        <div class="selected-project-chip" *ngFor="let project of selectedProjects">
+                                            <span>{{ project.name }}</span>
+                                            <mat-icon (click)="removeProject(project.id)">close</mat-icon>
+                                        </div>
+                                    </div>
+
+                                    <mat-error *ngIf="selectedProjectIds.length === 0" class="project-error">
+                                        กรุณาเลือกอย่างน้อย 1 โครงการ
+                                    </mat-error>
+                                </div>
+                            </div>
+
+                            <!-- กำหนดเวลาเผยแพร่ -->
+                            <div class="publish-settings">
+                                <div class="section-label">กำหนดเวลาเผยแพร่ (optional)</div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayout.lt-sm="column">
+                                    <mat-form-field appearance="outline" fxFlex>
+                                        <mat-label>วันเริ่มต้น</mat-label>
+                                        <input matInput [matDatepicker]="startPicker" formControlName="start_date"
+                                            [max]="announcementForm.get('end_date')?.value">
+                                        <mat-datepicker-toggle matIconSuffix
+                                            [for]="startPicker"></mat-datepicker-toggle>
+                                        <mat-datepicker #startPicker></mat-datepicker>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" fxFlex>
+                                        <mat-label>วันสิ้นสุด</mat-label>
+                                        <input matInput [matDatepicker]="endPicker" formControlName="end_date"
+                                            [min]="announcementForm.get('start_date')?.value">
+                                        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                                        <mat-datepicker #endPicker></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <!-- สถานะ -->
+                            <div class="publish-settings">
+                                <div class="section-label">
+                                    <span class="required">*</span>กำหนดสถานะ
+                                </div>
+                                <mat-radio-group formControlName="is_active" class="radio-group">
+                                    <mat-radio-button [value]="true">เผยแพร่ทันที (Active)</mat-radio-button>
+                                    <mat-radio-button [value]="false">บันทึกเป็นแบบร่าง (Inactive)</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="btn-group">
+                                <button mat-stroked-button (click)="onCancel()" [disabled]="isSaving">ยกเลิก</button>
+                                <button mat-flat-button color="primary" (click)="onSubmit()"
+                                    [disabled]="!isFormValid() || isSaving">
+                                    <mat-spinner *ngIf="isSaving" diameter="20" class="btn-spinner"></mat-spinner>
+                                    {{ isSaving ? 'กำลังบันทึก...' : (announcementForm.get('is_active')?.value ?
+                                    'เผยแพร่' : 'บันทึกร่าง') }}
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </mat-card>
+</div>

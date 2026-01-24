@@ -1,0 +1,135 @@
+<div ngClass="header" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="10px">
+    <div>
+        <span ngClass="sub-header" style="color: #9fa9b6">Super Admin / Projects / </span>
+        <span ngClass="sub-header" style="color: #171a1e">รายละเอียดโปรเจค</span>
+    </div>
+    <span ngClass="sub-body" fxLayoutGap="20px">
+        <mat-icon (click)="onBack()" class="back-icon">arrow_back</mat-icon>
+        <span>{{ project?.name || 'โปรเจค' }}</span>
+    </span>
+</div>
+
+<div style="padding-top: 24px; padding-bottom: 120px">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>กำลังโหลดข้อมูล...</span>
+    </div>
+
+    <div *ngIf="!isLoading && project" class="detail-container">
+        <!-- Project Info Card -->
+        <mat-card class="info-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <mat-icon>business</mat-icon>
+                    <h2>ข้อมูลโปรเจค</h2>
+                </div>
+                <div class="action-buttons">
+                    <button mat-stroked-button color="primary" (click)="onEdit()">
+                        <mat-icon>edit</mat-icon>
+                        แก้ไข
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="onDelete()">
+                        <mat-icon>delete</mat-icon>
+                        ลบ
+                    </button>
+                </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="project-logo-container" [ngClass]="{'light-bg': hasLightBackground && project.logo_url}">
+                    <img *ngIf="project.logo_url" [src]="project.logo_url" [alt]="project.name" class="project-logo" />
+                    <div *ngIf="!project.logo_url" class="project-logo-placeholder">
+                        <mat-icon>apartment</mat-icon>
+                    </div>
+                </div>
+                <div class="logo-info">
+                    <span class="logo-label">โลโก้โปรเจค</span>
+                    <span class="logo-status" *ngIf="project.logo_url">กำหนดแล้ว</span>
+                    <span class="logo-status no-logo" *ngIf="!project.logo_url">ยังไม่ได้กำหนด</span>
+                </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="info-content">
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>badge</mat-icon>
+                        <span>ID</span>
+                    </div>
+                    <div class="info-value">{{ project.id }}</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>apartment</mat-icon>
+                        <span>ชื่อโปรเจค</span>
+                    </div>
+                    <div class="info-value">{{ project.name }}</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>location_on</mat-icon>
+                        <span>ที่อยู่</span>
+                    </div>
+                    <div class="info-value">{{ project.address || '-' }}</div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <!-- Stats Summary -->
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <mat-icon>home</mat-icon>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number">{{ project.unit_count || 0 }}</span>
+                            <span class="stat-label">ยูนิตทั้งหมด</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <mat-icon>people</mat-icon>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number">{{ project.member_count || 0 }}</span>
+                            <span class="stat-label">สมาชิกทั้งหมด</span>
+                        </div>
+                    </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>calendar_today</mat-icon>
+                        <span>วันที่สร้าง</span>
+                    </div>
+                    <div class="info-value">{{ formatDate(project.created_at) }}</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>update</mat-icon>
+                        <span>อัปเดตล่าสุด</span>
+                    </div>
+                    <div class="info-value">{{ formatDate(project.updated_at) }}</div>
+                </div>
+
+                <div class="info-row" *ngIf="project.deleted_at">
+                    <div class="info-label">
+                        <mat-icon color="warn">delete_forever</mat-icon>
+                        <span>วันที่ลบ</span>
+                    </div>
+                    <div class="info-value text-warn">{{ formatDate(project.deleted_at) }}</div>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>

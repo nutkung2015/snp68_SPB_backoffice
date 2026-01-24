@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.component';
 import { RestService } from '../../../services/rest.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface ImageUrl {
   url: string;
@@ -97,7 +98,8 @@ export class IssueCommonEditComponent implements OnInit {
     private fb: FormBuilder,
     private rest: RestService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.editForm = this.fb.group({
       location: [{ value: '', disabled: true }, Validators.required],
@@ -174,6 +176,7 @@ export class IssueCommonEditComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading issue:', error);
+          this.toast.error('ไม่สามารถโหลดข้อมูลแจ้งซ่อมได้');
           this.isLoading.next(false);
         }
       });
@@ -214,10 +217,12 @@ export class IssueCommonEditComponent implements OnInit {
       this.rest.updateCommonIssueStatus(this.issue.id, updatePayload)
         .subscribe({
           next: () => {
+            this.toast.success('บันทึกการแก้ไขเรียบร้อยแล้ว');
             this.router.navigate(['/issue-common']);
           },
           error: (error) => {
             console.error('Error updating issue:', error);
+            this.toast.error('เกิดข้อผิดพลาดในการแก้ไขรายการแจ้งซ่อม');
           }
         });
     }

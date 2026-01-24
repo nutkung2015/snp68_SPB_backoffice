@@ -11,6 +11,7 @@ import { MatLabel } from '@angular/material/form-field';
 import { AnnouncementConfirmDeleteComponent } from '../../dialog/announcement-confirm-delete/announcement-confirm-delete.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RestService, Announcement as ApiAnnouncement } from '../../../services/rest.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface AttachmentUrl {
   url: string;
@@ -58,8 +59,9 @@ export class DetailAnnouncementComponent implements OnInit {
     private rest: RestService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    private toast: ToastService
+  ) { }
 
   ngOnInit() {
     const id = this.route.snapshot.params['id'];
@@ -154,10 +156,12 @@ export class DetailAnnouncementComponent implements OnInit {
             .deleteAnnouncement(this.announcement.id)
             .subscribe({
               next: () => {
+                this.toast.success('ลบประกาศเรียบร้อยแล้ว');
                 this.router.navigate(['/announcement']);
               },
               error: (error) => {
                 console.error('Error deleting announcement:', error);
+                this.toast.error('ไม่สามารถลบประกาศได้');
               },
             });
         }

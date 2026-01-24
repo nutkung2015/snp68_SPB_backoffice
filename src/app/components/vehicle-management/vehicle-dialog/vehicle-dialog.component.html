@@ -1,0 +1,105 @@
+<div class="vehicle-dialog">
+    <h2 mat-dialog-title>
+        <mat-icon>{{ data.mode === 'add' ? 'add_circle' : 'edit' }}</mat-icon>
+        {{ data.mode === 'add' ? 'เพิ่มยานพาหนะ' : 'แก้ไขยานพาหนะ' }}
+    </h2>
+
+    <mat-dialog-content>
+        <div *ngIf="isLoading" class="loading-container">
+            <mat-spinner diameter="40"></mat-spinner>
+            <span>กำลังโหลดข้อมูล...</span>
+        </div>
+
+        <form *ngIf="!isLoading" [formGroup]="vehicleForm" class="vehicle-form">
+            <!-- Unit Selection (only for add mode) -->
+            <mat-form-field appearance="outline" class="full-width" *ngIf="data.mode === 'add'">
+                <mat-label>บ้านเลขที่ *</mat-label>
+                <mat-select formControlName="unit_id">
+                    <mat-option *ngFor="let unit of filteredUnits" [value]="unit.id">
+                        {{ unit.unit_number }}
+                        <span *ngIf="unit.zone" class="unit-zone"> - {{ unit.zone }}</span>
+                    </mat-option>
+                </mat-select>
+                <mat-icon matPrefix>home</mat-icon>
+                <mat-error *ngIf="vehicleForm.get('unit_id')?.hasError('required')">
+                    กรุณาเลือกบ้านเลขที่
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Unit Display (for edit mode) -->
+            <div class="unit-display" *ngIf="data.mode === 'edit' && data.vehicle">
+                <mat-icon>home</mat-icon>
+                <div class="unit-info">
+                    <span class="label">บ้านเลขที่</span>
+                    <span class="value">{{ data.vehicle.unit_number }}</span>
+                </div>
+            </div>
+
+            <!-- Plate Number -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>เลขทะเบียน *</mat-label>
+                <input matInput formControlName="plate_number" placeholder="กก 1234">
+                <mat-icon matPrefix>confirmation_number</mat-icon>
+                <mat-error *ngIf="vehicleForm.get('plate_number')?.hasError('required')">
+                    กรุณากรอกเลขทะเบียน
+                </mat-error>
+                <mat-error *ngIf="vehicleForm.get('plate_number')?.hasError('maxlength')">
+                    เลขทะเบียนต้องไม่เกิน 20 ตัวอักษร
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Province -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>จังหวัด</mat-label>
+                <mat-select formControlName="province">
+                    <mat-option value="">ไม่ระบุ</mat-option>
+                    <mat-option *ngFor="let province of provinces" [value]="province">
+                        {{ province }}
+                    </mat-option>
+                </mat-select>
+                <mat-icon matPrefix>location_on</mat-icon>
+            </mat-form-field>
+
+            <!-- Two-column row -->
+            <div class="form-row">
+                <!-- Brand -->
+                <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>ยี่ห้อ</mat-label>
+                    <input matInput formControlName="brand" placeholder="เช่น Toyota, Honda">
+                    <mat-icon matPrefix>directions_car</mat-icon>
+                    <mat-error *ngIf="vehicleForm.get('brand')?.hasError('maxlength')">
+                        ยี่ห้อต้องไม่เกิน 50 ตัวอักษร
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Color -->
+                <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>สี</mat-label>
+                    <input matInput formControlName="color" placeholder="เช่น ขาว, ดำ, แดง">
+                    <mat-icon matPrefix>palette</mat-icon>
+                    <mat-error *ngIf="vehicleForm.get('color')?.hasError('maxlength')">
+                        สีต้องไม่เกิน 20 ตัวอักษร
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!-- Active Status -->
+            <div class="status-toggle">
+                <mat-checkbox formControlName="is_active" color="primary">
+                    <span class="checkbox-label">เปิดใช้งาน</span>
+                    <span class="checkbox-hint">ยานพาหนะที่เปิดใช้งานจะสามารถเข้า-ออกโครงการได้</span>
+                </mat-checkbox>
+            </div>
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="onCancel()" [disabled]="isSaving">
+            ยกเลิก
+        </button>
+        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isSaving || isLoading">
+            <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
+            <span *ngIf="!isSaving">{{ data.mode === 'add' ? 'เพิ่ม' : 'บันทึก' }}</span>
+        </button>
+    </mat-dialog-actions>
+</div>

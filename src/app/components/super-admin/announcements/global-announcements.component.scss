@@ -1,0 +1,242 @@
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.bt-primary {
+    background-color: #2084FC !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+// Status styles
+.status-active {
+    color: #10b981;
+    background-color: #d1fae5;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-inactive {
+    color: #9ca3af;
+    background-color: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+// Type badge styles
+.type-badge {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &.info {
+        color: #1976d2;
+        background-color: #e3f2fd;
+    }
+
+    &.warning {
+        color: #f57c00;
+        background-color: #fff8e1;
+    }
+
+    &.maintenance {
+        color: #388e3c;
+        background-color: #e8f5e9;
+    }
+
+    &.update {
+        color: #7b1fa2;
+        background-color: #ede7f6;
+    }
+
+    &.emergency {
+        color: #d32f2f;
+        background-color: #ffebee;
+    }
+}
+
+.target-all {
+    color: #2084FC;
+    font-weight: 500;
+}
+
+.no-schedule {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.schedule-cell {
+    white-space: nowrap;
+}
+
+.announcement-page {
+    position: relative;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+
+    // Search and Filter Section
+    .search-filter-section {
+        background: white;
+        padding: 0px 24px 24px 24px;
+        margin-bottom: 24px;
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .filter-input {
+            height: 40px;
+            padding: 5px 12px;
+            border: 1px solid #d3d9e0;
+            background: #ffffff;
+
+            &.left {
+                border-radius: 8px;
+            }
+
+            &.right {
+                border-radius: 8px;
+            }
+
+            mat-select {
+                width: 100%;
+                height: 100%;
+            }
+
+            input {
+                font-size: 14px;
+
+                &::placeholder {
+                    color: #64748b;
+                }
+            }
+        }
+
+        .reset-btn {
+            border: 1px solid #23272d;
+            border-radius: 8px;
+            color: #23272d;
+        }
+
+        mat-icon.secondary {
+            color: #64748b;
+        }
+    }
+}
+
+// Content cell styling for 2-line limit with ellipsis
+.content-cell {
+    display: -webkit-box;
+    display: box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    max-height: 3.2em;
+    line-height: 1.6em;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+// Material Design Overrides
+::ng-deep {
+    .div-table {
+        background: white !important;
+        border: none !important;
+        border-radius: 10px !important;
+        overflow: hidden;
+        overflow-x: auto;
+    }
+
+    // Table header
+    th {
+        background: #07354E !important;
+        color: #ffffff !important;
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
+    }
+
+    td {
+        background: rgb(255, 255, 255) !important;
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
+    }
+
+    mat-card {
+        background: white !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
+
+.no-data {
+    padding: 48px 0;
+    text-align: center;
+    color: #757575;
+
+    mat-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        margin-bottom: 16px;
+        color: #9e9e9e;
+    }
+
+    p {
+        margin: 0 0 24px;
+        font-size: 16px;
+    }
+
+    button {
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            color: white;
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .announcement-page {
+        padding: 16px;
+
+        .search-filter-section {
+            padding: 16px;
+
+            .search-container {
+                flex-direction: column;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .announcement-page {
+        .search-filter-section {
+            .filter-input {
+                width: 100%;
+            }
+        }
+    }
+}

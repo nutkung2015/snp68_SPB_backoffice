@@ -1,0 +1,265 @@
+.header {
+    font-style: normal;
+    background-color: #ffffff;
+    padding: 24px;
+    height: 120px;
+
+    .sub-header {
+        font-weight: 400;
+        font-size: 14px;
+    }
+
+    .sub-body {
+        font-weight: 600;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+    }
+
+    .back-icon {
+        cursor: pointer;
+        margin-right: 16px;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: #2084FC;
+        }
+    }
+}
+
+.form-content {
+    margin-bottom: 24px;
+}
+
+.preview-section {
+    min-width: 280px;
+}
+
+.section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #171a1e;
+    margin-bottom: 12px;
+}
+
+.type-preview-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.type-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &.selected {
+        border-color: #2084FC;
+        box-shadow: 0 2px 8px rgba(32, 132, 252, 0.2);
+    }
+
+    mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+    }
+
+    span {
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    &.info {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+
+    &.warning {
+        background-color: #fff8e1;
+        color: #f57c00;
+    }
+
+    &.maintenance {
+        background-color: #e8f5e9;
+        color: #388e3c;
+    }
+
+    &.update {
+        background-color: #ede7f6;
+        color: #7b1fa2;
+    }
+
+    &.emergency {
+        background-color: #ffebee;
+        color: #d32f2f;
+    }
+}
+
+.detail-section {
+    flex: 1;
+}
+
+.field-label {
+    font-size: 14px;
+    color: #171a1e;
+
+    .required {
+        color: #f5222d;
+        margin-right: 4px;
+    }
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.publish-settings {
+    padding: 16px 0;
+
+    .section-label {
+        margin-bottom: 16px;
+    }
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// Projects Section
+.select-projects-section {
+    margin-top: 8px;
+    padding: 16px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed #e0e0e0;
+}
+
+.select-projects-btn {
+    margin-bottom: 12px;
+
+    .selected-count {
+        font-size: 14px;
+        color: #1976d2;
+        font-weight: 500;
+    }
+
+    .hint-text {
+        font-size: 13px;
+        color: #9fa9b6;
+        font-style: italic;
+    }
+}
+
+.selected-projects-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.selected-project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+
+    mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: #d32f2f;
+        }
+    }
+}
+
+.project-error {
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.btn-group {
+    gap: 16px;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+
+    button {
+        min-width: 120px;
+    }
+
+    // Submit button disabled state
+    button[mat-flat-button][disabled] {
+        background-color: #e0e0e0 !important;
+        color: #9e9e9e !important;
+    }
+}
+
+.btn-spinner {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+// Material Overrides
+::ng-deep {
+    .mat-form-field-appearance-outline .mat-form-field-outline {
+        background-color: white;
+    }
+
+    .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+        border-color: #2084FC;
+    }
+
+    .mat-radio-button.mat-accent .mat-radio-inner-circle {
+        background-color: #2084FC;
+    }
+
+    .mat-flat-button.mat-primary {
+        background-color: #2084FC;
+    }
+
+    .mat-mdc-checkbox.mat-accent {
+        --mdc-checkbox-selected-checkmark-color: white;
+        --mdc-checkbox-selected-focus-icon-color: #2084FC;
+        --mdc-checkbox-selected-hover-icon-color: #2084FC;
+        --mdc-checkbox-selected-icon-color: #2084FC;
+        --mdc-checkbox-selected-pressed-icon-color: #2084FC;
+    }
+}
+
+// Responsive
+@media (max-width: 959px) {
+    .preview-section {
+        min-width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .type-preview-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .type-preview-item {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 140px;
+    }
+}

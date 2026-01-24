@@ -1,385 +1,584 @@
+// ==================== Variables ====================
+$primary-color: #07354E;
+$primary-light: #1a5a7a;
+
+$blue: #3b82f6;
+$green: #10b981;
+$orange: #f59e0b;
+$purple: #8b5cf6;
+$red: #ef4444;
+$cyan: #06b6d4;
+
+$text-primary: #111827;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
+
+$bg-page: #f8fafc;
+$bg-card: #ffffff;
+$border-color: #e5e7eb;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+
+// ==================== Base ====================
 .dashboard-container {
+  background-color: $bg-page;
+  min-height: calc(100vh - 64px);
   padding: 24px;
-  background-color: #f3f4f6;
-  min-height: calc(100vh - 64px); // Adjust based on header height
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 }
 
 .loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 50vh;
   gap: 16px;
 
   p {
-    color: #6b7280;
+    color: $text-secondary;
+    font-size: 14px;
   }
 }
 
-.bento-grid {
+// ==================== Page Header ====================
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0;
+    }
+
+    .date-range {
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+
+  .header-right {
+    .greeting-badge {
+      background: linear-gradient(135deg, $primary-color, $primary-light);
+      color: white;
+      padding: 10px 20px;
+      border-radius: $radius-lg;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    .header-left .page-title {
+      font-size: 22px;
+    }
+  }
+}
+
+// ==================== Stats Grid ====================
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: auto auto auto;
-  gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  gap: 20px;
+  margin-bottom: 24px;
 
-  // Grid Areas for Responsive Design
-  // Start with Desktop (4 columns)
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-  // Custom Class Assignments via nth-child or explicit classes
-
-  .grid-item {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    overflow: hidden;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-    }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
 }
 
-// ============== Specific Cards ============== //
-
-// 1. Welcome Card (Span 2 cols)
-.welcome-card {
-  grid-column: span 2;
-  background: linear-gradient(135deg, #07354E 0%, #1a4f6e 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  position: relative;
-
-  .welcome-content {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
-  }
-
-  h1 {
-    font-size: 24px;
-    margin: 0 0 8px 0;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 0;
-    font-size: 14px;
-    opacity: 0.9;
-  }
-
-  .weather-widget {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 8px 16px;
-    border-radius: 12px;
-    backdrop-filter: blur(4px);
-
-    mat-icon {
-      font-size: 24px;
-      height: 24px;
-      width: 24px;
-    }
-
-    span {
-      font-weight: 600;
-      font-size: 18px;
-    }
-  }
-}
-
-// 2. Visitor Stats (Span 1 col)
-.visitor-stats {
-  grid-column: span 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.stat-card {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  padding: 24px;
+  box-shadow: $shadow-md;
   cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.02);
 
-  .card-header {
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+
+  .stat-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    margin-bottom: 16px;
 
-    h3 {
-      font-size: 16px;
-      color: #6b7280;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      mat-icon {
-        color: #3b82f6;
-      }
+    .stat-label {
+      font-size: 14px;
+      color: $text-secondary;
+      font-weight: 500;
     }
 
-    .highlight-value {
-      font-size: 36px;
-      font-weight: 700;
-      color: #111827;
-      line-height: 1;
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: $radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &.blue {
+        background: rgba($blue, 0.1);
+
+        mat-icon {
+          color: $blue;
+        }
+      }
+
+      &.green {
+        background: rgba($green, 0.1);
+
+        mat-icon {
+          color: $green;
+        }
+      }
+
+      &.orange {
+        background: rgba($orange, 0.1);
+
+        mat-icon {
+          color: $orange;
+        }
+      }
+
+      &.purple {
+        background: rgba($purple, 0.1);
+
+        mat-icon {
+          color: $purple;
+        }
+      }
     }
   }
 
-  .mini-stats-row {
+  .stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .stat-footer {
     display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
+    align-items: center;
+    gap: 8px;
 
-    .stat-item {
-      display: flex;
-      flex-direction: column;
+    .change {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 20px;
+      gap: 2px;
 
-      .label {
-        font-size: 11px;
-        color: #9ca3af;
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
       }
 
-      .value {
-        font-size: 16px;
-        font-weight: 600;
-        color: #374151;
+      &.positive {
+        background: rgba($green, 0.1);
+        color: $green;
       }
+
+      &.negative {
+        background: rgba($orange, 0.1);
+        color: $orange;
+      }
+    }
+
+    .period,
+    .sub-stat {
+      font-size: 12px;
+      color: $text-muted;
     }
   }
 }
 
-// 3. Units Stats (Span 1 col)
-.units-stats {
-  grid-column: span 1;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  background: linear-gradient(135deg, white 0%, #f9fafb 100%);
+// ==================== Bento Grid ====================
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(200px, auto);
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-item {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  padding: 24px;
+  box-shadow: $shadow-md;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  overflow: hidden;
 
   .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
     h3 {
       font-size: 16px;
-      color: #6b7280;
+      font-weight: 600;
+      color: $text-primary;
       margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      mat-icon {
-        color: #10b981;
-      }
-    }
-  }
-
-  .center-value {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 12px;
-
-    .big-number {
-      font-size: 48px;
-      font-weight: 800;
-      color: #07354E;
     }
 
-    .sub-label {
-      font-size: 14px;
-      color: #9ca3af;
+    .period-badge {
+      font-size: 12px;
+      color: $text-muted;
+      background: #f3f4f6;
+      padding: 4px 10px;
+      border-radius: 12px;
     }
   }
 }
 
-// 4. Quick Actions (Span 1 col, Tall)
+// ==================== Chart Cards ====================
+.chart-card {
+  .chart-container {
+    height: 200px;
+    width: 100%;
+
+    &.donut {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: $text-muted;
+      gap: 8px;
+
+      mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        opacity: 0.3;
+      }
+
+      span {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.monthly-chart {
+  grid-column: span 2;
+}
+
+.donut-chart,
+.issue-status-chart {
+  grid-column: span 1;
+}
+
+// ==================== Actions Card ====================
 .actions-card {
   grid-column: span 1;
-  grid-row: span 2;
-  background-color: #ffffff;
-
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 24px 0;
-    color: #111827;
-  }
 
   .action-buttons {
     display: flex;
     flex-direction: column;
     gap: 12px;
 
-    button {
-      justify-content: flex-start;
-      padding: 24px 16px;
-      border-radius: 12px;
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid $border-color;
+      border-radius: $radius-md;
+      background: #07354E;
+      cursor: pointer;
+      transition: all 0.2s;
       font-size: 14px;
+      color: white;
+      font-weight: 500;
 
       mat-icon {
-        margin-right: 12px;
+        color: $text-secondary;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        background: rgb(10, 32, 53);
+        border-color: rgb(10, 32, 53);
+
+        mat-icon {
+          color: white;
+        }
+      }
+
+      &.primary {
+        background: #1a5a7a;
+        color: white !important;
+        border: none;
+
+        mat-icon {
+          color: white !important;
+        }
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(rgb(10, 32, 53), 0.3);
+        }
       }
     }
   }
 }
 
-// 5. Announcements (Span 2 cols, Tall)
-.announcements-card {
-  grid-column: span 2;
-  grid-row: span 2;
-
-  .card-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-      color: #111827;
-    }
-  }
-}
-
-// 6. Issues (Span 1 col, Tall)
-.issues-card {
+// ==================== List Cards ====================
+.list-card {
   grid-column: span 1;
-  grid-row: span 2;
 
-  .card-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-      color: #111827;
-    }
+  &.announcements-list {
+    grid-column: span 2;
   }
 }
 
-// Shared List Styles
 .list-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
 
   .list-item {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px;
+    border-radius: $radius-md;
     background: #f9fafb;
-    border-radius: 12px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 
     &:hover {
-      background: #f3f4f6;
+      background: #f1f5f9;
+
+      .item-arrow {
+        transform: translateX(4px);
+      }
     }
 
-    .item-icon {
+    .item-avatar {
       width: 40px;
       height: 40px;
-      border-radius: 10px;
+      border-radius: $radius-sm;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
 
-      &.announcement {
-        background: #e0f2fe;
-        color: #0284c7;
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
-      &.issue {
-        background: #fee2e2;
-        color: #b91c1c;
+      &.blue {
+        background: rgba($blue, 0.1);
+
+        mat-icon {
+          color: $blue;
+        }
+      }
+
+      &.green {
+        background: rgba($green, 0.1);
+
+        mat-icon {
+          color: $green;
+        }
+      }
+
+      &.orange {
+        background: rgba($orange, 0.1);
+
+        mat-icon {
+          color: $orange;
+        }
       }
     }
 
     .item-content {
       flex: 1;
-      display: flex;
-      flex-direction: column;
+      min-width: 0;
 
       .item-title {
-        font-weight: 500;
-        color: #1f2937;
+        display: block;
         font-size: 14px;
+        font-weight: 500;
+        color: $text-primary;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 200px;
       }
 
-      .item-date,
-      .item-subtitle {
+      .item-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         font-size: 12px;
-        color: #6b7280;
+        color: $text-muted;
+        margin-top: 4px;
+
+        .status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+
+          &.pending {
+            background: $orange;
+          }
+
+          &.in_progress {
+            background: $blue;
+          }
+
+          &.completed {
+            background: $green;
+          }
+        }
       }
+    }
+
+    .item-arrow {
+      color: $text-muted;
+      font-size: 20px;
+      transition: transform 0.2s;
     }
   }
 
   .empty-state {
-    text-align: center;
-    color: #9ca3af;
-    padding: 24px;
-  }
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    color: $text-muted;
 
-
-// Responsive Breakpoints
-@media (max-width: 1024px) {
-  .bento-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto;
-
-    // Adjust spans for Tablet
-    .welcome-card {
-      grid-column: span 2;
+    mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      opacity: 0.3;
+      margin-bottom: 8px;
     }
 
-    .visitor-stats {
-      grid-column: span 1;
-    }
-
-    .units-stats {
-      grid-column: span 1;
-    }
-
-    .actions-card {
-      grid-column: span 1;
-      grid-row: auto;
-    }
-
-    .announcements-card {
-      grid-column: span 2;
-      grid-row: auto;
-    }
-
-    .issues-card {
-      grid-column: span 1;
-      grid-row: auto;
+    p {
+      margin: 0;
+      font-size: 14px;
     }
   }
 }
 
-@media (max-width: 600px) {
-  .bento-grid {
-    grid-template-columns: 1fr;
-
-    // Everything stack in Mobile
-    .grid-item {
-      grid-column: span 1 !important;
-      grid-row: auto !important;
+// ==================== Chart Overrides ====================
+::ng-deep {
+  .ngx-charts {
+    text {
+      fill: $text-secondary !important;
+      font-size: 11px !important;
     }
+
+    .gridline-path {
+      stroke: #f3f4f6 !important;
+    }
+
+    .arc {
+      cursor: pointer;
+    }
+  }
+
+  .ngx-charts-bar-vertical {
+    .bar {
+      rx: 4;
+      ry: 4;
+    }
+  }
+}
+
+// ==================== Responsive Adjustments ====================
+@media (max-width: 1200px) {
+  .monthly-chart {
+    grid-column: span 2;
+  }
+
+  .donut-chart,
+  .issue-status-chart,
+  .actions-card,
+  .list-card {
+    grid-column: span 1;
+  }
+
+  .announcements-list {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .bento-grid .grid-item {
+    grid-column: span 1 !important;
   }
 }

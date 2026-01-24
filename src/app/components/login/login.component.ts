@@ -48,10 +48,12 @@ export class LoginComponent implements OnInit {
           if (response && response.data && typeof response.data.token === 'string' && response.data.token.length > 0) {
             this.authService.setToken(response.data.token);
             const userRole = this.authService.getUserRole();
-            if (userRole === 'juristic' && !this.authService.hasProjectMembership()) {
+            if (userRole === 'super-admin') {
+              this.router.navigate(['/super-admin/dashboard']);
+            } else if (userRole === 'juristic' && !this.authService.hasProjectMembership()) {
               this.router.navigate(['/no-project']);
             } else {
-              this.router.navigate(['/announcement']);
+              this.router.navigate(['/dashboard']);
             }
           } else {
             console.error('Login failed: Token not received or invalid.', response);

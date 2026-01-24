@@ -22,10 +22,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { ZoneDialogComponent } from './zone-dialog/zone-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-vilage-unit-management',
@@ -51,6 +53,7 @@ import { ZoneDialogComponent } from './zone-dialog/zone-dialog.component';
     MatCheckboxModule,
     MatDialogModule,
     MatMenuModule,
+    RouterLink,
     ZoneDialogComponent
   ],
   templateUrl: './vilage-unit-management.component.html',
@@ -82,7 +85,10 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
 
   // View Mode: 'units' | 'zones'
   viewMode: 'units' | 'zones' = 'units';
-  unitViewMode: 'grid' | 'table' = 'grid'; // Sub-view for units
+  unitViewMode: 'grid' | 'table' = 'table'; // Default to table view
+
+  // For Zone card view - selected zone to show units
+  selectedZoneForView: Zone | null = null;
 
   selectedZone = 'all';
   selectedBuilding = 'all';
@@ -101,10 +107,11 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private router: Router,
     private restService: RestService,
+    private dialog: MatDialog,
+    private router: Router,
     private authService: AuthService,
-    private dialog: MatDialog
+    private toast: ToastService
   ) {
     this.dataSource = new MatTableDataSource<Unit>([]);
   }
@@ -112,6 +119,7 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loadProjectData();
     this.loadUnits();
+    this.loadZones(); // โหลด zones ตอน init เพื่อให้ menu "ย้ายไปโซน" มีข้อมูล
   }
 
   ngAfterViewInit() {
@@ -213,10 +221,10 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/village/unit', unit.id]);
   }
 
-  viewResidents(unit: Unit): void {
-    // Navigate to unit residents page
-    this.router.navigate(['/village/unit', unit.id, 'residents']);
-  }
+  // viewResidents(unit: Unit): void {
+  //   // Navigate to unit residents page
+  //   this.router.navigate(['/village/unit', unit.id, 'residents']);
+  // }
 
   getStatusClass(status: string | null): string {
     if (!status || status === 'active') {
@@ -258,9 +266,15 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
   // ============================================
 
   loadZones() {
+    if (!this.projectId) {
+      console.warn('loadZones: No projectId available');
+      return;
+    }
+
     this.restService.getZones(this.projectId).subscribe({
       next: (zones) => {
         this.realZones = zones;
+        console.log('Zones loaded:', zones.length);
       },
       error: (err) => console.error('Failed to load zones', err)
     });
@@ -308,6 +322,25 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
   }
 
   // ============================================
+  // Zone Card View Logic
+  // ============================================
+  selectZoneCard(zone: Zone) {
+    this.selectedZoneForView = zone;
+  }
+
+  clearZoneSelection() {
+    this.selectedZoneForView = null;
+  }
+
+  getUnitsInZone(zone: Zone): Unit[] {
+    return this.allUnits.filter(u => u.zone === zone.name || u.zone_id === zone.id);
+  }
+
+  getUnitCountInZone(zone: Zone): number {
+    return this.getUnitsInZone(zone).length;
+  }
+
+  // ============================================
   // Smart Connect Logic
   // ============================================
   autoConnectZones() {
@@ -316,12 +349,12 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
       .pipe(finalize(() => this.isLoading.next(false)))
       .subscribe({
         next: (res) => {
-          alert(`เชื่อมต่อข้อมูลเรียบร้อย`);
+          this.toast.success('เชื่อมต่อข้อมูลเรียบร้อย');
           this.loadUnits(); // Reload units to see updated zone_ids
         },
         error: (err) => {
           console.error('Auto connect failed', err);
-          alert('เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล');
+          this.toast.error('เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล');
         }
       });
   }
@@ -372,13 +405,117 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
         next: () => {
           this.selection.clear();
           this.loadUnits();
-          alert('ย้ายเข้าโซนเรียบร้อยแล้ว');
+          this.toast.success('ย้ายเข้าโซนเรียบร้อยแล้ว');
         },
         error: (err) => {
           console.error('Move failed', err);
-          alert('เกิดข้อผิดพลาดในการย้ายข้อมูล');
+          this.toast.error('เกิดข้อผิดพลาดในการย้ายข้อมูล');
         }
       });
+  }
+
+  /** ลบ units ที่เลือก */
+  deleteSelectedUnits() {
+    if (this.selection.isEmpty()) return;
+
+    const count = this.selection.selected.length;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'ลบยูนิตที่เลือก',
+        message: `ต้องการลบ ${count} ยูนิตที่เลือกหรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้`,
+        confirmText: 'ลบ',
+        cancelText: 'ยกเลิก',
+        type: 'danger'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      const unitIds = this.selection.selected.map(u => u.id);
+      this.isLoading.next(true);
+
+      this.restService.deleteUnits(unitIds).subscribe({
+        next: () => {
+          this.isLoading.next(false);
+          this.toast.success(`ลบ ${count} ยูนิตเรียบร้อยแล้ว`);
+          this.selection.clear();
+          this.loadUnits();
+        },
+        error: (err) => {
+          this.isLoading.next(false);
+          this.toast.error(err || 'ไม่สามารถลบยูนิตได้ อาจมียูนิตที่ยังมีสมาชิกอยู่');
+        }
+      });
+    });
+  }
+
+  /** ลบ unit เดี่ยว */
+  deleteUnit(unit: Unit) {
+    // Step 1: เช็คว่า Unit มีสมาชิกอยู่หรือไม่
+    this.isLoading.next(true);
+    this.restService.getUnitResidents(unit.id).subscribe({
+      next: (response) => {
+        this.isLoading.next(false);
+        const residents = response.data || [];
+
+        if (residents.length > 0) {
+          // มีสมาชิกอยู่ - แสดง dialog แจ้งเตือนว่าลบไม่ได้
+          this.dialog.open(ConfirmDialogComponent, {
+            width: '400px',
+            data: {
+              title: 'ไม่สามารถลบได้',
+              message: `ยูนิต "${unit.unit_number}" มีสมาชิกอยู่ ${residents.length} คน กรุณาย้ายหรือลบสมาชิกออกก่อน`,
+              confirmText: 'ตกลง',
+              type: 'warning'
+            }
+          });
+          return;
+        }
+
+        // ไม่มีสมาชิก - แสดง dialog ยืนยันการลบ
+        this.confirmDeleteUnit(unit);
+      },
+      error: (err) => {
+        this.isLoading.next(false);
+        // กรณี API ไม่รองรับ ให้ลบได้เลย (fallback)
+        console.warn('Cannot check residents, proceeding with delete:', err);
+        this.confirmDeleteUnit(unit);
+      }
+    });
+  }
+
+  /** Dialog ยืนยันการลบ unit */
+  private confirmDeleteUnit(unit: Unit) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'ลบยูนิต',
+        message: `ต้องการลบยูนิต "${unit.unit_number}" หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้`,
+        confirmText: 'ลบ',
+        cancelText: 'ยกเลิก',
+        type: 'danger'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      // เรียก API ลบ unit
+      this.isLoading.next(true);
+      this.restService.deleteUnit(unit.id).subscribe({
+        next: () => {
+          this.isLoading.next(false);
+          this.toast.success(`ลบยูนิต "${unit.unit_number}" เรียบร้อยแล้ว`);
+          this.loadUnits();
+        },
+        error: (err) => {
+          this.isLoading.next(false);
+          this.toast.error(err || 'ไม่สามารถลบยูนิตได้ กรุณาลองใหม่อีกครั้ง');
+        }
+      });
+    });
   }
 }
 

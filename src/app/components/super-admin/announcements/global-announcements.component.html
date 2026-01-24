@@ -1,0 +1,197 @@
+<div class="announcement-page">
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading$ | async">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/announcement.svg" title="จัดการประกาศ Global"
+        subtitle="Global Announcements Management" iconColor="invert(100%)">
+        <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <button mat-flat-button class="bt-primary" (click)="goToCreate()">
+                <div style="display: flex; align-items: center; gap: 5px">
+                    <mat-icon>add</mat-icon>
+                    <span>สร้างประกาศ</span>
+                </div>
+            </button>
+        </div>
+    </app-page-header>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-container">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+                <!-- Search Section -->
+                <div fxFlex fxLayout="row" fxLayoutGap="10px">
+                    <div fxLayout="row" fxFlex fxLayoutAlign="start center" fxLayoutGap="10px">
+                        <!-- Search Input -->
+                        <div class="filter-input right" fxFlex="350px">
+                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
+                                <mat-icon class="secondary">search</mat-icon>
+                                <input matInput type="text" (keyup)="applyFilter($event)"
+                                    placeholder="ค้นหาหัวข้อประกาศ..."
+                                    style="border: none; width: 100%; height: 100%" />
+                            </div>
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                            <div fxFlex="50px" fxLayoutAlign="end center">
+                                <span>Status</span>
+                            </div>
+                            <div class="filter-input left" fxFlex style="height: 100%">
+                                <mat-select [(ngModel)]="selectedStatus"
+                                    (selectionChange)="filterByStatus($event.value)">
+                                    <mat-option value="all">ทั้งหมด</mat-option>
+                                    <mat-option value="active">Active</mat-option>
+                                    <mat-option value="inactive">Inactive</mat-option>
+                                </mat-select>
+                            </div>
+                        </div>
+
+                        <!-- Type Filter -->
+                        <div fxLayout="row" fxLayoutGap="10px" style="min-width: 280px">
+                            <div fxFlex="50px" fxLayoutAlign="end center">
+                                <span>Type</span>
+                            </div>
+                            <div class="filter-input left" fxFlex style="height: 100%">
+                                <mat-select [(ngModel)]="selectedType" (selectionChange)="filterByType($event.value)">
+                                    <mat-option *ngFor="let type of types" [value]="type.value">
+                                        {{ type.label }}
+                                    </mat-option>
+                                </mat-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons Section -->
+                <div fxLayout="row" fxLayoutGap="10px">
+                    <button mat-stroked-button class="reset-btn" (click)="onReset()">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements Table Section -->
+    <div id="box-content" style="padding: 10px" ngStyle.gt-sm="padding: 24px" fxLayout="column"
+        fxLayoutAlign="start stretch" fxLayoutGap.gt-sm="20px">
+        <mat-card fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+            <ng-container *ngTemplateOutlet="dataSource.data.length > 0 ? tableContent : noData">
+            </ng-container>
+
+            <ng-template #tableContent>
+                <div class="div-table">
+                    <table mat-table [dataSource]="dataSource" matSort>
+                        <!-- Sequence Column -->
+                        <ng-container matColumnDef="sequence">
+                            <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+                            <td mat-cell *matCellDef="let element; let i = index">
+                                {{ (pageEvent.pageIndex * pageEvent.pageSize) + i + 1 }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Title Column -->
+                        <ng-container matColumnDef="title">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>หัวข้อประกาศ</th>
+                            <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+                        </ng-container>
+
+                        <!-- Content Column -->
+                        <ng-container matColumnDef="content">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>เนื้อหา</th>
+                            <td mat-cell *matCellDef="let element">
+                                <div class="content-cell">{{ element.content }}</div>
+                            </td>
+                        </ng-container>
+
+                        <!-- Type Column -->
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>ประเภท</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span class="type-badge" [ngClass]="element.type">
+                                    {{ getTypeLabel(element.type) }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Target Column -->
+                        <ng-container matColumnDef="target">
+                            <th mat-header-cell *matHeaderCellDef>เป้าหมาย</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span *ngIf="!element.target_projects" class="target-all">ทุกโครงการ</span>
+                                <span *ngIf="element.target_projects">
+                                    {{ getTargetProjectCount(element.target_projects) }} โครงการ
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Schedule Column -->
+                        <ng-container matColumnDef="schedule">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>กำหนดการ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <div class="schedule-cell">
+                                    <span *ngIf="element.start_date">{{ element.start_date | date:'dd/MM/yy' }}</span>
+                                    <span *ngIf="element.end_date"> - {{ element.end_date | date:'dd/MM/yy' }}</span>
+                                    <span *ngIf="!element.start_date && !element.end_date"
+                                        class="no-schedule">ไม่ระบุ</span>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <!-- Status Column -->
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
+                            <td mat-cell *matCellDef="let element">
+                                <span [ngClass]="{
+                                    'status-active': element.is_active === 1 || element.is_active === true,
+                                    'status-inactive': element.is_active === 0 || element.is_active === false
+                                }">
+                                    {{ element.is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <!-- Actions Column -->
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef style="padding-left: 24px">จัดการ</th>
+                            <td mat-cell *matCellDef="let element" style="padding-left: 24px">
+                                <div fxLayout="row" fxLayoutGap="8px">
+                                    <button mat-icon-button color="primary" matTooltip="แก้ไข"
+                                        (click)="goToEdit(element.id)">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="warn" matTooltip="ลบ"
+                                        (click)="deleteAnnouncement(element.id)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                    </table>
+                </div>
+                <mat-paginator [length]="pageEvent.length" [pageSize]="pageEvent.pageSize"
+                    [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageEvent.pageIndex" (page)="handlePageEvent($event)"
+                    showFirstLastButtons aria-label="Select page">
+                </mat-paginator>
+            </ng-template>
+
+            <!-- No Data Template -->
+            <ng-template #noData>
+                <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+                    <mat-icon>campaign</mat-icon>
+                    <p>ไม่พบประกาศ Global</p>
+                    <button mat-raised-button color="primary" (click)="goToCreate()">
+                        <mat-icon>add</mat-icon>
+                        <span>สร้างประกาศใหม่</span>
+                    </button>
+                </div>
+            </ng-template>
+        </mat-card>
+    </div>
+</div>

@@ -10,6 +10,8 @@ import { AuthService } from '../../services/auth.service';
 import { forkJoin } from 'rxjs';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ToastService } from '../../shared/toast/toast.service';
+import { InputDialogComponent } from '../../shared/input-dialog/input-dialog.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -79,7 +81,9 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
   constructor(
     private unitService: UnitService,
     private restService: RestService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -221,7 +225,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
       },
       error: (err) => {
         console.error('Upload error:', err);
-        alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
+        this.toast.error('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
         if (fileType === 'plan_file') row.isUploadingPlan = false;
         else row.isUploadingDetail = false;
       }
@@ -244,7 +248,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
       },
       error: (err) => {
         console.error('Delete error:', err);
-        alert('เกิดข้อผิดพลาดในการลบไฟล์');
+        this.toast.error('เกิดข้อผิดพลาดในการลบไฟล์');
       }
     });
   }
@@ -280,7 +284,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
       },
       error: (err) => {
         console.error('Upload error:', err);
-        alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
+        this.toast.error('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
         if (this.projectInfoData) {
           if (fileType === 'project_detail') this.projectInfoData.isUploadingDetail = false;
           else this.projectInfoData.isUploadingRules = false;
@@ -292,7 +296,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
   deleteProjectFile(fileType: 'project_detail' | 'rules'): void {
     if (!confirm('ต้องการลบไฟล์นี้ใช่หรือไม่?')) return;
     if (!this.projectId) {
-      alert('ไม่พบ Project ID');
+      this.toast.error('ไม่พบ Project ID');
       return;
     }
 
@@ -305,7 +309,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
       error: (err) => {
         console.error('Delete error:', err);
         this.isLoading = false;
-        alert('เกิดข้อผิดพลาดในการลบไฟล์: ' + (err.message || err));
+        this.toast.error('เกิดข้อผิดพลาดในการลบไฟล์: ' + (err.message || err));
       }
     });
   }
@@ -321,26 +325,40 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
   }
 
   addNewCard(): void {
-    const typeName = prompt('กรุณาระบุชื่อแบบบ้าน (Type Name):');
-    if (typeName && typeName.trim()) {
-      if (this.dataSource.find(x => x.model_name === typeName.trim())) {
-        alert('มี Unit Type นี้อยู่แล้ว');
-        return;
+    const dialogRef = this.dialog.open(InputDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'สร้างแบบบ้านใหม่',
+        label: 'ชื่อแบบบ้าน (Type Name)',
+        placeholder: 'ระบุชื่อแบบบ้าน...',
+        confirmText: 'สร้าง',
+        cancelText: 'ยกเลิก',
+        icon: 'add_home'
       }
+    });
 
-      if (!this.projectId) return;
+    dialogRef.afterClosed().subscribe(typeName => {
+      if (typeName && typeName.trim()) {
+        if (this.dataSource.find(x => x.model_name === typeName.trim())) {
+          this.toast.warning('มี Unit Type นี้อยู่แล้ว');
+          return;
+        }
 
-      const formData = new FormData();
-      formData.append('project_id', this.projectId);
-      formData.append('model_name', typeName.trim());
+        if (!this.projectId) return;
 
-      this.restService.saveHouseModel(formData).subscribe({
-        next: () => {
-          this.loadData();
-        },
-        error: (err) => alert('ไม่สามารถสร้างแบบบ้านใหม่ได้: ' + err.message)
-      });
-    }
+        const formData = new FormData();
+        formData.append('project_id', this.projectId);
+        formData.append('model_name', typeName.trim());
+
+        this.restService.saveHouseModel(formData).subscribe({
+          next: () => {
+            this.toast.success('สร้างแบบบ้านใหม่เรียบร้อยแล้ว');
+            this.loadData();
+          },
+          error: (err) => this.toast.error('ไม่สามารถสร้างแบบบ้านใหม่ได้: ' + err.message)
+        });
+      }
+    });
   }
 
   deleteCard(row: HouseTypeRow): void {
@@ -349,7 +367,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
     }
 
     if (!row.id) {
-      alert('ไม่พบ ID ของแบบบ้าน');
+      this.toast.error('ไม่พบ ID ของแบบบ้าน');
       return;
     }
 
@@ -357,28 +375,23 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
     this.restService.deleteHouseModel(row.id).subscribe({
       next: () => {
         this.isLoading = false;
+        this.toast.success('ลบแบบบ้านเรียบร้อยแล้ว');
         this.loadData(); // Reload data to refresh the grid
       },
       error: (err) => {
         console.error('Delete card error:', err);
         this.isLoading = false;
-        alert('เกิดข้อผิดพลาดในการลบแบบบ้าน: ' + (err.message || err));
+        this.toast.error('เกิดข้อผิดพลาดในการลบแบบบ้าน: ' + (err.message || err));
       }
     });
   }
 
   viewPdf(url: string, filename: string): void {
-    if (!this.projectId || !url) {
-      window.open(url, '_blank');
+    if (!url) {
+      this.toast.warning('ไม่พบ URL ของไฟล์');
       return;
     }
-
-    const streamUrl = this.restService.getStreamPdfUrl(
-      this.projectId,
-      url,
-      filename,
-      'inline'
-    );
-    window.open(streamUrl, '_blank');
+    // เปิด PDF โดยตรงจาก Cloudinary URL
+    window.open(url, '_blank');
   }
 }

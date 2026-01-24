@@ -1,0 +1,66 @@
+<app-loading-data *ngIf="isLoading$ | async"></app-loading-data>
+
+<div ngClass="header" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="10px">
+    <div>
+        <span ngClass="sub-header" style="color: #9fa9b6">Super Admin / Projects / </span>
+        <span ngClass="sub-header" style="color: #171a1e">สร้างโปรเจค</span>
+    </div>
+    <span ngClass="sub-body" fxLayoutGap="20px">
+        <mat-icon (click)="onCancel()" class="back-icon">arrow_back</mat-icon>
+        <span>สร้างโปรเจคใหม่</span>
+    </span>
+</div>
+
+<div style="padding-top: 24px; padding-bottom: 120px">
+    <mat-card>
+        <div fxLayout="column" fxLayoutAlign="center stretch" style="
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 24px;
+        padding-right: 24px;
+      ">
+            <form [formGroup]="projectForm">
+                <div class="form-content">
+                    <div fxLayout="column" fxLayoutGap="24px" style="max-width: 600px">
+
+                        <!-- ชื่อโปรเจค -->
+                        <div fxLayout="column" fxLayoutGap="10px">
+                            <span class="field-label">
+                                <span class="required">*</span>ชื่อโปรเจค
+                            </span>
+                            <mat-form-field appearance="outline">
+                                <input matInput formControlName="name" placeholder="กรอกชื่อโปรเจค" required />
+                                <mat-error *ngIf="projectForm.get('name')?.hasError('required')">
+                                    กรุณาระบุชื่อโปรเจค
+                                </mat-error>
+                                <mat-error *ngIf="projectForm.get('name')?.hasError('minlength')">
+                                    ชื่อต้องมีอย่างน้อย 2 ตัวอักษร
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <!-- ที่อยู่ -->
+                        <div fxLayout="column" fxLayoutGap="10px">
+                            <span class="field-label">ที่อยู่</span>
+                            <mat-form-field appearance="outline">
+                                <textarea matInput formControlName="address" rows="4"
+                                    placeholder="กรอกที่อยู่โปรเจค (ถ้ามี)"></textarea>
+                            </mat-form-field>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="btn-group">
+                            <button mat-stroked-button (click)="onCancel()" [disabled]="isSaving">ยกเลิก</button>
+                            <button mat-flat-button color="primary" (click)="onSubmit()"
+                                [disabled]="!projectForm.valid || isSaving">
+                                <mat-spinner *ngIf="isSaving" diameter="20" class="btn-spinner"></mat-spinner>
+                                {{ isSaving ? 'กำลังสร้าง...' : 'สร้างโปรเจค' }}
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </mat-card>
+</div>

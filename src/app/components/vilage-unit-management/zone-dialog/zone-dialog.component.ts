@@ -42,9 +42,7 @@ export class ZoneDialogComponent {
             name: [data.zone?.name || '', [Validators.required]],
             code: [data.zone?.code || ''],
             description: [data.zone?.description || ''],
-            color: [data.zone?.color || '#1e293b'], // Default color
-            guard_phone: [data.zone?.guard_phone || ''],
-            guard_phone_2: [data.zone?.guard_phone_2 || '']
+            color: [data.zone?.color || '#1e293b'] // Default color
         });
     }
 

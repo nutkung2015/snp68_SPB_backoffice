@@ -1,48 +1,45 @@
-<app-page-header iconSrc="assets/icons/visitor.svg" title="จัดการผู้มาเยี่ยม" subtitle="Visitor Management"
+<app-page-header iconSrc="assets/icons/bxs--car-garage.svg" title="จัดการผู้มาเยี่ยม" subtitle="Visitor Management"
     iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
     </div>
 </app-page-header>
 
 <div class="dashboard-container">
-    <!-- Stats Cards Row -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-icon blue">
-                <i class="fas fa-car"></i>
+    <!-- Stats Summary -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>directions_car</mat-icon>
             </div>
             <div class="stat-content">
-                <span class="stat-value">{{ stats.totalEntryToday }}</span>
+                <span class="stat-number">{{ stats.totalEntryToday }}</span>
                 <span class="stat-label">รถเข้าทั้งหมดวันนี้</span>
             </div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon orange">
-                <i class="fas fa-walking"></i>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>directions_walk</mat-icon>
             </div>
             <div class="stat-content">
-                <span class="stat-value">{{ stats.walkInCount }}</span>
+                <span class="stat-number">{{ stats.walkInCount }}</span>
                 <span class="stat-label">รถ Walk-in</span>
             </div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon green">
-                <i class="fas fa-stamp"></i>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>verified</mat-icon>
             </div>
             <div class="stat-content">
-                <span class="stat-value">{{ stats.stampedCount }}</span>
+                <span class="stat-number">{{ stats.stampedCount }}</span>
                 <span class="stat-label">ได้รับการประทับตรา</span>
             </div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon purple">
-                <i class="fas fa-home"></i>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>home</mat-icon>
             </div>
             <div class="stat-content">
-                <span class="stat-value">{{ stats.insideCount }}</span>
+                <span class="stat-number">{{ stats.insideCount }}</span>
                 <span class="stat-label">รถในหมู่บ้าน</span>
             </div>
         </div>

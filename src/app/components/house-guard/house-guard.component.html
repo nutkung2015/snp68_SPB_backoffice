@@ -1,0 +1,120 @@
+<!-- Header Section -->
+<app-page-header iconSrc="assets/icons/mdi--security-home.svg" title="จัดการป้อมยาม"
+    subtitle="บริหารจัดการข้อมูลป้อมยามและพื้นที่ดูแล" iconColor="invert(100%)">
+    <button mat-flat-button class="btn-add" (click)="openDialog()">
+        <mat-icon>add</mat-icon> เพิ่มป้อมยาม
+    </button>
+</app-page-header>
+
+<!-- Main Content -->
+<div class="guard-container">
+
+    <!-- Loading State -->
+    <div class="loading-overlay" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>shield</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ guardPosts.length }}</span>
+                <span class="stat-label">ป้อมยามทั้งหมด</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ activeCount }}</span>
+                <span class="stat-label">ใช้งานปกติ</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <mat-icon>grid_view</mat-icon>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ totalZones }}</span>
+                <span class="stat-label">โซนทั้งหมด</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guard Posts Grid -->
+    <div class="cards-grid" *ngIf="guardPosts.length > 0">
+        <div class="guard-card" *ngFor="let post of guardPosts">
+
+            <!-- Card Header -->
+            <div class="card-header">
+                <div class="post-icon">
+                    <mat-icon>security</mat-icon>
+                </div>
+                <div class="post-info">
+                    <h3 class="post-name">{{ post.post_name }}</h3>
+                    <span class="status-badge" [class.active]="post.status === 'active'">
+                        {{ post.status === 'active' ? 'ใช้งานปกติ' : 'ปิดใช้งาน' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+                <!-- Phone 1 -->
+                <div class="info-row">
+                    <mat-icon class="info-icon">phone</mat-icon>
+                    <span class="info-label">เบอร์โทรหลัก</span>
+                    <span class="info-value" [class.no-data]="!post.phone_1">
+                        {{ post.phone_1 || 'ไม่ระบุ' }}
+                    </span>
+                </div>
+
+                <!-- Phone 2 -->
+                <div class="info-row">
+                    <mat-icon class="info-icon">phone_forwarded</mat-icon>
+                    <span class="info-label">เบอร์โทรสำรอง</span>
+                    <span class="info-value" [class.no-data]="!post.phone_2">
+                        {{ post.phone_2 || 'ไม่ระบุ' }}
+                    </span>
+                </div>
+
+                <!-- Zone Count -->
+                <div class="info-row">
+                    <mat-icon class="info-icon">grid_view</mat-icon>
+                    <span class="info-label">พื้นที่ดูแล</span>
+                    <span class="info-value" [class.no-data]="!post.zone_count || post.zone_count === 0">
+                        {{ post.zone_count ? post.zone_count + ' โซน' : 'ยังไม่กำหนด' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="card-actions">
+                <button mat-button class="action-btn" (click)="openZoneManage(post)">
+                    <mat-icon>map</mat-icon>
+                    จัดการโซน
+                </button>
+                <button mat-icon-button class="action-icon" (click)="openDialog(post)" matTooltip="แก้ไข">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button class="action-icon delete" (click)="deleteGuardPost(post)" matTooltip="ลบ">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="guardPosts.length === 0 && !isLoading">
+        <mat-icon>shield</mat-icon>
+        <h3>ยังไม่มีข้อมูลป้อมยาม</h3>
+        <p>เริ่มต้นเพิ่มป้อมยามเพื่อจัดการพื้นที่ดูแล</p>
+        <button mat-flat-button class="btn-add" (click)="openDialog()">
+            <mat-icon>add</mat-icon> เพิ่มป้อมยาม
+        </button>
+    </div>
+</div>

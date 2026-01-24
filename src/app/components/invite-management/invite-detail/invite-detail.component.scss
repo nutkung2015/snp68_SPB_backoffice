@@ -1,0 +1,224 @@
+.invite-detail-page {
+    padding: 24px;
+}
+
+.content-container {
+    padding: 24px 0;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    min-height: 200px;
+}
+
+.loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.04);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-card {
+    width: 100%;
+    max-width: 1000px;
+    padding: 32px;
+}
+
+.card-content {
+    display: flex;
+    gap: 32px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+}
+
+.vertical-divider {
+    display: block;
+    height: auto;
+    min-height: 100%;
+
+    @media (max-width: 768px) {
+        display: none;
+    }
+}
+
+/* Left Column */
+.info-column {
+    flex: 1;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+
+    &.center {
+        text-align: center;
+    }
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+        font-size: 14px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    span {
+        font-size: 16px;
+        color: #1e293b;
+        font-weight: 400;
+    }
+
+    span .status-badge {
+        color: #ffffff;
+    }
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    width: fit-content;
+
+    &.pending {
+        background-color: #fff7ed;
+        color: #c2410c;
+        border: 1px solid #ffedd5;
+    }
+
+    &.accepted {
+        background-color: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #dcfce7;
+    }
+
+    &.declined {
+        background-color: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fee2e2;
+    }
+
+    &.expired {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+}
+
+/* Right Column */
+.qr-column {
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @media (max-width: 768px) {
+        flex: 1;
+    }
+}
+
+.qr-wrapper {
+    background: white;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.code-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+
+    label {
+        font-size: 14px;
+        color: #64748b;
+        font-weight: 500;
+    }
+}
+
+.code-box {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 24px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2A405E;
+    letter-spacing: 2px;
+    width: 100%;
+    text-align: center;
+    font-family: monospace;
+}
+
+.info-item .badge-remaining {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    background-color: #2A405E;
+    color: #ffffff !important;
+    border: none;
+    line-height: 1.5;
+
+    &.expired {
+        background-color: #fef2f2;
+        color: #dc2626 !important;
+        border: 1px solid #fee2e2;
+    }
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 14px;
+}
+
+.sub-header {
+    font-family: 'Inter', sans-serif;
+}
+
+.title-row {
+    mat-icon {
+        cursor: pointer;
+        color: #64748b;
+
+        &:hover {
+            color: #1e293b;
+        }
+    }
+}
+
+.sub-body {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+}

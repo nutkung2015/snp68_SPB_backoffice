@@ -11,6 +11,7 @@ import {
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, RegisterRequest } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-register-juristic',
@@ -34,7 +35,8 @@ export class RegisterJuristicComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) {
     this.registerForm = this.fb.group({
       full_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -87,13 +89,13 @@ export class RegisterJuristicComponent implements OnInit {
       this.authService.register(registerData).subscribe({
         next: (response) => {
           console.log('Registration successful:', response);
-          alert('Registration successful! Please login with your credentials.');
+          this.toast.success('Registration successful! Please login with your credentials.');
           this.router.navigate(['/login']);
         },
         error: (error: HttpErrorResponse) => {
           console.error('Registration failed:', error);
           const errorMessage = error.error?.message || 'Registration failed. Please try again.';
-          alert('Registration failed: ' + errorMessage);
+          this.toast.error('Registration failed: ' + errorMessage);
           this.isLoading = false;
         },
         complete: () => {

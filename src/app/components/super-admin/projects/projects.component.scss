@@ -1,0 +1,610 @@
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.bt-primary {
+    background-color: rgb(14, 167, 90) !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+// Status badge styles
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &.status-active {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    &.status-inactive {
+        background-color: #fee2e2;
+        color: #ef4444;
+    }
+}
+
+.projects-page {
+    position: relative;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+
+    // Header styles
+    div.header {
+        font-style: normal;
+        background-color: #ffffff;
+        padding: 24px;
+        height: 120px;
+        border-radius: 12px;
+
+        .sub-header {
+            font-weight: 400;
+            font-size: 14px;
+            color: #171a1e;
+        }
+
+        .sub-body {
+            font-weight: 600;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .name {
+            color: #171a1e;
+            font-weight: 500;
+        }
+
+        ::ng-deep {
+            .filter-input {
+                .mat-select {
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .mat-select-trigger {
+                    height: 100%;
+                    padding: 0 8px;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .mat-select-value {
+                    color: inherit;
+                    padding: 0;
+                }
+
+                .mat-select-arrow-wrapper {
+                    display: flex;
+                    align-items: center;
+                }
+            }
+
+            .mat-select-panel {
+                min-width: calc(100% + 32px) !important;
+                margin-left: -16px !important;
+                margin-top: 32px;
+            }
+        }
+    }
+
+    // Search and Filter Section
+    .search-filter-section {
+        background: white;
+        padding: 0px 24px 24px 24px;
+        margin-bottom: 24px;
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .filter-input {
+            height: 40px;
+            padding: 5px 12px;
+            border: 1px solid #d3d9e0;
+            background: #ffffff;
+
+            &.left {
+                border-radius: 8px;
+            }
+
+            &.right {
+                border-radius: 8px;
+            }
+
+            mat-select {
+                width: 100%;
+                height: 100%;
+            }
+
+            input {
+                font-size: 14px;
+
+                &::placeholder {
+                    color: #64748b;
+                }
+            }
+        }
+
+        .reset-button {
+            border: 1px solid #23272d;
+            border-radius: 8px;
+            color: #23272d;
+        }
+
+        .search-button {
+            border: 1px solid #2084fc;
+            border-radius: 8px;
+            color: #2084fc;
+
+            mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        mat-icon.secondary {
+            color: #64748b;
+        }
+    }
+}
+
+
+// Material Design Overrides
+::ng-deep {
+    .mat-table {
+        background: white !important;
+
+        th.mat-header-cell {
+            background: rgb(255, 255, 255) !important;
+            color: #000000de !important;
+            font-size: 14px;
+            padding: 0px 16px;
+        }
+
+        td.mat-cell {
+            background: rgb(37, 165, 5) !important;
+            padding: 0px 16px;
+        }
+    }
+
+    th {
+        background: #07354E !important;
+        color: #ffffff !important;
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
+    }
+
+    td {
+        background: rgb(255, 255, 255) !important;
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
+    }
+
+    .div-table {
+        background: white !important;
+        border: none !important;
+        border-radius: 10px !important;
+        overflow: hidden;
+        overflow-x: auto;
+
+        .mat-mdc-table {
+            .sequence-text {
+                font-weight: 500;
+                color: #475569;
+            }
+
+            .id-text {
+                font-family: monospace;
+                font-size: 12px;
+                color: #64748b;
+            }
+
+            .project-name {
+                font-weight: 500;
+                color: #07354E;
+            }
+
+            .count-badge {
+                background-color: #e2e8f0;
+                color: #475569;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+
+            .date-text {
+                color: #64748b;
+                font-size: 13px;
+            }
+        }
+    }
+
+    mat-card {
+        background: white !important;
+        border-radius: 12px !important;
+    }
+}
+
+.link {
+    a {
+        color: #2084fc !important;
+        cursor: pointer;
+    }
+}
+
+.mat-option.mat-active {
+    background-color: #e9f3ff !important;
+    font-weight: 600;
+}
+
+::ng-deep mat-card {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 24px !important;
+
+    .div-table {
+        border-radius: 10px !important;
+    }
+}
+
+.no-data {
+    padding: 48px 0;
+    text-align: center;
+    color: #757575;
+
+    mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        color: #9e9e9e;
+    }
+
+    p {
+        margin: 0 0 24px;
+        font-size: 16px;
+    }
+
+    button {
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            color: white;
+        }
+    }
+}
+
+.action-menu-btn {
+    color: #64748b;
+
+    &:hover {
+        color: #07354E;
+    }
+}
+
+.text-warn {
+    color: #f44336 !important;
+}
+
+// Button styles
+.reset-btn {
+    border: 1px solid #23272d !important;
+    border-radius: 8px !important;
+    color: #23272d !important;
+}
+
+.search-btn {
+    border: 1px solid #2084fc !important;
+    border-radius: 8px !important;
+    color: #2084fc !important;
+
+    mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .projects-page {
+        padding: 16px;
+
+        div.header {
+            height: auto;
+            padding: 16px;
+        }
+
+        .search-filter-section {
+            padding: 16px;
+
+            .search-container {
+                flex-direction: column;
+
+                .search-input-group {
+                    min-width: 100%;
+                }
+
+                .filter-group {
+                    width: 100%;
+                    flex-wrap: wrap;
+
+                    .reset-btn,
+                    .search-btn {
+                        flex: 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .projects-page {
+        div.header {
+            .sub-header {
+                font-size: 12px;
+            }
+
+            .sub-body {
+                font-size: 24px;
+            }
+        }
+
+        .filter-group {
+            flex-direction: column;
+            width: 100%;
+
+            .reset-btn,
+            .search-btn {
+                width: 100%;
+            }
+        }
+    }
+}
+
+// View Toggle Styles
+.view-toggle {
+    border: 1px solid #d3d9e0;
+    border-radius: 8px;
+    overflow: hidden;
+
+    ::ng-deep {
+        .mat-button-toggle {
+            background: white;
+
+            &.mat-button-toggle-checked {
+                background: #07354E;
+
+                .mat-icon {
+                    color: white;
+                }
+            }
+
+            .mat-button-toggle-button {
+                padding: 4px 12px;
+            }
+
+            .mat-icon {
+                color: #64748b;
+                font-size: 20px;
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .mat-button-toggle-appearance-standard {
+            .mat-button-toggle-label-content {
+                line-height: 32px;
+                padding: 0;
+            }
+        }
+    }
+}
+
+// Card View Styles
+.cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.project-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.project-card {
+    background: white !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    padding: 20px !important;
+    transition: all 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+
+        .project-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #07354E 0%, #0a4d6e 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            mat-icon {
+                color: white;
+                font-size: 24px;
+                width: 24px;
+                height: 24px;
+            }
+
+            .project-logo {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 12px;
+            }
+        }
+
+        .project-info {
+            flex: 1;
+            min-width: 0;
+
+            .project-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #07354E;
+                margin: 0 0 4px 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .project-date {
+                font-size: 12px;
+                color: #64748b;
+            }
+        }
+
+        .card-menu-btn {
+            color: #64748b;
+            flex-shrink: 0;
+
+            &:hover {
+                color: #07354E;
+            }
+        }
+    }
+
+    // Stats Bar - Same as house-guard
+    $primary: #2A405E;
+    $white: #ffffff;
+    $gray-100: #f8f9fa;
+    $gray-200: #e9ecef;
+    $gray-500: #6c757d;
+
+    .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, $gray-100 0%, $white 100%);
+            border: 1px solid $gray-200;
+            transition: all 0.2s ease;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba($primary, 0.1);
+                border-color: rgba($primary, 0.3);
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: $primary;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+
+                mat-icon {
+                    color: $white;
+                    font-size: 20px;
+                    width: 20px;
+                    height: 20px;
+                }
+            }
+
+            .stat-content {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .stat-number {
+                font-size: 20px;
+                font-weight: 700;
+                color: $primary;
+                line-height: 1;
+            }
+
+            .stat-label {
+                font-size: 12px;
+                color: $gray-500;
+                margin-top: 2px;
+            }
+        }
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: flex-end;
+
+        .view-btn {
+            border: 1px solid #07354E;
+            color: #07354E;
+            border-radius: 8px;
+            font-size: 13px;
+
+            mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+                margin-right: 4px;
+            }
+
+            &:hover {
+                background: #07354E;
+                color: white;
+            }
+        }
+    }
+}
+
+// Card View Responsive
+@media (max-width: 768px) {
+    .project-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card {
+        .stats-bar {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+    }
+}

@@ -12,6 +12,7 @@ import { RestService } from '../../../services/rest.service';
 import { IssuePersonalConfirmDeleteComponent } from '../../dialog/issue-personal-confirm-delete/issue-personal-confirm-delete.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface ImageUrl {
   url: string;
@@ -67,7 +68,8 @@ export class IssueCommonDetailComponent implements OnInit {
     private rest: RestService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private toast: ToastService
   ) { }
 
   ngOnInit() {
@@ -88,6 +90,7 @@ export class IssueCommonDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading common issue:', error);
+        this.toast.error('ไม่สามารถโหลดข้อมูลแจ้งซ่อมได้');
         this.isLoading.next(false);
       }
     });
@@ -153,10 +156,12 @@ export class IssueCommonDetailComponent implements OnInit {
           // ใช้ API deleteCommonIssue ที่มีใน rest service
           this.rest.deleteCommonIssue(this.issue.id).subscribe({
             next: () => {
+              this.toast.success('ลบรายการแจ้งซ่อมเรียบร้อยแล้ว');
               this.router.navigate(['/issue-common']);
             },
             error: (error) => {
               console.error('Error deleting issue:', error);
+              this.toast.error('ไม่สามารถลบรายการแจ้งซ่อมได้');
             }
           });
         }

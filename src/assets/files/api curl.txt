@@ -1,0 +1,389 @@
+api curl
+
+📚 Super Admin API Documentation
+🔐 Authentication
+ทุก API ต้องส่ง Header:
+
+Authorization: Bearer <JWT_TOKEN>
+โดย User ต้องมี role = 'super-admin' ใน Database
+
+1️⃣ Dashboard Stats
+GET /api/super-admin/dashboard
+cURL:
+
+bash
+curl -X GET "http://localhost:5000/api/super-admin/dashboard" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "data": {
+    "projects": 12,
+    "units": 2340,
+    "users": {
+      "resident": 1200,
+      "security": 45,
+      "juristic": 30,
+      "super-admin": 2
+    },
+    "timestamp": "2026-01-14T00:58:00.000Z"
+  }
+}
+2️⃣ Activity Logs
+GET /api/super-admin/logs
+Query Parameters:
+
+Param	Type	Default	Description
+limit	number	50	จำนวน Log ที่ต้องการ
+offset	number	0	สำหรับ Pagination
+type	string	-	Filter ตาม action_type (CREATE, UPDATE, DELETE, VIEW, LOGIN, LOGOUT)
+cURL:
+
+bash
+# ดึง Log ทั้งหมด
+curl -X GET "http://localhost:5000/api/super-admin/logs?limit=20&offset=0" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+# ดึงเฉพาะ DELETE actions
+curl -X GET "http://localhost:5000/api/super-admin/logs?type=DELETE&limit=10" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "admin_user_id": "uuid-123",
+      "admin_name": "Admin Test",
+      "admin_email": "admin@test.com",
+      "action_type": "UPDATE",
+      "target_type": "system_config",
+      "target_id": "multiple",
+      "details": {
+        "updates": {
+          "maintenance_mode": "true"
+        }
+      },
+      "ip_address": "192.168.1.100",
+      "user_agent": "Mozilla/5.0...",
+      "created_at": "2026-01-14T00:45:00.000Z"
+    }
+  ]
+}
+3️⃣ System Configuration
+GET /api/super-admin/config
+cURL:
+
+bash
+curl -X GET "http://localhost:5000/api/super-admin/config" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "data": {
+    "maintenance_mode": {
+      "value": false,
+      "description": "System-wide maintenance mode",
+      "updated_at": "2026-01-14T00:30:00.000Z"
+    },
+    "default_theme_color": {
+      "value": "#2A405E",
+      "description": "Default primary color for new projects",
+      "updated_at": "2026-01-13T12:00:00.000Z"
+    },
+    "rate_limit_requests": {
+      "value": 100,
+      "description": "Global API rate limit per minute",
+      "updated_at": "2026-01-10T10:00:00.000Z"
+    }
+  }
+}
+PUT /api/super-admin/config
+Request Body:
+
+json
+{
+  "updates": {
+    "maintenance_mode": "true",
+    "rate_limit_requests": "150"
+  }
+}
+cURL:
+
+bash
+curl -X PUT "http://localhost:5000/api/super-admin/config" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "updates": {
+      "maintenance_mode": "true",
+      "default_theme_color": "#1A2B3C"
+    }
+  }'
+Response:
+
+json
+{
+  "status": "success",
+  "message": "Configuration updated successfully"
+}
+4️⃣ Global Announcements
+GET /api/super-admin/announcements
+Query Parameters:
+
+Param	Type	Default	Description
+page	number	1	หน้าปัจจุบัน
+limit	number	20	จำนวนต่อหน้า
+cURL:
+
+bash
+curl -X GET "http://localhost:5000/api/super-admin/announcements?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "title": "ปิดปรับปรุงระบบ 15 ม.ค.",
+      "content": "ระบบจะปิดปรับปรุงในวันที่ 15 ม.ค. 2026 เวลา 02:00-04:00 น.",
+      "type": "maintenance",
+      "target_projects": null,
+      "is_active": true,
+      "start_date": "2026-01-14T00:00:00.000Z",
+      "end_date": "2026-01-15T06:00:00.000Z",
+      "created_by": "uuid-admin-123",
+      "created_at": "2026-01-13T23:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 5,
+    "page": 1,
+    "limit": 10
+  }
+}
+POST /api/super-admin/announcements
+Request Body:
+
+json
+{
+  "title": "ปิดปรับปรุงระบบ",
+  "content": "ระบบจะปิดปรับปรุงในวันที่...",
+  "type": "maintenance",
+  "target_projects": null,
+  "is_active": true,
+  "start_date": "2026-01-14T00:00:00.000Z",
+  "end_date": "2026-01-15T06:00:00.000Z"
+}
+Field	Type	Required	Description
+title	string	✅	หัวข้อประกาศ
+content	string	✅	เนื้อหาประกาศ
+type	enum	❌	info, warning, maintenance, 
+update
+, emergency (default: info)
+target_projects	array/null	❌	null = ทุกโครงการ, [1,2,3] = เฉพาะโครงการที่ระบุ
+is_active	boolean	❌	default: true
+start_date	datetime	❌	วันเริ่มแสดง
+end_date	datetime	❌	วันสิ้นสุดแสดง
+cURL:
+
+bash
+# ประกาศถึงทุกโครงการ
+curl -X POST "http://localhost:5000/api/super-admin/announcements" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "ปิดปรับปรุงระบบ",
+    "content": "ระบบจะปิดปรับปรุงในวันที่ 15 ม.ค. 2026",
+    "type": "maintenance",
+    "target_projects": null,
+    "start_date": "2026-01-14T00:00:00Z",
+    "end_date": "2026-01-15T06:00:00Z"
+  }'
+# ประกาศเฉพาะบางโครงการ
+curl -X POST "http://localhost:5000/api/super-admin/announcements" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Feature ใหม่ QR Code",
+    "content": "โครงการของท่านได้รับการอัพเกรดระบบ QR Code",
+    "type": "update",
+    "target_projects": [1, 2, 5]
+  }'
+Response:
+
+json
+{
+  "status": "success",
+  "message": "Announcement created successfully",
+  "data": {
+    "id": 2
+  }
+}
+PUT /api/super-admin/announcements/:id
+cURL:
+
+bash
+curl -X PUT "http://localhost:5000/api/super-admin/announcements/1" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "หัวข้อใหม่",
+    "is_active": false
+  }'
+Response:
+
+json
+{
+  "status": "success",
+  "message": "Announcement updated"
+}
+DELETE /api/super-admin/announcements/:id
+cURL:
+
+bash
+curl -X DELETE "http://localhost:5000/api/super-admin/announcements/1" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "message": "Announcement deleted"
+}
+5️⃣ Feature Flags
+GET /api/super-admin/features/:projectId
+cURL:
+
+bash
+curl -X GET "http://localhost:5000/api/super-admin/features/1" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "data": [
+    {
+      "feature_name": "visitor_management",
+      "is_enabled": true
+    },
+    {
+      "feature_name": "qr_invitation",
+      "is_enabled": true
+    },
+    {
+      "feature_name": "online_payment",
+      "is_enabled": false
+    }
+  ]
+}
+POST /api/super-admin/features
+Request Body:
+
+json
+{
+  "project_id": 1,
+  "feature_name": "online_payment",
+  "is_enabled": true
+}
+cURL:
+
+bash
+curl -X POST "http://localhost:5000/api/super-admin/features" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": 1,
+    "feature_name": "online_payment",
+    "is_enabled": true
+  }'
+Response:
+
+json
+{
+  "status": "success",
+  "message": "Feature flag updated"
+}
+6️⃣ Global Announcements (User API)
+GET /api/global-announcements
+(สำหรับผู้ใช้ทั่วไป - ไม่ต้องเป็น Super Admin)
+
+Query Parameters:
+
+Param	Type	Required	Description
+project_id	number	✅	ID ของโครงการที่ต้องการดูประกาศ
+cURL:
+
+bash
+curl -X GET "http://localhost:5000/api/global-announcements?project_id=1" \
+  -H "Authorization: Bearer USER_TOKEN"
+Response:
+
+json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "title": "ปิดปรับปรุงระบบ 15 ม.ค.",
+      "content": "ระบบจะปิดปรับปรุงในวันที่...",
+      "type": "maintenance",
+      "start_date": "2026-01-14T00:00:00.000Z",
+      "created_at": "2026-01-13T23:00:00.000Z"
+    }
+  ]
+}
+📋 Data Shapes Summary
+Activity Log
+typescript
+interface ActivityLog {
+  id: number;
+  admin_user_id: string;
+  admin_name: string;      // จาก JOIN users
+  admin_email: string;     // จาก JOIN users
+  action_type: 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'LOGIN' | 'LOGOUT' | 'OTHER';
+  target_type: string;     // เช่น 'project', 'user', 'system_config'
+  target_id: string | null;
+  details: object | null;  // JSON data
+  ip_address: string;
+  user_agent: string;
+  created_at: string;      // ISO 8601
+}
+System Config
+typescript
+interface SystemConfig {
+  [key: string]: {
+    value: string | number | boolean | object;
+    description: string;
+    updated_at: string;
+  };
+}
+Global Announcement
+typescript
+interface GlobalAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  type: 'info' | 'warning' | 'maintenance' | 'update' | 'emergency';
+  target_projects: number[] | null;  // null = ทุกโครงการ
+  is_active: boolean;
+  start_date: string | null;
+  end_date: string | null;
+  created_by: string;
+  created_at: string;
+}
+Feature Flag
+typescript
+interface FeatureFlag {
+  project_id: number;
+  feature_name: string;
+  is_enabled: boolean;
+}
