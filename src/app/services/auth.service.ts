@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs'; // Import tap operator
-import { jwtDecode } from 'jwt-decode';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface RegisterRequest {
@@ -22,145 +22,170 @@ export interface RegisterResponse {
   };
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  role: string;
+  phone?: string;
+  username?: string;
+  projectMemberships?: any[];
+  projectCustomizations?: any;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/api/auth`;
 
+  // Use BehaviorSubject to hold the current user state
+  private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
+  // Flag to track if the initial session check has completed
+  private sessionCheckedSubject = new BehaviorSubject<boolean>(false);
+  public sessionChecked$ = this.sessionCheckedSubject.asObservable();
+
   constructor(private http: HttpClient) { }
+
+  /**
+   * Check if the user has a valid session (HttpOnly cookie)
+   * This should be called on app initialization.
+   */
+  checkSession(): Observable<UserProfile | null> {
+    return this.http.get<any>(`${this.apiUrl}/profile`).pipe(
+      map(response => {
+        console.log('AuthService: Check Session Response Full:', response);
+
+        // Handle different response structures
+        let user = response;
+        if (response.data) {
+          user = response.data;
+        }
+
+        // Check if user info is nested under 'user' key (common in some API frameworks)
+        if (user.user) {
+          user = user.user;
+        }
+
+        if (!user.role && response.role) {
+          user.role = response.role;
+        }
+
+        // Normalize role to lowercase
+        if (user.role && typeof user.role === 'string') {
+          user.role = user.role.toLowerCase();
+        }
+
+        // Normalize project_memberships -> projectMemberships
+        if (!user.projectMemberships && user.project_memberships) {
+          user.projectMemberships = user.project_memberships;
+        }
+
+        console.log('AuthService: Resolved User Object:', user);
+
+        this.currentUserSubject.next(user);
+        this.sessionCheckedSubject.next(true);
+        return user;
+      }),
+      catchError(error => {
+        console.log('AuthService: No active session found.', error);
+        this.currentUserSubject.next(null);
+        this.sessionCheckedSubject.next(true);
+        return of(null);
+      })
+    );
+  }
 
   register(userData: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, userData);
   }
 
   login(credentials: any): Observable<any> {
+    // withCredentials is handled by Interceptor
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
-        if (response && response.data && response.data.token) {
-          this.setToken(response.data.token);
-          if (response.data.role) {
-            localStorage.setItem('userRole', response.data.role);
-            localStorage.setItem(
-              'projectCustomizations',
-              JSON.stringify(response.data.projectCustomizations)
-            );
+        // Backend should set the HttpOnly cookie.
+        // We just need to update our local user state.
+        if (response && response.data) {
+          const user = {
+            ...response.data,
+            // If backend returns role separately or inside data
+            role: response.data.role ? response.data.role.toLowerCase() : null
+          };
+
+          // Normalize project_memberships -> projectMemberships
+          if (!user.projectMemberships && user.project_memberships) {
+            user.projectMemberships = user.project_memberships;
           }
-          if (response.data.projectMemberships) {
-            localStorage.setItem(
-              'projectMemberships',
-              JSON.stringify(response.data.projectMemberships)
-            );
-          } else {
-            localStorage.removeItem('projectMemberships');
-          }
+
+          this.currentUserSubject.next(user);
+
+          // Legacy support: We might still need these in localStorage if other parts of the app read them directly
+          // BUT the goal is to remove reliance on localStorage.
+          // For now, I will NOT write to localStorage to enforce the refactor.
         }
       })
     );
   }
 
+  logout(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/logout`, {}).pipe(
+      tap(() => {
+        this.currentUserSubject.next(null);
+        // Clear legacy storage just in case
+        localStorage.clear();
+      }),
+      catchError(err => {
+        // Even if API fails, clear local state
+        this.currentUserSubject.next(null);
+        localStorage.clear();
+        return of(null);
+      })
+    );
+  }
+
   getProfile(): Observable<any> {
-    // Assuming you have an interceptor to add the token to the header
     return this.http.get(`${this.apiUrl}/profile`);
   }
 
-  setToken(token: string): void {
-    localStorage.setItem('authToken', token);
+  // --- State Getters ---
+
+  isLoggedIn(): boolean {
+    return !!this.currentUserSubject.value;
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('authToken');
-  }
-
-  removeToken(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('projectMemberships');
-    localStorage.removeItem('projectCustomizations');
-    localStorage.removeItem('project_id');
-  }
-
-  getDecodedToken(): any {
-    const token = this.getToken();
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        console.log('AuthService: Decoded Token:', decoded);
-        return decoded;
-      } catch (Error) {
-        console.error('AuthService: Error decoding token:', Error);
-        return null;
-      }
-    }
-    console.log('AuthService: No token found.');
-    return null;
-  }
-
-  getUserRoleFromStorage(): string | null {
-    return localStorage.getItem('userRole');
+  getCurrentUser(): UserProfile | null {
+    return this.currentUserSubject.value;
   }
 
   getUserRole(): string | null {
-    // Try to get role from localStorage first, fallback to token if not found
-    let role = this.getUserRoleFromStorage();
-    if (!role) {
-      const decodedToken = this.getDecodedToken();
-      role = decodedToken ? decodedToken.role : null;
-      console.log('AuthService: User Role from token:', role);
-    } else {
-      console.log('AuthService: User Role from storage:', role);
-    }
-    return role;
+    return this.currentUserSubject.value?.role || null;
   }
 
   getProjectMemberships(): any[] | null {
-    const memberships = localStorage.getItem('projectMemberships');
-    if (memberships) {
-      try {
-        return JSON.parse(memberships);
-      } catch (e) {
-        console.error('AuthService: Error parsing project memberships:', e);
-        return null;
-      }
-    }
-    return null;
+    return this.currentUserSubject.value?.projectMemberships || null;
   }
 
   hasProjectMembership(): boolean {
-    const userRole = this.getUserRole();
-    if (userRole === 'juristic') {
-      const memberships = this.getProjectMemberships();
-      return !!memberships && memberships.length > 0;
+    const user = this.currentUserSubject.value;
+    if (user?.role === 'juristic') {
+      return !!user.projectMemberships && user.projectMemberships.length > 0;
     }
-    return true; // Non-juristic roles don't need project membership check for this logic
+    return true;
   }
 
   getUserName(): string | null {
-    const decodedToken = this.getDecodedToken();
-    if (decodedToken) {
-      // ลองดึงจาก name, username, หรือ email
-      return (
-        decodedToken.name || decodedToken.username || decodedToken.email || null
-      );
-    }
-    return null;
+    const user = this.currentUserSubject.value;
+    return user ? user.full_name : null;
   }
 
   getUserId(): string | null {
-    const decodedToken = this.getDecodedToken();
-    if (decodedToken) {
-      // ดึง user ID จาก token (อาจเป็น id, userId, user_id ขึ้นอยู่กับ backend)
-      return (
-        decodedToken.id || decodedToken.userId || decodedToken.user_id || null
-      );
-    }
-    return null;
+    const user = this.currentUserSubject.value;
+    return user ? (user.id || (user as any).userId || (user as any).user_id) : null;
   }
 
-  isLoggedIn(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-    const decodedToken = this.getDecodedToken();
-    return decodedToken && decodedToken.exp * 1000 > Date.now(); // Check if token is not expired
-  }
+  // --- Legacy Methods to be removed or mapped ---
+  // getToken/setToken/removeToken are removed as we don't handle tokens client-side anymore.
 }

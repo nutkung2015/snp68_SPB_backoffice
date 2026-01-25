@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { environment } from '../../../environments/environment';
 import { RestService } from '../../services/rest.service';
+import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../shared/toast/toast.service';
 
 interface ThemeSettings {
@@ -192,7 +193,12 @@ export class CustomThemeAppComponent implements OnInit {
     { icon: 'notifications', label: 'การแจ้งเตือน' },
     { icon: 'menu_book', label: 'คู่มือ' },
   ];
-  constructor(private toast: ToastService, private http: HttpClient, private restService: RestService) { }
+  constructor(
+    private toast: ToastService,
+    private http: HttpClient,
+    private restService: RestService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
     console.log('ngOnInit เริ่มทำงาน');
@@ -210,69 +216,32 @@ export class CustomThemeAppComponent implements OnInit {
   }
 
   private loadSavedTheme() {
-    // โหลดข้อมูลจาก projectCustomizations ใน localStorage
-    const projectCustomizationsStr = localStorage.getItem('projectCustomizations');
-    console.log('projectCustomizations จาก localStorage:', projectCustomizationsStr);
+    // Favor getting customizations from AuthService/Session instead of manual localStorage
+    const user = this.authService.getCurrentUser();
+    const customizations = user?.projectCustomizations;
 
-    if (projectCustomizationsStr) {
-      try {
-        const projectCustomizations = JSON.parse(projectCustomizationsStr);
-        console.log('Parsed projectCustomizations:', projectCustomizations);
-
-        // ตรวจสอบว่ามีข้อมูลและนำมาใช้
-        if (projectCustomizations) {
-          // Map ข้อมูลจาก projectCustomizations ไปยัง theme
-          this.theme = {
-            project_id: projectCustomizations.project_id || this.theme.project_id,
-            primary_color: projectCustomizations.primary_color || this.theme.primary_color,
-            secondary_color: projectCustomizations.secondary_color || this.theme.secondary_color,
-            logo_url: projectCustomizations.logo_url || this.theme.logo_url,
-            favicon_url: projectCustomizations.favicon_url || this.theme.favicon_url,
-          };
-
-          console.log('Theme loaded from projectCustomizations:', this.theme);
-          this.isDefaultTheme = false;
-          this.hasExistingCustomization = true; // มี customization อยู่แล้ว
-        }
-      } catch (e) {
-        console.error('Error loading projectCustomizations:', e);
-        this.hasExistingCustomization = false;
-      }
+    if (customizations) {
+      this.theme = {
+        project_id: customizations.project_id || this.theme.project_id,
+        primary_color: customizations.primary_color || this.theme.primary_color,
+        secondary_color: customizations.secondary_color || this.theme.secondary_color,
+        logo_url: customizations.logo_url || this.theme.logo_url,
+        favicon_url: customizations.favicon_url || this.theme.favicon_url,
+      };
+      this.isDefaultTheme = false;
+      this.hasExistingCustomization = true;
     } else {
-      console.log('No projectCustomizations found in localStorage');
-      this.hasExistingCustomization = false; // ไม่มี customization
+      this.hasExistingCustomization = false;
     }
   }
 
   private loadProjectMemberships() {
-    const projectMembershipsStr = localStorage.getItem('projectMemberships');
-    console.log('Raw projectMemberships string:', projectMembershipsStr);
-
-    if (projectMembershipsStr) {
-      try {
-        const projectMemberships = JSON.parse(projectMembershipsStr);
-        console.log('Parsed Project Memberships:', projectMemberships);
-
-        if (Array.isArray(projectMemberships) && projectMemberships.length > 0) {
-          const project = projectMemberships[0];
-          this.theme.project_id = project.project_id;
-          this.projectName = project.project_name;
-          console.log(
-            'Using project_id and project_name from projectMemberships:',
-            this.theme.project_id,
-            this.projectName
-          );
-        } else {
-          console.log('No project memberships found or empty array');
-          this.projectName = 'Unknown Project';
-        }
-      } catch (e) {
-        console.error('Error parsing project memberships:', e);
-        this.toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล Project Memberships');
-        this.projectName = 'Unknown Project';
-      }
+    const memberships = this.authService.getProjectMemberships();
+    if (memberships && memberships.length > 0) {
+      const project = memberships[0];
+      this.theme.project_id = project.project_id;
+      this.projectName = project.project_name;
     } else {
-      console.log('No projectMemberships found in localStorage');
       this.projectName = 'Unknown Project';
     }
   }
@@ -334,7 +303,12 @@ export class CustomThemeAppComponent implements OnInit {
   createTheme() {
     // สร้าง FormData สำหรับส่งไฟล์และข้อมูลอื่นๆ
     const formData = new FormData();
-    const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
+    const projectId = this.theme.project_id;
+
+    if (!projectId) {
+      this.toast.error('ไม่พบรหัสโครงการ');
+      return;
+    }
 
     formData.append('project_id', projectId);
     formData.append('primary_color', this.theme.primary_color);
@@ -391,7 +365,12 @@ export class CustomThemeAppComponent implements OnInit {
 
   // อัปเดต customization ที่มีอยู่
   updateTheme() {
-    const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
+    const projectId = this.theme.project_id;
+
+    if (!projectId) {
+      this.toast.error('ไม่พบรหัสโครงการ');
+      return;
+    }
 
     // สร้าง FormData สำหรับส่งไฟล์และข้อมูลอื่นๆ
     const formData = new FormData();
@@ -445,7 +424,8 @@ export class CustomThemeAppComponent implements OnInit {
   }
 
   resetToDefault() {
-    const projectId = this.theme.project_id || localStorage.getItem('project_id') || '';
+    const projectId = this.theme.project_id;
+    if (!projectId) return;
 
     // กำหนดค่า default
     const defaultTheme = {

@@ -45,9 +45,10 @@ export class LoginComponent implements OnInit {
       const { email, password } = this.loginForm.value;
       this.authService.login({ email, password }).subscribe({
         next: (response) => {
-          if (response && response.data && typeof response.data.token === 'string' && response.data.token.length > 0) {
-            this.authService.setToken(response.data.token);
+          if (response && response.data) {
+            // Token is set in cookie by backend. AuthService updates local state automatically in tap().
             const userRole = this.authService.getUserRole();
+
             if (userRole === 'super-admin') {
               this.router.navigate(['/super-admin/dashboard']);
             } else if (userRole === 'juristic' && !this.authService.hasProjectMembership()) {
@@ -56,8 +57,8 @@ export class LoginComponent implements OnInit {
               this.router.navigate(['/dashboard']);
             }
           } else {
-            console.error('Login failed: Token not received or invalid.', response);
-            alert('Login failed: Invalid token received from server.');
+            console.error('Login failed: Invalid response format.', response);
+            alert('Login failed: Invalid server response.');
             this.isLoading = false;
           }
         },

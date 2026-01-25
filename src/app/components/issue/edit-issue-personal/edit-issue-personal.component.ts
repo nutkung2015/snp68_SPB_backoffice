@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { LoadingDataComponent } from '../../../shared/loading-data/loading-data.component';
 import { RestService, PersonalRepair } from '../../../services/rest.service';
+import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../shared/toast/toast.service';
 
 interface AttachmentUrl {
@@ -95,7 +96,8 @@ export class EditIssuePersonalComponent implements OnInit {
     private rest: RestService,
     private route: ActivatedRoute,
     private router: Router,
-    private toast: ToastService
+    private toast: ToastService,
+    private authService: AuthService
   ) {
     this.editForm = this.fb.group({
       repair_area: [{ value: '', disabled: true }, Validators.required],
@@ -118,7 +120,9 @@ export class EditIssuePersonalComponent implements OnInit {
   }
 
   loadJuristicMembers() {
-    const projectId = localStorage.getItem('project_id');
+    const memberships = this.authService.getProjectMemberships();
+    const projectId = (memberships && memberships.length > 0) ? memberships[0].project_id : null;
+
     if (projectId) {
       this.rest.getJuristicMembers(projectId).subscribe({
         next: (response) => {

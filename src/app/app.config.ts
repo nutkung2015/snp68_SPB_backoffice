@@ -1,4 +1,4 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
@@ -8,6 +8,12 @@ import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
 import { AuthInterceptor } from './services/auth.interceptor';
+import { AuthService } from './services/auth.service';
+import { firstValueFrom } from 'rxjs';
+
+function initializeAppFactory(authService: AuthService) {
+  return () => firstValueFrom(authService.checkSession());
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +21,12 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
     provideAnimations(),
     provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAppFactory,
+      deps: [AuthService],
+      multi: true
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

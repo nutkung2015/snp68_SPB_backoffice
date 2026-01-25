@@ -9,6 +9,7 @@ import {
     Zone,
     GetVehiclesParams,
 } from '../../services/rest.service';
+import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -112,7 +113,8 @@ export class VehicleManagementComponent implements OnInit {
         private restService: RestService,
         private router: Router,
         private dialog: MatDialog,
-        private toast: ToastService
+        private toast: ToastService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -123,30 +125,9 @@ export class VehicleManagementComponent implements OnInit {
     }
 
     loadProjectId(): void {
-        const userData = localStorage.getItem('userData');
-        if (userData) {
-            try {
-                const user = JSON.parse(userData);
-                if (user.projectMemberships && user.projectMemberships.length > 0) {
-                    this.projectId = user.projectMemberships[0].project_id;
-                }
-            } catch (e) {
-                console.error('Error parsing userData:', e);
-            }
-        }
-
-        if (!this.projectId) {
-            const projectMembershipsStr = localStorage.getItem('projectMemberships');
-            if (projectMembershipsStr) {
-                try {
-                    const projectMemberships = JSON.parse(projectMembershipsStr);
-                    if (projectMemberships && projectMemberships.length > 0) {
-                        this.projectId = projectMemberships[0].project_id;
-                    }
-                } catch (e) {
-                    console.error('Error parsing projectMemberships:', e);
-                }
-            }
+        const memberships = this.authService.getProjectMemberships();
+        if (memberships && memberships.length > 0) {
+            this.projectId = memberships[0].project_id;
         }
     }
 

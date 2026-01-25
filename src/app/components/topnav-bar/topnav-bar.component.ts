@@ -34,14 +34,19 @@ export class TopnavBarComponent implements OnInit {
   userName: string | null = null;
   userRole: string | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    const decodedToken = this.authService.getDecodedToken();
-    if (decodedToken) {
-      this.userName = decodedToken.full_name || 'User'; // Assuming 'fullname' field in token
-      this.userRole = decodedToken.role || 'Guest'; // Assuming 'role' field in token
-    }
+    // Subscribe to currentUser$ to get updates on user state
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.userName = user.full_name;
+        this.userRole = user.role || 'Guest';
+      } else {
+        this.userName = null;
+        this.userRole = null;
+      }
+    });
   }
 
   toggleNotifications(): void {
@@ -53,8 +58,15 @@ export class TopnavBarComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.removeToken(); // Assuming AuthService has a removeToken method
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Logout failed', err);
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   // Method to toggle notifications dropdown

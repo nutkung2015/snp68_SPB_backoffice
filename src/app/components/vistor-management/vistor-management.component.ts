@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RestService } from '../../services/rest.service';
+import { AuthService } from '../../services/auth.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -79,7 +80,11 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   // Filter
   activeFilter: 'all' | 'inside' | 'exited' | 'pending' = 'all';
 
-  constructor(private restService: RestService, private router: Router) { }
+  constructor(
+    private restService: RestService,
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadProjectId();
@@ -92,31 +97,9 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   }
 
   loadProjectId(): void {
-    const userData = localStorage.getItem('userData');
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        if (user.projectMemberships && user.projectMemberships.length > 0) {
-          this.projectId = user.projectMemberships[0].project_id;
-        }
-      } catch (e) {
-        console.error('Error parsing userData:', e);
-      }
-    }
-
-    // Fallback to projectMemberships if userData doesn't have it
-    if (!this.projectId) {
-      const projectMembershipsStr = localStorage.getItem('projectMemberships');
-      if (projectMembershipsStr) {
-        try {
-          const projectMemberships = JSON.parse(projectMembershipsStr);
-          if (projectMemberships && projectMemberships.length > 0) {
-            this.projectId = projectMemberships[0].project_id;
-          }
-        } catch (e) {
-          console.error('Error parsing projectMemberships:', e);
-        }
-      }
+    const memberships = this.authService.getProjectMemberships();
+    if (memberships && memberships.length > 0) {
+      this.projectId = memberships[0].project_id;
     }
   }
 

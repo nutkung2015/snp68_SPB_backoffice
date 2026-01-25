@@ -20,6 +20,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterModule } from '@angular/router';
 import { RestService } from '../../services/rest.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
+import { AuthService } from '../../services/auth.service';
 
 type IssueStatus = 'pending' | 'in_progress' | 'completed' | 'rejected' | 'all';
 
@@ -121,7 +122,11 @@ export class IssueCommonComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private rest: RestService, private router: Router) {
+  constructor(
+    private rest: RestService,
+    private router: Router,
+    private authService: AuthService // Inject AuthService
+  ) {
     this.dataSource = new MatTableDataSource<Issue>([]);
   }
 
@@ -137,26 +142,16 @@ export class IssueCommonComponent implements OnInit {
   loadIssues() {
     this.isLoading.next(true);
 
-    // ดึง project_id จาก projectMemberships ใน localStorage หรือที่เก็บไว้
-    let projectId = localStorage.getItem('project_id');
+    // Get project_id from AuthService
+    const memberships = this.authService.getProjectMemberships();
+    let projectId: string | null = null;
 
-    if (!projectId) {
-      const membershipsStr = localStorage.getItem('projectMemberships');
-      if (membershipsStr) {
-        try {
-          const memberships = JSON.parse(membershipsStr);
-          if (memberships && memberships.length > 0) {
-            projectId = memberships[0].project_id;
-            localStorage.setItem('project_id', projectId!);
-          }
-        } catch (e) {
-          console.error('Error parsing projectMemberships:', e);
-        }
-      }
+    if (memberships && memberships.length > 0) {
+      projectId = memberships[0].project_id;
     }
 
     if (!projectId) {
-      console.error('No project_id found');
+      console.error('No project_id found in user session');
       this.isLoading.next(false);
       return;
     }

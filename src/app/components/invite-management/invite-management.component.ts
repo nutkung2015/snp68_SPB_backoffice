@@ -215,13 +215,14 @@ export class InviteManagementComponent implements OnInit {
       .replace('mm', minutes);
   }
 
-  private getHttpHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      Authorization: `Bearer ${token} `,
-      'Content-Type': 'application/json',
-    });
-  }
+  // private getHttpHeaders(): HttpHeaders {
+  //   // Token handling is now done via HttpOnly cookies and Interceptor
+  //   // const token = this.authService.getToken(); // getToken removed
+  //   return new HttpHeaders({
+  //     // Authorization: `Bearer ${token} `,
+  //     'Content-Type': 'application/json',
+  //   });
+  // }
 
   private buildParams(): URLSearchParams {
     const params = new URLSearchParams();

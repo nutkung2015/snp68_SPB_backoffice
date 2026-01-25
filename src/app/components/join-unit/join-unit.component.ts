@@ -3,6 +3,7 @@ import { PageHeaderComponent } from '../../shared/page-header/page-header.compon
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RestService, ProjectMembership } from '../../services/rest.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-join-unit',
@@ -17,14 +18,15 @@ export class JoinUnitComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private restService: RestService
+    private restService: RestService,
+    private authService: AuthService
   ) {
     this.joinProjectForm = this.fb.group({
       projectCode: ['', Validators.required],
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   onSubmit(): void {
     if (this.joinProjectForm.valid) {
@@ -35,20 +37,17 @@ export class JoinUnitComponent implements OnInit {
         next: (response) => {
           console.log('Project joined successfully:', response);
 
-          // Create projectMemberships from API response
-          const projectMemberships: ProjectMembership[] = [{
-            project_id: response.project_id,
-            project_name: response.project_name,
-            role: response.role
-          }];
-
-          // Store in localStorage
-          localStorage.setItem('projectMemberships', JSON.stringify(projectMemberships));
-          console.log('Project memberships stored:', projectMemberships);
-
-          // Show success message and navigate to announcement page
-          alert('เข้าโครงการสำเร็จ');
-          this.router.navigate(['/announcement']);
+          // Refresh user session state instead of manually setting localStorage
+          this.authService.checkSession().subscribe({
+            next: () => {
+              alert('เข้าโครงการสำเร็จ');
+              this.router.navigate(['/announcement']);
+            },
+            error: () => {
+              // Fallback if session check fails but join succeeded
+              this.router.navigate(['/announcement']);
+            }
+          });
         },
         error: (error) => {
           console.error('Error joining project:', error);

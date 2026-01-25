@@ -9,6 +9,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface Zone {
   id: string;
@@ -510,7 +511,10 @@ export class RestService {
     return this._apiUrl;
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   // Announcement related methods
   getAnnouncements(params?: any): Observable<AnnouncementResponse> {
@@ -533,20 +537,13 @@ export class RestService {
   getAnnouncementsByProject(params?: any): Observable<AnnouncementResponse> {
     this.isLoadingSubject.next(true);
 
-    // ดึง project_id จาก projectMemberships ใน localStorage
+    // Get project_id from AuthService
+    const memberships = this.authService.getProjectMemberships();
     let projectId: string | null = null;
-    const projectMembershipsStr = localStorage.getItem('projectMemberships');
-    if (projectMembershipsStr) {
-      try {
-        const projectMemberships = JSON.parse(projectMembershipsStr);
-        // ถ้ามี projectMemberships และมีข้อมูล ให้เอา project_id จากตัวแรก
-        if (projectMemberships && projectMemberships.length > 0) {
-          projectId = projectMemberships[0].project_id;
-          console.log('RestService: Using project_id from memberships:', projectId);
-        }
-      } catch (e) {
-        console.error('RestService: Error parsing projectMemberships:', e);
-      }
+
+    if (memberships && memberships.length > 0) {
+      projectId = memberships[0].project_id;
+      console.log('RestService: Using project_id from AuthService:', projectId);
     }
 
     // สร้าง HttpParams และเพิ่ม project_id
@@ -609,20 +606,12 @@ export class RestService {
   createAnnouncementMultipart(formData: FormData): Observable<HttpEvent<any>> {
     this.isLoadingSubject.next(true);
 
-    // ดึง project_id จาก projectMemberships ใน localStorage
-    const projectMembershipsStr = localStorage.getItem('projectMemberships');
-    if (projectMembershipsStr) {
-      try {
-        const projectMemberships = JSON.parse(projectMembershipsStr);
-        // ถ้ามี projectMemberships และมีข้อมูล ให้เอา project_id จากตัวแรก
-        if (projectMemberships && projectMemberships.length > 0) {
-          const projectId = projectMemberships[0].project_id;
-          formData.append('project_id', projectId);
-          console.log('RestService: Added project_id to FormData:', projectId);
-        }
-      } catch (e) {
-        console.error('RestService: Error parsing projectMemberships:', e);
-      }
+    // Get project_id from AuthService
+    const memberships = this.authService.getProjectMemberships();
+    if (memberships && memberships.length > 0) {
+      const projectId = memberships[0].project_id;
+      formData.append('project_id', projectId);
+      console.log('RestService: Added project_id to FormData:', projectId);
     }
 
     return this.http
@@ -691,8 +680,6 @@ export class RestService {
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization:
-          'Bearer ' + localStorage.getItem(environment.auth.tokenKey),
       }),
     };
   }
@@ -700,8 +687,7 @@ export class RestService {
   private getHttpOptionsForFormData() {
     return {
       headers: new HttpHeaders({
-        Authorization:
-          'Bearer ' + localStorage.getItem(environment.auth.tokenKey),
+        // 'Content-Type': 'multipart/form-data' is usually handled automatically by HttpClient when body is FormData
       }),
     };
   }
@@ -723,7 +709,10 @@ export class RestService {
    */
   createPersonalRepair(repairData: any): Observable<PersonalRepair> {
     this.isLoadingSubject.next(true);
-    const projectId = localStorage.getItem('project_id');
+
+    // Get project_id from AuthService
+    const memberships = this.authService.getProjectMemberships();
+    const projectId = (memberships && memberships.length > 0) ? memberships[0].project_id : null;
 
     // เพิ่ม project_id เข้าไปใน repairData
     const dataWithProjectId = {

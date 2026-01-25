@@ -13,7 +13,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -32,12 +32,10 @@ export class AuthGuard implements CanActivate {
 
       // Handle juristic users without project membership
       if (userRole === 'juristic' && !this.authService.hasProjectMembership()) {
-        // If the user is already on a route within the no-project path, allow access
         if (state.url.startsWith('/no-project')) {
           console.log('AuthGuard: Juristic user without project membership accessing no-project path. Access Granted.');
           return true;
         } else {
-          // Otherwise, redirect to the no-project page
           console.log('AuthGuard: Juristic user without project membership. Redirecting to no-project page.');
           return this.router.createUrlTree(['/no-project']);
         }
@@ -48,23 +46,18 @@ export class AuthGuard implements CanActivate {
         console.log('AuthGuard: Access Granted');
         return true;
       } else if (!requiredRoles || requiredRoles.length === 0) {
-        // If no specific roles are required, just being logged in is enough
         console.log('AuthGuard: Access Granted (No specific roles required)');
         return true;
       } else {
         console.log('AuthGuard: Access Denied - Role Mismatch');
-        alert('You do not have the necessary permissions to access this page.');
+        alert(`You do not have the necessary permissions to access this page. (Your role: ${userRole || 'None'}, Required: ${requiredRoles?.join(', ')})`);
         return this.router.createUrlTree(['/login']);
       }
     } else {
-      // Redirect to the login page
       console.log('AuthGuard: Access Denied - Not Logged In');
       alert('You need to log in to access this page.');
-      return this.router.createUrlTree(['/login']);
+      // Pass the return URL so we can redirect back after login
+      return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
     }
-    // This part should ideally not be reached if all conditions are handled
-    console.log('AuthGuard: Access Denied - Fallback');
-    alert('Access Denied.');
-    return this.router.createUrlTree(['/login']); // Redirect if not authorized
   }
 }

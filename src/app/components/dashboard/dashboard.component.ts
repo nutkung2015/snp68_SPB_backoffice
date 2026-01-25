@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RestService } from '../../services/rest.service';
+import { AuthService } from '../../services/auth.service';
 import { forkJoin } from 'rxjs';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -61,7 +62,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private restService: RestService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -70,29 +72,10 @@ export class DashboardComponent implements OnInit {
   }
 
   loadProjectId(): void {
-    const userData = localStorage.getItem('userData');
-    const projectMemberships = localStorage.getItem('projectMemberships');
+    const memberships = this.authService.getProjectMemberships();
 
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        if (user.projectMemberships && user.projectMemberships.length > 0) {
-          this.projectId = user.projectMemberships[0].project_id;
-        }
-      } catch (e) {
-        console.error('Error parsing userData:', e);
-      }
-    }
-
-    if (!this.projectId && projectMemberships) {
-      try {
-        const memberships = JSON.parse(projectMemberships);
-        if (memberships && memberships.length > 0) {
-          this.projectId = memberships[0].project_id;
-        }
-      } catch (e) {
-        console.error('Error parsing projectMemberships:', e);
-      }
+    if (memberships && memberships.length > 0) {
+      this.projectId = memberships[0].project_id;
     }
   }
 

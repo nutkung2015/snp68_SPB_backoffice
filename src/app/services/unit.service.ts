@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, finalize, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 // ==================== Interfaces ====================
 
@@ -96,7 +97,10 @@ export class UnitService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   public isLoading$ = this.isLoadingSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   // ==================== HTTP Options ====================
 
@@ -104,7 +108,6 @@ export class UnitService {
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem(environment.auth.tokenKey)}`
       })
     };
   }
@@ -233,8 +236,17 @@ export class UnitService {
 
     let httpParams = new HttpParams();
 
-    if (projectId) {
-      httpParams = httpParams.set('project_id', projectId);
+    // Resolve project ID
+    let resolvedProjectId = projectId;
+    if (!resolvedProjectId) {
+      const memberships = this.authService.getProjectMemberships();
+      if (memberships && memberships.length > 0) {
+        resolvedProjectId = memberships[0].project_id;
+      }
+    }
+
+    if (resolvedProjectId) {
+      httpParams = httpParams.set('project_id', resolvedProjectId);
     }
 
     if (status && status !== 'all') {
