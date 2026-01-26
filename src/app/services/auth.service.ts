@@ -146,6 +146,19 @@ export class AuthService {
     );
   }
 
+  refreshToken(): Observable<any> {
+    // ยิงไปที่ endpoint นี้ แล้ว Backend จะอ่าน Cookie 'refreshToken' เอง
+    // ต้องมี { withCredentials: true } เพื่อส่ง Cookie ไปด้วย
+    return this.http.post(`${this.apiUrl}/refresh`, {}, { withCredentials: true }).pipe(
+      tap((response: any) => {
+        // ถ้า Backend ส่งข้อมูล User ใหม่กลับมา ก็อัปเดตเข้าระบบ
+        if (response && response.data) {
+          this.currentUserSubject.next(response.data);
+        }
+      })
+    );
+  }
+
   getProfile(): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile`);
   }
