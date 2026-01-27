@@ -67,6 +67,37 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+  get paginatedData(): EntryLog[] {
+    const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+    const endIndex = startIndex + this.pageEvent.pageSize;
+    return this.sortedData.slice(startIndex, endIndex);
+  }
+
+  // Getter สำหรับข้อมูลที่ sort แล้ว
+  get sortedData(): EntryLog[] {
+    const data = this.dataSource.filteredData.slice();
+    if (!this.sort || !this.sort.active || this.sort.direction === '') {
+      return data;
+    }
+    return data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'plate_number': return this.compare(a.plate_number || '', b.plate_number || '', isAsc);
+        case 'visitor_name': return this.compare(a.visitor_name || '', b.visitor_name || '', isAsc);
+        case 'unit_number': return this.compare(a.unit_number || '', b.unit_number || '', isAsc);
+        case 'check_in_time': return this.compare(a.check_in_time || '', b.check_in_time || '', isAsc);
+        case 'check_out_time': return this.compare(a.check_out_time || '', b.check_out_time || '', isAsc);
+        case 'status': return this.compare(a.status, b.status, isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+  compare(a: string | number, b: string | number, isAsc: boolean): number {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
   isLoading = false;
   projectId: string = '';
 
@@ -79,6 +110,7 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
 
   // Filter
   activeFilter: 'all' | 'inside' | 'exited' | 'pending' = 'all';
+  private allEntryLogs: EntryLog[] = [];
 
   constructor(
     private restService: RestService,
@@ -92,8 +124,16 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // เชื่อมต่อ sort หลังจาก view init
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+        // Subscribe to sort changes to reset to first page
+        this.sort.sortChange.subscribe(() => {
+          this.pageEvent.pageIndex = 0;
+        });
+      }
+    });
   }
 
   loadProjectId(): void {
@@ -140,8 +180,7 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   loadEntryLogs(): void {
     const params: any = {
       project_id: this.projectId,
-      page: this.pageEvent.pageIndex + 1,
-      limit: this.pageEvent.pageSize
+      // โหลดข้อมูลทั้งหมด (ไม่ส่ง page และ limit)
     };
 
     if (this.activeFilter !== 'all') {
@@ -151,8 +190,16 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
     this.restService.getEntryLogs(params).subscribe({
       next: (res: any) => {
         if (res.status === 'success') {
-          this.dataSource.data = res.data || [];
-          this.pageEvent.length = res.total || res.data?.length || 0;
+          const logs = res.data || [];
+          this.allEntryLogs = logs;
+          this.dataSource.data = logs;
+          this.pageEvent.length = logs.length;
+          this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
+
+          // เชื่อมต่อ sort หลังจากโหลดข้อมูล
+          if (this.sort) {
+            this.dataSource.sort = this.sort;
+          }
         }
         this.isLoading = false;
       },
@@ -171,10 +218,7 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   }
 
   handlePageEvent(event: PageEvent): void {
-    this.pageEvent.pageIndex = event.pageIndex;
-    this.pageEvent.pageSize = event.pageSize;
-    this.isLoading = true;
-    this.loadEntryLogs();
+    this.pageEvent = event;
   }
 
   getStatusBadgeClass(item: EntryLog): string {

@@ -122,6 +122,39 @@ export class IssueCommonComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+  get paginatedData(): Issue[] {
+    const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+    const endIndex = startIndex + this.pageEvent.pageSize;
+    return this.sortedData.slice(startIndex, endIndex);
+  }
+
+  // Getter สำหรับข้อมูลที่ sort แล้ว
+  get sortedData(): Issue[] {
+    const data = this.dataSource.filteredData.slice();
+    if (!this.sort || !this.sort.active || this.sort.direction === '') {
+      return data;
+    }
+    return data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'title': return this.compare(a.title, b.title, isAsc);
+        case 'type': return this.compare(a.type, b.type, isAsc);
+        case 'priority': return this.compare(a.priority, b.priority, isAsc);
+        case 'status': return this.compare(a.status, b.status, isAsc);
+        case 'reportedBy': return this.compare(a.reportedBy, b.reportedBy, isAsc);
+        case 'reportedTel': return this.compare(a.reportedTel, b.reportedTel, isAsc);
+        case 'assignedTo': return this.compare(a.assignedTo || '', b.assignedTo || '', isAsc);
+        case 'createdAt': return this.compare(a.createdAt.getTime(), b.createdAt.getTime(), isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+  compare(a: string | number, b: string | number, isAsc: boolean): number {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
   constructor(
     private rest: RestService,
     private router: Router,
@@ -135,8 +168,27 @@ export class IssueCommonComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // เชื่อมต่อ sort หลังจาก view init
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+        // Subscribe to sort changes to reset to first page
+        this.sort.sortChange.subscribe(() => {
+          this.pageEvent.pageIndex = 0;
+        });
+      }
+    });
+
+    // กำหนด filter predicate สำหรับการค้นหา
+    this.dataSource.filterPredicate = (data: Issue, filter: string) => {
+      const searchLower = filter.toLowerCase();
+      return (
+        (data.title || '').toLowerCase().includes(searchLower) ||
+        (data.description || '').toLowerCase().includes(searchLower) ||
+        (data.reportedBy || '').toLowerCase().includes(searchLower) ||
+        (data.reportedTel || '').toLowerCase().includes(searchLower)
+      );
+    };
   }
 
   loadIssues() {
@@ -158,8 +210,7 @@ export class IssueCommonComponent implements OnInit {
 
     const params: any = {
       project_id: projectId,
-      limit: this.pageEvent.pageSize.toString(),
-      offset: (this.pageEvent.pageIndex * this.pageEvent.pageSize).toString(),
+      // โหลดข้อมูลทั้งหมด (ไม่ส่ง limit และ offset)
     };
 
     // Add filters if they are not 'all' or empty
@@ -194,15 +245,22 @@ export class IssueCommonComponent implements OnInit {
         if (response.status === 'error') {
           console.error('API returned error:', response.message);
           this.allIssues = [];
-          this.updateDataSource([], 0);
+          this.dataSource.data = [];
+          this.pageEvent.length = 0;
+          this.pageEvent.pageIndex = 0;
           return;
         }
 
         const issues = response.data.map((item: any) => this.mapApiDataToIssue(item));
-        const total = response.pagination?.total || response.count || 0;
-
         this.allIssues = issues;
-        this.updateDataSource(issues, total);
+        this.dataSource.data = issues;
+        this.pageEvent.length = issues.length;
+        this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
+
+        // เชื่อมต่อ sort หลังจากโหลดข้อมูล
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
       },
       error: (error) => console.error('Subscription error:', error),
     });
@@ -228,10 +286,7 @@ export class IssueCommonComponent implements OnInit {
     };
   }
 
-  private updateDataSource(issues: Issue[], total: number) {
-    this.dataSource.data = issues;
-    this.pageEvent.length = total;
-  }
+
 
   onSearch(): void {
     this.pageEvent.pageIndex = 0;
@@ -265,7 +320,6 @@ export class IssueCommonComponent implements OnInit {
 
   handlePageEvent(event: PageEvent) {
     this.pageEvent = event;
-    this.loadIssues();
   }
 
   // Utility methods for labels and badges
@@ -293,23 +347,26 @@ export class IssueCommonComponent implements OnInit {
   // Filter methods
   applyFilter(event: Event): void {
     this.searchTerm = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
+    this.pageEvent.length = this.dataSource.filteredData.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   filterByStatus(event: { value: IssueStatus }): void {
     this.selectedStatus = event.value;
     this.pageEvent.pageIndex = 0;
-    this.loadIssues();
+    this.onSearch();
   }
 
   filterByType(event: { value: string }): void {
     this.selectedType = event.value;
     this.pageEvent.pageIndex = 0;
-    this.loadIssues();
+    this.onSearch();
   }
 
   filterByPriority(event: { value: string }): void {
     this.selectedPriority = event.value;
     this.pageEvent.pageIndex = 0;
-    this.loadIssues();
+    this.onSearch();
   }
 }

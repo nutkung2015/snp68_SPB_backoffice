@@ -106,6 +106,36 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+  get paginatedData(): Unit[] {
+    const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+    const endIndex = startIndex + this.pageEvent.pageSize;
+    return this.sortedData.slice(startIndex, endIndex);
+  }
+
+  // Getter สำหรับข้อมูลที่ sort แล้ว
+  get sortedData(): Unit[] {
+    const data = this.dataSource.filteredData.slice();
+    if (!this.sort || !this.sort.active || this.sort.direction === '') {
+      return data;
+    }
+    return data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'unitNumber': return this.compare(a.unit_number, b.unit_number, isAsc);
+        case 'zone': return this.compare(a.zone || '', b.zone || '', isAsc);
+        case 'building': return this.compare(a.building || '', b.building || '', isAsc);
+        case 'area': return this.compare(a.area_sqm || 0, b.area_sqm || 0, isAsc);
+        case 'status': return this.compare(a.status || '', b.status || '', isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+  compare(a: string | number, b: string | number, isAsc: boolean): number {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
   constructor(
     private restService: RestService,
     private dialog: MatDialog,
@@ -123,8 +153,16 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // เชื่อมต่อ sort หลังจาก view init
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+        // Subscribe to sort changes to reset to first page
+        this.sort.sortChange.subscribe(() => {
+          this.pageEvent.pageIndex = 0;
+        });
+      }
+    });
 
     // Custom filtering
     this.dataSource.filterPredicate = (data: Unit, filter: string) => {
@@ -158,14 +196,13 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
         next: (units) => {
           this.allUnits = units;
           this.dataSource.data = units;
+          this.pageEvent.length = units.length;
 
           // Extract unique zones and buildings for filters
           this.zones = Array.from(new Set(units.map(u => u.zone).filter(Boolean).sort()));
           this.buildings = Array.from(new Set(units.map(u => u.building).filter(Boolean).sort()));
 
-          if (this.paginator) {
-            this.dataSource.paginator = this.paginator;
-          }
+          // เชื่อมต่อ sort หลังจากโหลดข้อมูล
           if (this.sort) {
             this.dataSource.sort = this.sort;
           }
@@ -200,9 +237,8 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
     }
 
     this.dataSource.data = filteredData;
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.pageEvent.length = filteredData.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   onReset(): void {
@@ -211,9 +247,8 @@ export class VilageUnitManagementComponent implements OnInit, AfterViewInit {
     this.selectedBuilding = 'all';
     this.selectedStatus = 'all';
     this.dataSource.data = this.allUnits;
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.pageEvent.length = this.allUnits.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   viewDetails(unit: Unit): void {

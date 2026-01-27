@@ -88,6 +88,41 @@ export class VehicleManagementComponent implements OnInit {
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
 
+    // เก็บข้อมูลทั้งหมด
+    private allVehicles: Vehicle[] = [];
+
+    // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+    get paginatedData(): Vehicle[] {
+        const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+        const endIndex = startIndex + this.pageEvent.pageSize;
+        return this.sortedData.slice(startIndex, endIndex);
+    }
+
+    // Getter สำหรับข้อมูลที่ sort แล้ว
+    get sortedData(): Vehicle[] {
+        const data = this.dataSource.filteredData.slice();
+        if (!this.sort || !this.sort.active || this.sort.direction === '') {
+            return data;
+        }
+        return data.sort((a, b) => {
+            const isAsc = this.sort.direction === 'asc';
+            switch (this.sort.active) {
+                case 'plate_number': return this.compare(a.plate_number || '', b.plate_number || '', isAsc);
+                case 'brand': return this.compare(a.brand || '', b.brand || '', isAsc);
+                case 'color': return this.compare(a.color || '', b.color || '', isAsc);
+                case 'unit_number': return this.compare(a.unit_number || '', b.unit_number || '', isAsc);
+                case 'zone_name': return this.compare(a.zone_name || '', b.zone_name || '', isAsc);
+                case 'is_active': return this.compare(a.is_active ? 1 : 0, b.is_active ? 1 : 0, isAsc);
+                case 'created_at': return this.compare(a.created_at || '', b.created_at || '', isAsc);
+                default: return 0;
+            }
+        });
+    }
+
+    compare(a: string | number, b: string | number, isAsc: boolean): number {
+        return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    }
+
     // Loading & Project
     isLoading = false;
     projectId: string = '';
@@ -122,6 +157,19 @@ export class VehicleManagementComponent implements OnInit {
         this.loadZones();
         this.loadStats();
         this.loadVehicles();
+    }
+
+    ngAfterViewInit(): void {
+        // เชื่อมต่อ sort หลังจาก view init
+        setTimeout(() => {
+            if (this.sort) {
+                this.dataSource.sort = this.sort;
+                // Subscribe to sort changes to reset to first page
+                this.sort.sortChange.subscribe(() => {
+                    this.pageEvent.pageIndex = 0;
+                });
+            }
+        });
     }
 
     loadProjectId(): void {
@@ -170,10 +218,7 @@ export class VehicleManagementComponent implements OnInit {
 
         const params: GetVehiclesParams = {
             project_id: this.projectId,
-            page: this.pageEvent.pageIndex + 1,
-            limit: this.pageEvent.pageSize,
-            sort_by: this.sortBy,
-            sort_order: this.sortOrder,
+            // โหลดข้อมูลทั้งหมด (ไม่ส่ง page และ limit)
         };
 
         if (this.searchQuery.trim()) {
@@ -191,8 +236,16 @@ export class VehicleManagementComponent implements OnInit {
         this.restService.getVehicles(params).subscribe({
             next: (res) => {
                 if (res.status === 'success') {
-                    this.dataSource.data = res.data || [];
-                    this.pageEvent.length = res.pagination?.total_items || 0;
+                    const vehicles = res.data || [];
+                    this.allVehicles = vehicles;
+                    this.dataSource.data = vehicles;
+                    this.pageEvent.length = vehicles.length;
+                    this.pageEvent.pageIndex = 0;
+
+                    // เชื่อมต่อ sort หลังจากโหลดข้อมูล
+                    if (this.sort) {
+                        this.dataSource.sort = this.sort;
+                    }
                 }
                 this.isLoading = false;
             },
@@ -223,9 +276,7 @@ export class VehicleManagementComponent implements OnInit {
     }
 
     handlePageEvent(event: PageEvent): void {
-        this.pageEvent.pageIndex = event.pageIndex;
-        this.pageEvent.pageSize = event.pageSize;
-        this.loadVehicles();
+        this.pageEvent = event;
     }
 
     // Selection

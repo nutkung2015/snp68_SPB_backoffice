@@ -150,6 +150,37 @@ export class AnnouncementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+  get paginatedData(): Announcement[] {
+    const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+    const endIndex = startIndex + this.pageEvent.pageSize;
+    return this.sortedData.slice(startIndex, endIndex);
+  }
+
+  // Getter สำหรับข้อมูลที่ sort แล้ว
+  get sortedData(): Announcement[] {
+    const data = this.dataSource.filteredData.slice();
+    if (!this.sort || !this.sort.active || this.sort.direction === '') {
+      return data;
+    }
+    return data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'title': return this.compare(a.title, b.title, isAsc);
+        case 'content': return this.compare(a.content, b.content, isAsc);
+        case 'type': return this.compare(a.type, b.type, isAsc);
+        case 'recipient': return this.compare(a.recipient, b.recipient, isAsc);
+        case 'postDate': return this.compare(a.postDate?.getTime() || 0, b.postDate?.getTime() || 0, isAsc);
+        case 'status': return this.compare(a.status, b.status, isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+  compare(a: string | number, b: string | number, isAsc: boolean): number {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
   // Mockup data
   // mockAnnouncements: Announcement[] = [
   //   {
@@ -218,12 +249,26 @@ export class AnnouncementComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // เชื่อมต่อ sort หลังจาก view init
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+        // Subscribe to sort changes to reset to first page
+        this.sort.sortChange.subscribe(() => {
+          this.pageEvent.pageIndex = 0;
+        });
+      }
+    });
 
     // กำหนด filter predicate สำหรับการค้นหา
     this.dataSource.filterPredicate = (data: Announcement, filter: string) => {
-      return data.title.toLowerCase().includes(filter.toLowerCase());
+      const searchLower = filter.toLowerCase();
+      return (
+        (data.title || '').toLowerCase().includes(searchLower) ||
+        (data.content || '').toLowerCase().includes(searchLower) ||
+        (data.type || '').toLowerCase().includes(searchLower) ||
+        (data.recipient || '').toLowerCase().includes(searchLower)
+      );
     };
   }
 
@@ -285,12 +330,14 @@ export class AnnouncementComponent implements OnInit {
       .subscribe({
         next: (announcements) => {
           this.allAnnouncements = announcements;
-          this.pageEvent = {
-            pageIndex: 0,
-            pageSize: 10,
-            length: announcements.length
-          };
-          this.dataSource.data = this.allAnnouncements.slice(0, 10); // Show first page
+          this.dataSource.data = announcements;
+          this.pageEvent.length = announcements.length;
+          this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
+
+          // เชื่อมต่อ sort หลังจากโหลดข้อมูล
+          if (this.sort) {
+            this.dataSource.sort = this.sort;
+          }
         },
         error: (error) => console.error('Subscription error:', error),
       });
@@ -355,12 +402,14 @@ export class AnnouncementComponent implements OnInit {
       )
       .subscribe((announcements) => {
         this.allAnnouncements = announcements;
-        this.pageEvent = {
-          pageIndex: 0,
-          pageSize: 10,
-          length: announcements.length
-        };
-        this.dataSource.data = this.allAnnouncements.slice(0, 10);
+        this.dataSource.data = announcements;
+        this.pageEvent.length = announcements.length;
+        this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
+
+        // เชื่อมต่อ sort หลังจากโหลดข้อมูล
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
       });
   }
 
@@ -421,9 +470,5 @@ export class AnnouncementComponent implements OnInit {
 
   handlePageEvent(event: PageEvent) {
     this.pageEvent = event;
-    this.dataSource.data = this.allAnnouncements.slice(
-      event.pageIndex * event.pageSize,
-      (event.pageIndex + 1) * event.pageSize
-    );
   }
 }

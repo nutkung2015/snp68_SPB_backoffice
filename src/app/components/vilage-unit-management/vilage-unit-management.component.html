@@ -157,7 +157,7 @@
             <ng-container *ngIf="!(isLoading$ | async)">
                 <ng-container *ngIf="dataSource.data.length > 0; else noData">
                     <div class="div-table">
-                        <table mat-table [dataSource]="dataSource" matSort>
+                        <table mat-table [dataSource]="paginatedData" matSort>
 
                             <!-- Checkbox Column -->
                             <ng-container matColumnDef="select">

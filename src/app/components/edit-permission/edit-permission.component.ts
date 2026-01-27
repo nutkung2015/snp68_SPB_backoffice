@@ -123,6 +123,46 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Page event สำหรับ pagination
+  pageEvent = {
+    length: 0,
+    pageSize: 10,
+    pageIndex: 0
+  };
+
+  // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
+  get paginatedData(): JuristicMember[] {
+    const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
+    const endIndex = startIndex + this.pageEvent.pageSize;
+    return this.sortedData.slice(startIndex, endIndex);
+  }
+
+  // Getter สำหรับข้อมูลที่ sort แล้ว
+  get sortedData(): JuristicMember[] {
+    const data = this.dataSource.filteredData.slice();
+    if (!this.sort || !this.sort.active || this.sort.direction === '') {
+      return data;
+    }
+    return data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'fullName': return this.compare(a.full_name || '', b.full_name || '', isAsc);
+        case 'phone': return this.compare(a.phone || '', b.phone || '', isAsc);
+        case 'role': return this.compare(a.role_in_project || '', b.role_in_project || '', isAsc);
+        case 'status': return this.compare(a.status || '', b.status || '', isAsc);
+        default: return 0;
+      }
+    });
+  }
+
+  compare(a: string | number, b: string | number, isAsc: boolean): number {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
+  handlePageEvent(event: any): void {
+    this.pageEvent = event;
+  }
+
   constructor(
     private restService: RestService,
     private authService: AuthService,
@@ -139,8 +179,16 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // เชื่อมต่อ sort หลังจาก view init
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+        // Subscribe to sort changes to reset to first page
+        this.sort.sortChange.subscribe(() => {
+          this.pageEvent.pageIndex = 0;
+        });
+      }
+    });
 
     // Custom filtering
     this.dataSource.filterPredicate = (data: JuristicMember, filter: string) => {
@@ -202,10 +250,9 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
 
           console.log('Mapped members:', this.allMembers);
           this.dataSource.data = this.allMembers;
+          this.pageEvent.length = this.allMembers.length;
 
-          if (this.paginator) {
-            this.dataSource.paginator = this.paginator;
-          }
+          // เชื่อมต่อ sort หลังจากโหลดข้อมูล
           if (this.sort) {
             this.dataSource.sort = this.sort;
           }
@@ -275,9 +322,8 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
     }
 
     this.dataSource.data = filteredData;
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.pageEvent.length = filteredData.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   onReset(): void {
@@ -285,9 +331,8 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
     this.selectedRole = 'all';
     this.selectedStatus = 'all';
     this.dataSource.data = this.allMembers;
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.pageEvent.length = this.allMembers.length;
+    this.pageEvent.pageIndex = 0;
   }
 
   // ============ Permission Display Functions (COMMENTED - FOR FUTURE USE) ============

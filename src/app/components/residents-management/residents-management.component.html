@@ -80,12 +80,12 @@
 
       <ng-template #tableContent>
         <div fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="10px" class="div-table">
-          <table mat-table [dataSource]="dataSource" matSort>
+          <table mat-table [dataSource]="paginatedData" matSort>
             <!-- Sequence Column -->
             <ng-container matColumnDef="sequence">
-              <th mat-header-cell *matHeaderCellDef>ลำดับ</th>
+              <th mat-header-cell *matHeaderCellDef>#</th>
               <td mat-cell *matCellDef="let element; let i = index">
-                {{ i + 1 }}
+                {{ pageEvent.pageIndex * pageEvent.pageSize + i + 1 }}
               </td>
             </ng-container>
 
