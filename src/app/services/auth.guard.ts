@@ -32,8 +32,9 @@ export class AuthGuard implements CanActivate {
 
       // Handle juristic users without project membership
       if (userRole === 'juristic' && !this.authService.hasProjectMembership()) {
-        if (state.url.startsWith('/no-project')) {
-          console.log('AuthGuard: Juristic user without project membership accessing no-project path. Access Granted.');
+        // Allow access to no-project and register paths
+        if (state.url.startsWith('/no-project') || state.url.startsWith('/register')) {
+          console.log('AuthGuard: Juristic user without project membership accessing allowed path. Access Granted.');
           return true;
         } else {
           console.log('AuthGuard: Juristic user without project membership. Redirecting to no-project page.');
