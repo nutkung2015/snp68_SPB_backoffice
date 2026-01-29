@@ -27,10 +27,6 @@ export const routes: Routes = [
         component: LoginComponent,
       },
       {
-        path: 'register',
-        component: RegisterJuristicComponent,
-      },
-      {
         path: 'internal-sever',
         component: InternalSeverComponent,
       },
@@ -54,6 +50,10 @@ export const routes: Routes = [
         path: '',
         redirectTo: '/dashboard',
         pathMatch: 'full',
+      },
+      {
+        path: 'register',
+        component: RegisterJuristicComponent,
       },
       {
         path: 'announcement',
