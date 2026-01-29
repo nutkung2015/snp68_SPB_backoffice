@@ -424,7 +424,7 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((result: 'create' | 'invite' | null) => {
       if (result === 'create') {
         // Navigate to register-juristic page
-        this.router.navigate(['/register-juristic']);
+        this.router.navigate(['/register']);
       } else if (result === 'invite') {
         // Navigate to invite-management/create page
         this.router.navigate(['/invite-management/create']);
