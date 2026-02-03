@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,6 +33,7 @@ interface AnnouncementDetail {
   posted_by: string;
   audience: string;
   status: string;
+  expires_at?: string; // วันหมดอายุ
   created_at: string;
   updated_at: string;
 }
@@ -50,7 +53,9 @@ interface AnnouncementDetail {
     FlexLayoutModule,
     FormsModule,
     ReactiveFormsModule,
-    LoadingDataComponent
+    LoadingDataComponent,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './edit-announcement.component.html',
   styleUrls: ['./edit-announcement.component.scss']
@@ -65,6 +70,9 @@ export class EditAnnouncementComponent implements OnInit {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   uploadProgress = 0;
+
+  // กำหนดวันต่ำสุดของ expires_at (วันนี้)
+  minExpiryDate: Date = new Date();
 
   audienceOptions = [
     { value: 'all', label: 'ทั้งหมด' },
@@ -90,7 +98,8 @@ export class EditAnnouncementComponent implements OnInit {
       title: ['', Validators.required],
       content: ['', Validators.required],
       audience: ['', Validators.required],
-      status: ['', Validators.required]
+      status: ['', Validators.required],
+      expiresAt: [null] // วันหมดอายุ (optional)
     });
   }
 
@@ -125,6 +134,7 @@ export class EditAnnouncementComponent implements OnInit {
             posted_by: data.posted_by,
             audience: data.audience,
             status: data.status,
+            expires_at: data.expires_at || '',
             created_at: data.created_at || '',
             updated_at: data.updated_at || ''
           };
@@ -138,7 +148,8 @@ export class EditAnnouncementComponent implements OnInit {
             title: this.announcement.title,
             content: this.announcement.content,
             audience: this.announcement.audience,
-            status: this.announcement.status
+            status: this.announcement.status,
+            expiresAt: this.announcement.expires_at ? new Date(this.announcement.expires_at) : null
           });
         },
         error: (error) => {
@@ -177,6 +188,16 @@ export class EditAnnouncementComponent implements OnInit {
         audience: this.editForm.get('audience')?.value,
         status: this.editForm.get('status')?.value
       };
+
+      // เพิ่ม expires_at ถ้ามีการกำหนดวันหมดอายุ
+      const expiresAtValue = this.editForm.get('expiresAt')?.value;
+      if (expiresAtValue) {
+        const expiryDate = new Date(expiresAtValue);
+        expiryDate.setHours(23, 59, 59, 999);
+        updatePayload.expires_at = expiryDate.toISOString();
+      } else {
+        updatePayload.expires_at = null; // ล้างค่าถ้าไม่ได้เลือก
+      }
 
       // Note: file upload flow should call dedicated upload API first, get URL(s), then include in payload
       // For now, we keep logic simple and only update text fields via RestService

@@ -196,7 +196,7 @@ export class DashboardComponent implements OnInit {
       'pending': 'รอดำเนินการ',
       'in_progress': 'กำลังดำเนินการ',
       'completed': 'เสร็จสิ้น',
-      'cancelled': 'ยกเลิก',
+      'rejected': 'ไม่ผ่าน',
       'unknown': 'ไม่ระบุ'
     };
     return map[status] || status;

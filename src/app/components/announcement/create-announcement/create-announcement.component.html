@@ -128,6 +128,18 @@
                 </mat-form-field>
               </div>
 
+              <!-- วันหมดอายุ (Optional) -->
+              <div fxLayout="column" fxLayoutGap="10px">
+                <span class="field-label">วันหมดอายุ (optional)</span>
+                <mat-form-field appearance="outline">
+                  <input matInput [matDatepicker]="expiryPicker" formControlName="expiresAt"
+                    placeholder="เลือกวันหมดอายุ" [min]="minExpiryDate">
+                  <mat-datepicker-toggle matIconSuffix [for]="expiryPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #expiryPicker></mat-datepicker>
+                  <mat-hint>ประกาศจะหมดอายุเมื่อถึงวันที่กำหนด (ไม่บังคับ)</mat-hint>
+                </mat-form-field>
+              </div>
+
               <!-- ส่วนกำหนดเวลาเผยแพร่ -->
               <div class="publish-settings">
                 <div class="section-label">

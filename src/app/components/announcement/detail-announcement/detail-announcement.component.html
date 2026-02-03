@@ -2,22 +2,12 @@
 
 <div class="detail-announcement-container">
   <!-- Header Section -->
-  <div
-    class="header"
-    fxLayout="column"
-    fxLayoutAlign="start start"
-    fxLayoutGap="8px"
-  >
+  <div class="header" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="8px">
     <div class="breadcrumb">
       <span class="sub-header" style="color: #9fa9b6">ประกาศและเอกสาร / </span>
       <span class="sub-header" style="color: #171a1e">รายละเอียดประกาศ</span>
     </div>
-    <div
-      class="title-row"
-      fxLayout="row"
-      fxLayoutAlign="start center"
-      fxLayoutGap="16px"
-    >
+    <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
       <mat-icon (click)="onBack()">arrow_back</mat-icon>
       <span class="sub-body">รายละเอียดประกาศ</span>
     </div>
@@ -76,6 +66,12 @@
               {{ getStatusLabel(announcement.status) }}
             </div>
           </div>
+          <div class="half-width" *ngIf="announcement.expires_at">
+            <mat-label class="field-label">วันหมดอายุ</mat-label>
+            <div class="field-value">
+              {{ announcement.expires_at | date : "medium" }}
+            </div>
+          </div>
         </div>
       </div>
       <!-- <div class="full-width"> -->
@@ -89,12 +85,7 @@
           <button class="btn-cancel" mat-stroked-button (click)="onBack()">
             ยกเลิก
           </button>
-          <button
-            class="btn-edit"
-            mat-flat-button
-            color="primary"
-            (click)="onEdit()"
-          >
+          <button class="btn-edit" mat-flat-button color="primary" (click)="onEdit()">
             แก้ไข
           </button>
         </div>

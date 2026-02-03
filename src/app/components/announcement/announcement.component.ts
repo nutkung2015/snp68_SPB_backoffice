@@ -33,6 +33,7 @@ interface Announcement {
   type: string; // เพิ่ม type field
   recipient: string;
   postDate: Date | null;
+  expiresAt: Date | null; // วันหมดอายุ
   hasAttachment: boolean;
   attachmentUrls?: string[]; // เพิ่ม field นี้
   attachmentName?: string;
@@ -60,6 +61,7 @@ interface AnnouncementAPI {
   posted_by: string;
   audience: string;
   status: string;
+  expires_at?: string; // วันหมดอายุ (optional)
   created_at: string;
   updated_at: string;
 }
@@ -304,6 +306,11 @@ export class AnnouncementComponent implements OnInit {
               ? new Date(item.created_at)
               : null;
 
+            // Parse expires_at if exists
+            const expiresAt = (item as any).expires_at && !isNaN(Date.parse((item as any).expires_at))
+              ? new Date((item as any).expires_at)
+              : null;
+
             return {
               id: item.id,
               title: item.title,
@@ -311,6 +318,7 @@ export class AnnouncementComponent implements OnInit {
               type: item.type, // เพิ่ม type field  
               recipient: this.getRecipientLabel(item.audience),
               postDate: createdAt,
+              expiresAt: expiresAt, // วันหมดอายุ
               hasAttachment: hasAttachment,
               attachmentUrls: attachmentUrls,
               createdBy: item.posted_by,
@@ -378,6 +386,11 @@ export class AnnouncementComponent implements OnInit {
               ? new Date(item.created_at)
               : null;
 
+            // Parse expires_at if exists
+            const expiresAt = (item as any).expires_at && !isNaN(Date.parse((item as any).expires_at))
+              ? new Date((item as any).expires_at)
+              : null;
+
             return {
               id: item.id,
               title: item.title,
@@ -385,6 +398,7 @@ export class AnnouncementComponent implements OnInit {
               type: item.type, // เพิ่ม type field
               recipient: this.getRecipientLabel(item.audience),
               postDate: createdAt,
+              expiresAt: expiresAt, // วันหมดอายุ
               hasAttachment: hasAttachment,
               attachmentUrls: attachmentUrls,
               createdBy: item.posted_by,

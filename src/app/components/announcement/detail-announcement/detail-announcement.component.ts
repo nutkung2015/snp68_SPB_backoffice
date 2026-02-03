@@ -28,6 +28,7 @@ interface AnnouncementDetail {
   posted_by: string;
   audience: string;
   status: string;
+  expires_at?: string; // วันหมดอายุ
   created_at: string;
   updated_at: string;
 }
@@ -95,6 +96,7 @@ export class DetailAnnouncementComponent implements OnInit {
             posted_by: data.posted_by,
             audience: data.audience,
             status: data.status,
+            expires_at: data.expires_at || '', // วันหมดอายุ
             created_at: data.created_at || '',
             updated_at: data.updated_at || ''
           };

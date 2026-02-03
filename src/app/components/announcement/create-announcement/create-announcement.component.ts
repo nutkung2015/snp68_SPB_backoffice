@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -38,6 +40,7 @@ interface Announcement {
   attachment_urls: string[];
   audience: string;
   status: string;
+  expires_at?: string; // วันหมดอายุ (optional)
 }
 
 @Component({
@@ -59,6 +62,8 @@ interface Announcement {
     // FontAwesomeModule,
     FlexLayoutModule, // เพิ่มตรงนี้
     MatProgressBarModule, // เพิ่มตรงนี้
+    MatDatepickerModule, // เพิ่ม Date Picker
+    MatNativeDateModule, // ต้องมีสำหรับ Datepicker
   ],
   templateUrl: './create-announcement.component.html',
   styleUrl: './create-announcement.component.scss',
@@ -72,6 +77,9 @@ export class CreateAnnouncementComponent {
 
   announcementForm: FormGroup;
   selectedFile: File | null = null;
+
+  // กำหนดวันต่ำสุดของ expires_at (วันนี้)
+  minExpiryDate: Date = new Date();
 
   // faArrowLeft = faArrowLeft;
   // faPlus = faPlus;
@@ -92,6 +100,7 @@ export class CreateAnnouncementComponent {
       type: ['maintenance', [Validators.required]],
       recipient: ['residents', [Validators.required]], // ตั้งค่าเริ่มต้น
       status: ['draft', [Validators.required]],
+      expiresAt: [null], // วันหมดอายุ (optional)
     });
   }
 
@@ -166,6 +175,15 @@ export class CreateAnnouncementComponent {
         formData.append('posted_by', userId);
         formData.append('audience', formValue.recipient);
         formData.append('status', formValue.status);
+
+        // เพิ่ม expires_at ถ้ามีการกำหนดวันหมดอายุ
+        if (formValue.expiresAt) {
+          // แปลงเป็น ISO 8601 format
+          const expiryDate = new Date(formValue.expiresAt);
+          expiryDate.setHours(23, 59, 59, 999); // ตั้งเวลาเป็นสิ้นวัน
+          formData.append('expires_at', expiryDate.toISOString());
+        }
+
         if (this.selectedFile) {
           formData.append('files', this.selectedFile, this.selectedFile.name);
         }

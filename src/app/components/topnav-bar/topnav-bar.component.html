@@ -19,22 +19,34 @@
 
       <div class="notification-dropdown" *ngIf="showNotifications">
         <div class="notification-header">
-          <h3>Notifications</h3>
-          <button class="mark-all-read" (click)="markAllAsRead()">
-            Mark all as read
+          <h3>การแจ้งเตือน</h3>
+          <button class="mark-all-read" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+            อ่านทั้งหมด
           </button>
         </div>
         <div class="notification-list">
-          <div *ngFor="let notification of notifications" class="notification-item" [class.unread]="notification.unread"
-            (click)="markAsRead(notification.id)">
-            <div class="notification-content">
-              <p class="notification-message">{{ notification.message }}</p>
-              <span class="notification-time">{{ notification.time }}</span>
+          <!-- Empty State -->
+          <div *ngIf="notifications.length === 0" class="notification-empty">
+            <span class="material-icons empty-icon">notifications_none</span>
+            <p>ไม่มีการแจ้งเตือน</p>
+          </div>
+
+          <!-- Notification Items -->
+          <div *ngFor="let notification of notifications" class="notification-item"
+            [class.unread]="!notification.is_read" (click)="onNotificationClick(notification)">
+            <div class="notification-icon" [style.background-color]="getNotificationColor(notification.type)">
+              <span class="material-icons">{{ getNotificationIcon(notification.type) }}</span>
             </div>
-            <div class="notification-dot" *ngIf="notification.unread"></div>
+            <div class="notification-content">
+              <p class="notification-title">{{ notification.title }}</p>
+              <p class="notification-message">{{ notification.body }}</p>
+              <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+            </div>
+            <div class="notification-dot" *ngIf="!notification.is_read"></div>
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- User Profile -->

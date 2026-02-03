@@ -89,6 +89,7 @@ export interface Announcement {
   attachment_urls: string[];
   audience: string;
   status: string;
+  expires_at?: string; // วันหมดอายุ (optional)
   created_at?: string;
   updated_at?: string;
 }
@@ -113,6 +114,7 @@ export interface CreateAnnouncementRequest {
   status: string;
   posted_by: string; // user id (foreign key)
   attachment_urls?: string[];
+  expires_at?: string; // วันหมดอายุ (optional) - format: ISO 8601
 }
 
 type IssueType = 'personal' | 'common';

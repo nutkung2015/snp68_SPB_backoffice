@@ -206,33 +206,61 @@ export class CustomThemeAppComponent implements OnInit {
     this.loadTheme();
   }
 
-  async loadTheme() {
+  loadTheme() {
     console.log('loadTheme เริ่มทำงาน');
-    this.loadSavedTheme();
+
+    // Load project memberships first to get project_id
     this.loadProjectMemberships();
-    console.log('Calling updatePreview...');
-    this.updatePreview();
-    console.log('updatePreview called successfully.');
+
+    // Then fetch customizations from API
+    if (this.theme.project_id) {
+      this.fetchProjectCustomizations(this.theme.project_id);
+    } else {
+      console.warn('No project_id found, using default theme');
+      this.updatePreview();
+    }
   }
 
-  private loadSavedTheme() {
-    // Favor getting customizations from AuthService/Session instead of manual localStorage
-    const user = this.authService.getCurrentUser();
-    const customizations = user?.projectCustomizations;
+  private fetchProjectCustomizations(projectId: string) {
+    console.log('Fetching project customizations for project_id:', projectId);
 
-    if (customizations) {
-      this.theme = {
-        project_id: customizations.project_id || this.theme.project_id,
-        primary_color: customizations.primary_color || this.theme.primary_color,
-        secondary_color: customizations.secondary_color || this.theme.secondary_color,
-        logo_url: customizations.logo_url || this.theme.logo_url,
-        favicon_url: customizations.favicon_url || this.theme.favicon_url,
-      };
-      this.isDefaultTheme = false;
-      this.hasExistingCustomization = true;
-    } else {
-      this.hasExistingCustomization = false;
-    }
+    this.restService.getProjectCustomization(projectId).subscribe({
+      next: (response: any) => {
+        console.log('API Response:', response);
+
+        // รองรับทั้ง 2 format:
+        // 1. { status: 'success', data: {...} }
+        // 2. { customization_id, project_id, primary_color, ... } (ข้อมูลโดยตรง)
+        const customizations = response.data || response;
+
+        // ตรวจสอบว่ามีข้อมูล customization หรือไม่
+        if (customizations && (customizations.primary_color || customizations.project_id)) {
+          this.theme = {
+            project_id: customizations.project_id || this.theme.project_id,
+            primary_color: customizations.primary_color || this.theme.primary_color,
+            secondary_color: customizations.secondary_color || this.theme.secondary_color,
+            logo_url: customizations.logo_url || this.theme.logo_url,
+            favicon_url: customizations.favicon_url || this.theme.favicon_url,
+          };
+
+          this.isDefaultTheme = false;
+          this.hasExistingCustomization = true;
+
+          console.log('Theme loaded from API:', this.theme);
+        } else {
+          console.log('No customizations found, using default theme');
+          this.hasExistingCustomization = false;
+        }
+
+        this.updatePreview();
+      },
+      error: (error) => {
+        console.error('Error fetching project customizations:', error);
+        console.log('Using default theme due to error');
+        this.hasExistingCustomization = false;
+        this.updatePreview();
+      }
+    });
   }
 
   private loadProjectMemberships() {
@@ -325,36 +353,11 @@ export class CustomThemeAppComponent implements OnInit {
       next: (response: any) => {
         console.log('Create API Response:', response);
 
-        // อัปเดต logo_url จาก response ที่ได้จาก Cloudinary
-        if (response.data && response.data.logo_url) {
-          this.theme.logo_url = response.data.logo_url;
-          this.updatePreview();
-        }
+        this.toast.success('สร้างธีมเรียบร้อยแล้ว');
 
-        // บันทึกข้อมูลลง localStorage ในคีย์ projectCustomizations
-        try {
-          const customizationData = {
-            customization_id: response.data?.id || response.customization_id || response.id,
-            project_id: this.theme.project_id,
-            primary_color: this.theme.primary_color,
-            secondary_color: this.theme.secondary_color,
-            accent_color: response.data?.accent_color || response.accent_color || null,
-            logo_url: response.data?.logo_url || this.theme.logo_url,
-            favicon_url: this.theme.favicon_url,
-            created_at: response.data?.created_at || response.created_at || new Date().toISOString(),
-            updated_at: response.data?.updated_at || response.updated_at || new Date().toISOString(),
-          };
-
-          localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));
-          this.isDefaultTheme = false;
-          this.hasExistingCustomization = true; // อัปเดตสถานะ
-          console.log('Saved to projectCustomizations:', customizationData);
-
-          this.toast.success('สร้างธีมเรียบร้อยแล้ว');
-        } catch (e) {
-          console.error('Error saving to localStorage:', e);
-          this.toast.warning('บันทึกไปยัง API สำเร็จ แต่เกิดข้อผิดพลาดในการบันทึกลง localStorage');
-        }
+        // Re-fetch จาก API เพื่อให้แน่ใจว่าข้อมูลตรงกัน
+        this.hasExistingCustomization = true;
+        this.fetchProjectCustomizations(projectId);
       },
       error: (error) => {
         console.error('Error creating theme:', error);
@@ -389,32 +392,10 @@ export class CustomThemeAppComponent implements OnInit {
       next: (response: any) => {
         console.log('Update API Response:', response);
 
-        // อัปเดต logo_url จาก response ที่ได้จาก Cloudinary (ถ้ามีการอัปโหลดใหม่)
-        if (response.data && response.data.logo_url) {
-          this.theme.logo_url = response.data.logo_url;
-          this.updatePreview();
-        }
+        this.toast.success('อัปเดตธีมเรียบร้อยแล้ว');
 
-        // อัปเดตข้อมูลใน localStorage
-        try {
-          const existingData = JSON.parse(localStorage.getItem('projectCustomizations') || '{}');
-          const customizationData = {
-            ...existingData,
-            primary_color: this.theme.primary_color,
-            secondary_color: this.theme.secondary_color,
-            logo_url: response.data?.logo_url || this.theme.logo_url,
-            favicon_url: this.theme.favicon_url,
-            updated_at: response.data?.updated_at || response.updated_at || new Date().toISOString(),
-          };
-
-          localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));
-          console.log('Updated projectCustomizations:', customizationData);
-
-          this.toast.success('อัปเดตธีมเรียบร้อยแล้ว');
-        } catch (e) {
-          console.error('Error updating localStorage:', e);
-          this.toast.warning('อัปเดตไปยัง API สำเร็จ แต่เกิดข้อผิดพลาดในการบันทึกลง localStorage');
-        }
+        // Re-fetch จาก API เพื่อให้แน่ใจว่าข้อมูลตรงกัน
+        this.fetchProjectCustomizations(projectId);
       },
       error: (error) => {
         console.error('Error updating theme:', error);
@@ -453,33 +434,12 @@ export class CustomThemeAppComponent implements OnInit {
           next: (response: any) => {
             console.log('Reset to default API Response:', response);
 
-            // อัปเดต theme ใน component
-            this.theme = {
-              project_id: projectId,
-              ...defaultTheme,
-            };
-
-            // อัปเดต localStorage ด้วยค่า default
-            try {
-              const existingData = JSON.parse(localStorage.getItem('projectCustomizations') || '{}');
-              const customizationData = {
-                ...existingData,
-                primary_color: defaultTheme.primary_color,
-                secondary_color: defaultTheme.secondary_color,
-                logo_url: response.data?.logo_url || defaultTheme.logo_url,
-                updated_at: new Date().toISOString(),
-              };
-              localStorage.setItem('projectCustomizations', JSON.stringify(customizationData));
-              console.log('Updated projectCustomizations with default:', customizationData);
-            } catch (e) {
-              console.error('Error updating localStorage:', e);
-            }
-
             this.isDefaultTheme = true;
             this.selectedThemeId = ''; // ล้าง theme ที่เลือก
-            this.updatePreview();
-
             this.toast.success('รีเซ็ตธีมเป็นค่าเริ่มต้นแล้ว');
+
+            // Re-fetch จาก API เพื่อให้แน่ใจว่าข้อมูลตรงกัน
+            this.fetchProjectCustomizations(projectId);
           },
           error: (error) => {
             console.error('Error resetting theme:', error);
