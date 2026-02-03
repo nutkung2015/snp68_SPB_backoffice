@@ -183,18 +183,24 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
       // โหลดข้อมูลทั้งหมด (ไม่ส่ง page และ limit)
     };
 
-    if (this.activeFilter !== 'all') {
-      params.filter = this.activeFilter;
-    }
-
     this.restService.getEntryLogs(params).subscribe({
       next: (res: any) => {
         if (res.status === 'success') {
           const logs = res.data || [];
           this.allEntryLogs = logs;
           this.dataSource.data = logs;
-          this.pageEvent.length = logs.length;
-          this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
+
+          // ตั้งค่า custom filter predicate
+          this.dataSource.filterPredicate = (data: EntryLog, filter: string) => {
+            if (filter === 'all') return true;
+            if (filter === 'inside') return data.status === 'inside';
+            if (filter === 'exited') return data.status === 'exited';
+            if (filter === 'pending') return data.estamp_status === 'pending' && data.status === 'inside';
+            return true;
+          };
+
+          // Apply filter
+          this.applyFilter();
 
           // เชื่อมต่อ sort หลังจากโหลดข้อมูล
           if (this.sort) {
@@ -210,11 +216,15 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
     });
   }
 
+  applyFilter(): void {
+    this.dataSource.filter = this.activeFilter;
+    this.pageEvent.length = this.dataSource.filteredData.length;
+    this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อ filter
+  }
+
   onFilterChange(filter: 'all' | 'inside' | 'exited' | 'pending'): void {
     this.activeFilter = filter;
-    this.pageEvent.pageIndex = 0;
-    this.isLoading = true;
-    this.loadEntryLogs();
+    this.applyFilter();
   }
 
   handlePageEvent(event: PageEvent): void {
