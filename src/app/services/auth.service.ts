@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
+import { Auth, signInWithPhoneNumber, RecaptchaVerifier, ConfirmationResult } from '@angular/fire/auth';
 import { environment } from '../../environments/environment';
 
 export interface RegisterRequest {
@@ -47,7 +48,7 @@ export class AuthService {
   private sessionCheckedSubject = new BehaviorSubject<boolean>(false);
   public sessionChecked$ = this.sessionCheckedSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private auth: Auth) { }
 
   /**
    * Check if the user has a valid session (HttpOnly cookie)
@@ -201,4 +202,45 @@ export class AuthService {
 
   // --- Legacy Methods to be removed or mapped ---
   // getToken/setToken/removeToken are removed as we don't handle tokens client-side anymore.
+
+  // --- Firebase Phone Auth & Password Reset ---
+
+  checkPhoneExists(phone: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/check-phone`, { phone });
+  }
+
+  // sendOTP will be called from the component where RecaptchaVerifier is initialized
+  async sendOTP(phone: string, appVerifier: any): Promise<any> {
+    try {
+      const confirmationResult = await signInWithPhoneNumber(this.auth, phone, appVerifier);
+      return confirmationResult;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // verifyOTP takes the confirmationResult from sendOTP and the user's code
+  async verifyOTP(confirmationResult: any, code: string): Promise<any> {
+    try {
+      const result = await confirmationResult.confirm(code);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getFirebaseToken(user: any): Promise<string> {
+    if (user && user.getIdToken) {
+      return await user.getIdToken();
+    }
+    return '';
+  }
+
+  resetPassword(password: string, firebaseToken: string): Observable<any> {
+    // Send the new password and the firebase token to the backend
+    return this.http.post(`${this.apiUrl}/reset-password-firebase`, {
+      password,
+      token: firebaseToken
+    });
+  }
 }

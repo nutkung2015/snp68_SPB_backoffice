@@ -63,7 +63,7 @@
 
       <!-- Profile Dropdown Menu -->
       <div class="profile-dropdown" *ngIf="showProfileMenu">
-        <div class="dropdown-item">Profile</div>
+        <div class="dropdown-item" (click)="onProfileClick()">Profile</div>
         <div class="dropdown-item logout" (click)="logout()">Logout</div>
       </div>
     </div>

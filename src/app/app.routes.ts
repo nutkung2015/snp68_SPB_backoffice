@@ -30,6 +30,20 @@ export const routes: Routes = [
         path: 'internal-sever',
         component: InternalSeverComponent,
       },
+      {
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('./components/forgot-password/forgot-password.component').then(
+            (m) => m.ForgotPasswordComponent
+          ),
+      },
+      {
+        path: 'new-password',
+        loadComponent: () =>
+          import('./components/new-password/new-password.component').then(
+            (m) => m.NewPasswordComponent
+          ),
+      },
     ],
   },
 
@@ -321,6 +335,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/vehicle-management/vehicle-management.component').then(
             (m) => m.VehicleManagementComponent
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./profile/profile.component').then(
+            (m) => m.ProfileComponent
+          ),
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () =>
+          import('./components/reset-password/reset-password.component').then(
+            (m) => m.ResetPasswordComponent
           ),
       },
     ],

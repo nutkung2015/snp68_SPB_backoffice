@@ -105,6 +105,11 @@ export class TopnavBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  onProfileClick(): void {
+    this.router.navigate(['/profile']);
+    this.showProfileMenu = false;
+  }
+
   // Get icon for notification type
   getNotificationIcon(type: NotificationType): string {
     return this.notificationService.getNotificationIcon(type);

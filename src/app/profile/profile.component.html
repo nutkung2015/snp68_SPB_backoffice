@@ -1,0 +1,232 @@
+<div class="profile-page">
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <app-page-header iconSrc="assets/icons/residents.svg" title="โปรไฟล์ของฉัน" subtitle="My Profile"
+        iconColor="invert(100%)">
+    </app-page-header>
+
+    <!-- Profile Content -->
+    <div class="profile-content" fxLayout="column" fxLayoutGap="24px">
+
+        <!-- Main Profile Card -->
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="24px">
+
+            <!-- Profile Info Card -->
+            <mat-card class="profile-card" fxFlex="65" fxFlex.lt-md="100">
+                <div class="card-header">
+                    <div class="header-title">
+                        <mat-icon>person</mat-icon>
+                        <span>ข้อมูลส่วนตัว</span>
+                    </div>
+                    <button mat-stroked-button class="edit-btn" (click)="onEditProfile()">
+                        <mat-icon>edit</mat-icon>
+                        แก้ไข
+                    </button>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="profile-info-content" *ngIf="userProfile">
+                    <!-- Avatar Section -->
+                    <div class="avatar-section" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+                        <div class="avatar-wrapper">
+                            <div class="avatar">
+                                <mat-icon>person</mat-icon>
+                            </div>
+                            <button mat-mini-fab class="edit-avatar-btn" (click)="onEditAvatar()"
+                                matTooltip="เปลี่ยนรูปโปรไฟล์">
+                                <mat-icon>camera_alt</mat-icon>
+                            </button>
+                        </div>
+                        <div class="user-name-section">
+                            <h2 class="user-name">{{ userProfile.full_name || 'ไม่ระบุชื่อ' }}</h2>
+                            <span class="role-badge" [ngClass]="getRoleBadgeClass()">
+                                {{ getRoleDisplayName() }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Profile Details -->
+                    <div class="profile-details">
+                        <div class="detail-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                            <div class="detail-icon">
+                                <mat-icon>email</mat-icon>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">อีเมล</span>
+                                <span class="detail-value">{{ userProfile.email || '-' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                            <div class="detail-icon">
+                                <mat-icon>phone</mat-icon>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">เบอร์โทรศัพท์</span>
+                                <span class="detail-value">{{ userProfile.phone || '-' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                            <div class="detail-icon">
+                                <mat-icon>badge</mat-icon>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">ชื่อผู้ใช้งาน</span>
+                                <span class="detail-value">{{ userProfile.username || '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="loading-state" *ngIf="!userProfile && !isLoading" fxLayout="column"
+                    fxLayoutAlign="center center">
+                    <mat-icon>error_outline</mat-icon>
+                    <span>ไม่สามารถโหลดข้อมูลได้</span>
+                    <button mat-stroked-button (click)="loadProfile()">ลองใหม่</button>
+                </div>
+            </mat-card>
+
+            <!-- Actions Card -->
+            <mat-card class="actions-card" fxFlex="35" fxFlex.lt-md="100">
+                <div class="card-header">
+                    <div class="header-title">
+                        <mat-icon>settings</mat-icon>
+                        <span>ตั้งค่าบัญชี</span>
+                    </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="actions-content">
+                    <div class="action-item" (click)="onChangePassword()">
+                        <div class="action-left" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+                            <div class="action-icon password">
+                                <mat-icon>lock</mat-icon>
+                            </div>
+                            <div class="action-text">
+                                <span class="action-title">เปลี่ยนรหัสผ่าน</span>
+                                <span class="action-subtitle">อัปเดตรหัสผ่านของคุณ</span>
+                            </div>
+                        </div>
+                        <mat-icon class="action-arrow">chevron_right</mat-icon>
+                    </div>
+
+                    <div class="action-item" fxLayout="row" fxLayoutAlign="space-between center">
+                        <div class="action-left" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+                            <div class="action-icon security">
+                                <mat-icon>security</mat-icon>
+                            </div>
+                            <div class="action-text">
+                                <span class="action-title">การยืนยันตัวตนสองขั้นตอน</span>
+                                <span class="action-subtitle">เพิ่มความปลอดภัยให้บัญชี</span>
+                            </div>
+                        </div>
+                        <mat-slide-toggle [checked]="has2FA" (change)="onToggle2FA()" color="primary">
+                        </mat-slide-toggle>
+                    </div>
+
+                    <div class="action-item" (click)="onNotificationSettings()">
+                        <div class="action-left" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+                            <div class="action-icon notification">
+                                <mat-icon>notifications</mat-icon>
+                            </div>
+                            <div class="action-text">
+                                <span class="action-title">การแจ้งเตือน</span>
+                                <span class="action-subtitle">ตั้งค่าการแจ้งเตือน</span>
+                            </div>
+                        </div>
+                        <mat-icon class="action-arrow">chevron_right</mat-icon>
+                    </div>
+
+                    <mat-divider class="logout-divider"></mat-divider>
+
+                    <div class="action-item logout" (click)="onLogout()">
+                        <div class="action-left" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+                            <div class="action-icon logout-icon">
+                                <mat-icon>logout</mat-icon>
+                            </div>
+                            <div class="action-text">
+                                <span class="action-title logout-text">ออกจากระบบ</span>
+                                <span class="action-subtitle">ออกจากระบบบัญชีนี้</span>
+                            </div>
+                        </div>
+                        <mat-icon class="action-arrow">chevron_right</mat-icon>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+
+        <!-- Project Memberships Card -->
+        <mat-card class="memberships-card"
+            *ngIf="userProfile && userProfile.projectMemberships && userProfile.projectMemberships.length > 0">
+            <div class="card-header">
+                <div class="header-title">
+                    <mat-icon>domain</mat-icon>
+                    <span>โครงการที่เป็นสมาชิก</span>
+                </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="memberships-content">
+                <div class="membership-item" *ngFor="let membership of userProfile!.projectMemberships" fxLayout="row"
+                    fxLayoutAlign="space-between center">
+                    <div class="membership-left" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <div class="project-icon">
+                            <mat-icon>apartment</mat-icon>
+                        </div>
+                        <div class="project-info">
+                            <span class="project-name">{{ membership.project_name || membership.projectName ||
+                                'ไม่ระบุชื่อโครงการ' }}</span>
+                            <span class="project-role">{{ getProjectRoleName(membership.role) }}</span>
+                        </div>
+                    </div>
+                    <div class="membership-status active">
+                        <mat-icon>check_circle</mat-icon>
+                        <span>สมาชิก</span>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Edit Profile Dialog -->
+    <ng-template #editProfileDialog>
+        <h2 mat-dialog-title>แก้ไขโปรไฟล์</h2>
+        <mat-dialog-content>
+            <form [formGroup]="profileForm" fxLayout="column" fxLayoutGap="16px">
+                <mat-form-field appearance="outline">
+                    <mat-label>ชื่อ-นามสกุล</mat-label>
+                    <input matInput formControlName="full_name" placeholder="กรอกชื่อ-นามสกุล">
+                    <mat-error *ngIf="profileForm.get('full_name')?.hasError('required')">
+                        กรุณากรอกชื่อ-นามสกุล
+                    </mat-error>
+                    <mat-error *ngIf="profileForm.get('full_name')?.hasError('minlength')">
+                        ชื่อต้องมีอย่างน้อย 2 ตัวอักษร
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>เบอร์โทรศัพท์</mat-label>
+                    <input matInput formControlName="phone" placeholder="0xxxxxxxxx">
+                    <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">
+                        กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง (9-10 หลัก)
+                    </mat-error>
+                </mat-form-field>
+            </form>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-stroked-button mat-dialog-close>ยกเลิก</button>
+            <button mat-flat-button class="bt-primary" (click)="saveProfile()" [disabled]="profileForm.invalid">
+                บันทึก
+            </button>
+        </mat-dialog-actions>
+    </ng-template>
+</div>

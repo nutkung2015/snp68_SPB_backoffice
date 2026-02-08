@@ -1,13 +1,13 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyCASlOXSaGEnZJFsL3eXwX6PV11SH1DTbY',
-    authDomain: 'snp68spb.firebaseapp.com',
-    projectId: 'snp68spb',
-    storageBucket: 'snp68spb.firebasestorage.app',
-    messagingSenderId: '58142314237',
-    appId: '1:58142314237:web:3330e67fd38c87147db894',
-    measurementId: 'G-B12DN0C3YQ',
+    apiKey: 'AIzaSyAwN3VxOfTy6lF-p18uQOXwTwBtcuilJhw',
+    authDomain: 'livlink-a45f4.firebaseapp.com',
+    projectId: 'livlink-a45f4',
+    storageBucket: 'livlink-a45f4.firebasestorage.app',
+    messagingSenderId: '340838499264',
+    appId: '1:340838499264:web:f2f4661ce2e9eface43e25',
+    measurementId: 'G-PRHV2HW0PE',
   },
   apiUrl: 'http://localhost:5000', /* Uses API_URL */
   auth: {
