@@ -70,6 +70,9 @@ export class NewPasswordComponent implements OnInit {
         this.isLoading = true;
         const password = this.passwordForm.get('password')?.value;
 
+        console.log('Resetting password with token length:', this.firebaseToken?.length);
+        console.log('Token preview:', this.firebaseToken?.substring(0, 20) + '...');
+
         this.authService.resetPassword(password, this.firebaseToken).subscribe({
             next: (res) => {
                 this.snackBar.open('Password reset successfully! Please login.', 'Close', { duration: 3000 });

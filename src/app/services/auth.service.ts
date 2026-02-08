@@ -240,7 +240,9 @@ export class AuthService {
     // Send the new password and the firebase token to the backend
     return this.http.post(`${this.apiUrl}/reset-password-firebase`, {
       password,
-      token: firebaseToken
+      token: firebaseToken,
+      firebase_token: firebaseToken, // Try snake_case
+      id_token: firebaseToken       // Try common standard
     });
   }
 }
