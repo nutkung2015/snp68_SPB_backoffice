@@ -239,10 +239,11 @@ export class AuthService {
   resetPassword(password: string, firebaseToken: string): Observable<any> {
     // Send the new password and the firebase token to the backend
     return this.http.post(`${this.apiUrl}/reset-password-firebase`, {
-      password,
+      new_password: password, // Core fix: Backend expects 'new_password'
+      password: password,     // Keep just in case
       token: firebaseToken,
-      firebase_token: firebaseToken, // Try snake_case
-      id_token: firebaseToken       // Try common standard
+      firebase_token: firebaseToken,
+      id_token: firebaseToken
     });
   }
 }
