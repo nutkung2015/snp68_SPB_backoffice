@@ -238,12 +238,12 @@ export class AuthService {
 
   resetPassword(password: string, firebaseToken: string): Observable<any> {
     // Send the new password and the firebase token to the backend
+    // Backend validation is strict (no unknown fields allowed).
+    // Based on errors, it likely wants 'new_password' and 'firebase_token' (or just 'token').
+    // Let's try the most likely schema for this project based on "reset-password-firebase":
     return this.http.post(`${this.apiUrl}/reset-password-firebase`, {
-      new_password: password, // Core fix: Backend expects 'new_password'
-      password: password,     // Keep just in case
-      token: firebaseToken,
-      firebase_token: firebaseToken,
-      id_token: firebaseToken
+      new_password: password,
+      firebase_token: firebaseToken
     });
   }
 }
