@@ -134,9 +134,9 @@ export class ResetPasswordComponent implements OnInit, OnDestroy, AfterViewInit 
 
         this.isLoading = true;
 
-        this.authService.checkPhoneExists(phone).subscribe({
+        this.authService.verifyPhoneOwnership(phone).subscribe({
             next: async (res) => {
-                if (res.exists) {
+                if (res.isOwner) { // Success: Phone matches session
                     try {
                         // Ensure verifier exists
                         if (!this.recaptchaVerifier) await this.initRecaptcha();
@@ -167,13 +167,16 @@ export class ResetPasswordComponent implements OnInit, OnDestroy, AfterViewInit 
                         // Clearing it causes 'already rendered' issues.
                     }
                 } else {
-                    this.snackBar.open('ไม่พบเบอร์โทรศัพท์นี้ในระบบ', 'ปิด', { duration: 3000 });
+                    // Not Owner / Number doesn't match
+                    const msg = res.message || 'เบอร์โทรศัพท์ไม่ถูกต้องหรือไม่ตรงกับบัญชีผู้ใช้';
+                    this.snackBar.open(msg, 'ปิด', { duration: 3000 });
                     this.isLoading = false;
                 }
             },
             error: (err) => {
-                console.error('Error checking phone', err);
-                this.snackBar.open('เกิดข้อผิดพลาดในการตรวจสอบเบอร์โทร', 'ปิด', { duration: 3000 });
+                console.error('Error verifying phone ownership', err);
+                const msg = err.error?.message || 'เกิดข้อผิดพลาดในการตรวจสอบเบอร์โทร';
+                this.snackBar.open(msg, 'ปิด', { duration: 3000 });
                 this.isLoading = false;
             }
         });

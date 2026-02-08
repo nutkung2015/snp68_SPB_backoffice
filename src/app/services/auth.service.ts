@@ -209,6 +209,16 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/check-phone`, { phone });
   }
 
+  // Verify ownership for authenticated users
+  verifyPhoneOwnership(phone: string): Observable<any> {
+    const isOwnerObservable = this.http.post(
+      `${this.apiUrl}/verify-phone-ownership`,
+      { phone }, // Send phone to verify
+      { withCredentials: true } // Send cookies
+    );
+    return isOwnerObservable;
+  }
+
   // sendOTP will be called from the component where RecaptchaVerifier is initialized
   async sendOTP(phone: string, appVerifier: any): Promise<any> {
     try {
