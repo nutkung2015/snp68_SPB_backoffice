@@ -204,12 +204,15 @@
                 </ng-template>
 
                 <ng-template #noData>
-                    <div class="no-data-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
-                        <mat-icon class="no-data-icon">people_outline</mat-icon>
-                        <span class="no-data-text">ไม่พบข้อมูลนิติบุคคล</span>
-                        <button mat-flat-button color="primary" (click)="inviteMember()">
+                    <div class="no-data-container">
+                        <div class="no-data-icon">
+                            <mat-icon>people_outline</mat-icon>
+                        </div>
+                        <h3 class="no-data-title">ไม่พบข้อมูลนิติบุคคล</h3>
+                        <p class="no-data-hint">ยังไม่มีข้อมูลนิติบุคคลในระบบ</p>
+                        <button class="add-action-btn" (click)="inviteMember()">
                             <mat-icon>person_add</mat-icon>
-                            เชิญสมาชิกใหม่
+                            <span>เชิญสมาชิกใหม่</span>
                         </button>
                     </div>
                 </ng-template>

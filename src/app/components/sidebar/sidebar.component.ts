@@ -104,7 +104,7 @@ export class SidebarComponent implements OnInit {
     },
     {
       title: 'ข้อมูลแบบบ้าน',
-      icon: 'assets/icons/village.svg', // Using village icon temporarily or you can change to a new one
+      icon: 'assets/icons/hugeicons--floor-plan.svg', // Using village icon temporarily or you can change to a new one
       route: '/information-home-project',
       active: false
     },

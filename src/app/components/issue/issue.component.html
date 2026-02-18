@@ -245,13 +245,12 @@
 
       <!-- No Data Template -->
       <ng-template #noData>
-        <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
-          <mat-icon>info_outline</mat-icon>
-          <p>ไม่พบข้อมูลรายงานปัญหา</p>
-          <!-- <button mat-raised-button color="primary" (click)="onCreateNew()">
-            <mat-icon>add</mat-icon>
-            <span>รายงานปัญหาใหม่</span>
-          </button> -->
+        <div class="no-data-container">
+          <div class="no-data-icon">
+            <mat-icon>report_problem</mat-icon>
+          </div>
+          <h3 class="no-data-title">ไม่พบข้อมูลรายงานปัญหา</h3>
+          <p class="no-data-hint">ยังไม่มีรายงานปัญหาส่วนตัวในระบบ</p>
         </div>
       </ng-template>
     </mat-card>

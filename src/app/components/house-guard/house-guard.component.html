@@ -109,12 +109,15 @@
     </div>
 
     <!-- Empty State -->
-    <div class="empty-state" *ngIf="guardPosts.length === 0 && !isLoading">
-        <mat-icon>shield</mat-icon>
-        <h3>ยังไม่มีข้อมูลป้อมยาม</h3>
-        <p>เริ่มต้นเพิ่มป้อมยามเพื่อจัดการพื้นที่ดูแล</p>
-        <button mat-flat-button class="btn-add" (click)="openDialog()">
-            <mat-icon>add</mat-icon> เพิ่มป้อมยาม
+    <div class="no-data-container" *ngIf="guardPosts.length === 0 && !isLoading">
+        <div class="no-data-icon">
+            <mat-icon>shield</mat-icon>
+        </div>
+        <h3 class="no-data-title">ยังไม่มีข้อมูลป้อมยาม</h3>
+        <p class="no-data-hint">เริ่มต้นเพิ่มป้อมยามเพื่อจัดการพื้นที่ดูแล</p>
+        <button class="add-action-btn" (click)="openDialog()">
+            <mat-icon>add_circle</mat-icon>
+            <span>เพิ่มป้อมยาม</span>
         </button>
     </div>
 </div>

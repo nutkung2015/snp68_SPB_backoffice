@@ -1,4 +1,4 @@
-<app-page-header iconSrc="assets/icons/building.svg" title="จัดการข้อมูลแบบบ้าน"
+<app-page-header iconSrc="assets/icons/hugeicons--floor-plan.svg" title="จัดการข้อมูลแบบบ้าน"
     subtitle="จัดการไฟล์แปลนบ้านและรายละเอียดสำหรับแต่ละแบบบ้าน" iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
         <mat-button-toggle-group #group="matButtonToggleGroup" [value]="viewMode" (change)="setViewMode(group.value)">
@@ -54,10 +54,9 @@
 
                         <!-- Edit State Actions (Overlay or Replacement) -->
                         <div class="edit-actions" *ngIf="element.isEditing">
-                            <button mat-icon-button color="warn" class="delete-btn"
-                                *ngIf="element.plan_file_url && canDelete" (click)="deleteFile(element, 'plan_file')"
-                                matTooltip="ลบไฟล์">
-                                <mat-icon>delete</mat-icon>
+                            <button mat-mini-fab class="delete-btn" *ngIf="element.plan_file_url && canDelete"
+                                (click)="deleteFile(element, 'plan_file')" matTooltip="ลบไฟล์">
+                                <mat-icon>close</mat-icon>
                             </button>
 
                             <button mat-stroked-button class="upload-btn-mini" (click)="planInput.click()"
@@ -96,10 +95,9 @@
 
                         <!-- Edit State Actions -->
                         <div class="edit-actions" *ngIf="element.isEditing">
-                            <button mat-icon-button color="warn" class="delete-btn"
-                                *ngIf="element.detail_file_url && canDelete"
+                            <button mat-mini-fab class="delete-btn" *ngIf="element.detail_file_url && canDelete"
                                 (click)="deleteFile(element, 'detail_file')" matTooltip="ลบไฟล์">
-                                <mat-icon>delete</mat-icon>
+                                <mat-icon>close</mat-icon>
                             </button>
 
                             <button mat-stroked-button class="upload-btn-mini" (click)="detailInput.click()"
@@ -173,10 +171,10 @@
 
                         <!-- Edit State Actions -->
                         <div class="edit-actions" *ngIf="projectInfoData.isEditing">
-                            <button mat-icon-button color="warn" class="delete-btn"
+                            <button mat-mini-fab class="delete-btn"
                                 *ngIf="projectInfoData.project_detail_file_url && canDelete"
                                 (click)="deleteProjectFile('project_detail')" matTooltip="ลบไฟล์">
-                                <mat-icon>delete</mat-icon>
+                                <mat-icon>close</mat-icon>
                             </button>
 
                             <button mat-stroked-button class="upload-btn-mini" (click)="projectDetailInput.click()"
@@ -215,10 +213,9 @@
 
                         <!-- Edit State Actions -->
                         <div class="edit-actions" *ngIf="projectInfoData.isEditing">
-                            <button mat-icon-button color="warn" class="delete-btn"
-                                *ngIf="projectInfoData.rules_file_url && canDelete" (click)="deleteProjectFile('rules')"
-                                matTooltip="ลบไฟล์">
-                                <mat-icon>delete</mat-icon>
+                            <button mat-mini-fab class="delete-btn" *ngIf="projectInfoData.rules_file_url && canDelete"
+                                (click)="deleteProjectFile('rules')" matTooltip="ลบไฟล์">
+                                <mat-icon>close</mat-icon>
                             </button>
 
                             <button mat-stroked-button class="upload-btn-mini" (click)="rulesInput.click()"

@@ -11,6 +11,40 @@
   z-index: 1000;
 }
 
+::ng-deep {
+  .mat-mdc-select-trigger {
+    font-size: 14px;
+  }
+
+  // Force Line Seed Sans TH font for all Material components
+  .mat-mdc-table,
+  .mat-mdc-header-cell,
+  .mat-mdc-cell,
+  .mat-mdc-menu-item,
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-stroked-button,
+  .mat-mdc-flat-button,
+  // .mat-mdc-icon-button,
+  .mat-mdc-paginator,
+  .mat-mdc-form-field,
+  .mat-mdc-select,
+  .mat-mdc-option,
+  .mat-mdc-checkbox,
+  .mat-mdc-radio-button,
+  .mdc-button,
+  .mdc-list-item,
+  .mat-sort-header-content,
+  // span,
+  p,
+  div,
+  button,
+  input,
+  label {
+    font-family: 'Line Seed Sans TH', sans-serif !important;
+  }
+}
+
 .bt-primary {
   background-color: rgb(14, 167, 90) !important;
   color: white !important;

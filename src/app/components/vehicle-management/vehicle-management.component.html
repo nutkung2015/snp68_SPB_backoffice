@@ -248,13 +248,15 @@
 
             <!-- No Data Template -->
             <ng-template #noData>
-                <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
-                    <mat-icon>directions_car</mat-icon>
-                    <p>ไม่มีข้อมูลยานพาหนะ</p>
-                    <span class="empty-hint">ยังไม่มีข้อมูลยานพาหนะในระบบ</span>
-                    <button mat-raised-button color="primary" (click)="openAddDialog()">
-                        <mat-icon>add</mat-icon>
-                        เพิ่มยานพาหนะใหม่
+                <div class="no-data-container">
+                    <div class="no-data-icon">
+                        <mat-icon>directions_car</mat-icon>
+                    </div>
+                    <h3 class="no-data-title">ไม่มีข้อมูลยานพาหนะ</h3>
+                    <p class="no-data-hint">ยังไม่มีข้อมูลยานพาหนะในระบบ เริ่มต้นเพิ่มยานพาหนะใหม่เลย</p>
+                    <button class="add-vehicle-btn" (click)="openAddDialog()">
+                        <mat-icon>add_circle</mat-icon>
+                        <span>เพิ่มยานพาหนะใหม่</span>
                     </button>
                 </div>
             </ng-template>

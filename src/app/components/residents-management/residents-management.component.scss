@@ -17,6 +17,40 @@
   font-weight: bold !important;
 }
 
+::ng-deep {
+  .mat-mdc-select-trigger {
+    font-size: 14px;
+  }
+
+  // Force Line Seed Sans TH font for all Material components
+  .mat-mdc-table,
+  .mat-mdc-header-cell,
+  .mat-mdc-cell,
+  .mat-mdc-menu-item,
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-stroked-button,
+  .mat-mdc-flat-button,
+  // .mat-mdc-icon-button,
+  .mat-mdc-paginator,
+  .mat-mdc-form-field,
+  .mat-mdc-select,
+  .mat-mdc-option,
+  .mat-mdc-checkbox,
+  .mat-mdc-radio-button,
+  .mdc-button,
+  .mdc-list-item,
+  .mat-sort-header-content,
+  // span,
+  p,
+  div,
+  button,
+  input,
+  label {
+    font-family: 'Line Seed Sans TH', sans-serif !important;
+  }
+}
+
 // Status styles สำหรับผู้อยู่อาศัย
 .status-active {
   color: #10b981;
@@ -142,6 +176,7 @@
 
       input {
         font-size: 14px;
+
         &::placeholder {
           color: #64748b;
         }
@@ -195,6 +230,7 @@
   .div-table {
     background: white !important;
     border: none !important;
+
     .mat-mdc-table {
       .mat-column-status {
         min-width: 100px;

@@ -5,6 +5,7 @@
 .village-page {
     min-height: 100vh;
     background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    font-family: 'Line Seed Sans TH', sans-serif;
 }
 
 // Loading Overlay
@@ -344,14 +345,48 @@ $gray-500: #6c757d;
 
 // Refresh Button
 .refresh-btn {
-    border-radius: 10px !important;
+    background: rgba($primary, 0.08) !important;
+    color: $primary !important;
+    border-radius: 12px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid rgba($primary, 0.1) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
 
     mat-icon {
-        transition: transform 0.3s ease;
+        margin-right: 8px !important;
+        transition: transform 0.4s ease !important;
 
         &.spin {
-            animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite !important;
         }
+    }
+
+    &:hover:not(:disabled) {
+        background: $primary !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba($primary, 0.25) !important;
+        transform: translateY(-2px);
+
+        mat-icon:not(.spin) {
+            transform: rotate(180deg);
+        }
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0) scale(0.95);
+    }
+
+    &:disabled {
+        background: #F3F4F6 !important;
+        color: #9CA3AF !important;
+        border-color: #E5E7EB !important;
+        cursor: not-allowed;
     }
 }
 
@@ -662,6 +697,34 @@ $gray-500: #6c757d;
 ::ng-deep {
     .mat-mdc-select-trigger {
         font-size: 14px;
+    }
+
+    // Force Line Seed Sans TH font for all Material components
+    .mat-mdc-table,
+    .mat-mdc-header-cell,
+    .mat-mdc-cell,
+    .mat-mdc-menu-item,
+    .mat-mdc-button,
+    .mat-mdc-raised-button,
+    .mat-mdc-stroked-button,
+    .mat-mdc-flat-button,
+    // .mat-mdc-icon-button,
+    .mat-mdc-paginator,
+    .mat-mdc-form-field,
+    .mat-mdc-select,
+    .mat-mdc-option,
+    .mat-mdc-checkbox,
+    .mat-mdc-radio-button,
+    .mdc-button,
+    .mdc-list-item,
+    .mat-sort-header-content,
+    // span,
+    p,
+    div,
+    button,
+    input,
+    label {
+        font-family: 'Line Seed Sans TH', sans-serif !important;
     }
 }
 

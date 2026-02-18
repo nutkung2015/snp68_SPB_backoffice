@@ -106,7 +106,7 @@ export class ResidentsManagementComponent implements OnInit {
     'email',
     'moveInDate',
     'status',
-    'details',
+    // 'details',
   ];
   dataSource: MatTableDataSource<Resident>;
   searchTerm = '';

@@ -78,6 +78,8 @@ $gray-500: #6c757d;
         }
     }
 
+
+
     @media (max-width: 1200px) {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -169,10 +171,44 @@ $gray-500: #6c757d;
 }
 
 .refresh-btn {
+    color: $primary !important;
+    background: rgba($primary, 0.08) !important;
     border-radius: 10px !important;
+    width: 40px;
+    height: 40px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba($primary, 0.1) !important;
+
+    &:hover:not(:disabled) {
+        background: $primary !important;
+        color: $white !important;
+        box-shadow: 0 4px 12px rgba($primary, 0.25);
+        transform: translateY(-2px);
+
+        mat-icon:not(.spin) {
+            transform: rotate(180deg);
+        }
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0) scale(0.95);
+    }
+
+    &[disabled] {
+        background: #F3F4F6 !important;
+        color: #9CA3AF !important;
+        border-color: #E5E7EB !important;
+        cursor: not-allowed;
+    }
 
     mat-icon {
-        transition: transform 0.3s ease;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        transition: transform 0.4s ease;
 
         &.spin {
             animation: spin 1s linear infinite;
@@ -353,5 +389,40 @@ $gray-500: #6c757d;
         button {
             flex-shrink: 0;
         }
+    }
+}
+
+
+::ng-deep {
+    .mat-mdc-select-trigger {
+        font-size: 14px;
+    }
+
+    // Force Line Seed Sans TH font for all Material components
+    .mat-mdc-table,
+    .mat-mdc-header-cell,
+    .mat-mdc-cell,
+    .mat-mdc-menu-item,
+    .mat-mdc-button,
+    .mat-mdc-raised-button,
+    .mat-mdc-stroked-button,
+    .mat-mdc-flat-button,
+    // .mat-mdc-icon-button,
+    .mat-mdc-paginator,
+    .mat-mdc-form-field,
+    .mat-mdc-select,
+    .mat-mdc-option,
+    .mat-mdc-checkbox,
+    .mat-mdc-radio-button,
+    .mdc-button,
+    .mdc-list-item,
+    .mat-sort-header-content,
+    // span,
+    p,
+    div,
+    button,
+    input,
+    label {
+        font-family: 'Line Seed Sans TH', sans-serif !important;
     }
 }

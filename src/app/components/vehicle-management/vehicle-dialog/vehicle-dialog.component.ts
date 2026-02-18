@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { RestService, Vehicle, Unit } from '../../../services/rest.service';
@@ -32,6 +33,7 @@ export interface VehicleDialogData {
         MatButtonModule,
         MatIconModule,
         MatCheckboxModule,
+        MatSlideToggleModule,
         MatProgressSpinnerModule,
         MatAutocompleteModule,
     ],

@@ -147,9 +147,12 @@
       </ng-container>
 
       <ng-template #noData>
-        <div class="no-data" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="8px">
-          <mat-icon>email</mat-icon>
-          <span>ยังไม่มีคำเชิญในยูนิตนี้</span>
+        <div class="no-data-container">
+          <div class="no-data-icon">
+            <mat-icon>email</mat-icon>
+          </div>
+          <h3 class="no-data-title">ไม่มีคำเชิญ</h3>
+          <p class="no-data-hint">ยังไม่มีคำเชิญในยูนิตนี้</p>
         </div>
       </ng-template>
     </mat-card>
