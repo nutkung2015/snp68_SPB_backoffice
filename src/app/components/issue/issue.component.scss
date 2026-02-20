@@ -29,6 +29,10 @@
 
   }
 
+  .mat-option {
+    font-family: 'LINE Seed Sans TH', sans-serif !important;
+  }
+
   .search-filter-section {
     margin-bottom: 16px;
 
@@ -78,6 +82,14 @@
           font-size: 20px;
           width: 20px;
           height: 20px;
+        }
+
+        ::ng-deep .mat-select-value,
+        ::ng-deep .mat-mdc-select-value,
+        ::ng-deep .mat-mdc-select-value-text {
+          font-family: 'LINE Seed Sans TH', sans-serif !important;
+          font-size: 14px;
+          color: #333;
         }
       }
     }

@@ -11,15 +11,24 @@
   z-index: 1000;
 }
 
+// ::ng-deep .mat-flat-button {
+//   background-color: #2084fc !important;
+//   color: white !important;
+//   font-weight: bold !important;
+//   border-radius: 8px !important;
+// }
+
 .no-attachment {
   color: #666;
   font-style: italic;
 }
 
 .bt-primary {
-  background-color: rgb(14, 167, 90) !important;
+  background-color: #2084fc !important;
   color: white !important;
   font-weight: bold !important;
+  border-radius: 8px !important;
+  font-family: 'Line Seed Sans TH', sans-serif;
 }
 
 // Status styles
@@ -82,6 +91,8 @@
       color: #171a1e;
       font-weight: 500;
     }
+
+
 
     ::ng-deep {
       .filter-input {
@@ -266,6 +277,13 @@
 .mat-option.mat-active {
   background-color: #e9f3ff !important;
   font-weight: 600;
+}
+
+.reset-btn,
+.search-btn {
+  font-family: 'LINE Seed Sans TH', sans-serif;
+  font-weight: 400;
+  border-radius: 8px;
 }
 
 ::ng-deep mat-card {

@@ -20,23 +20,23 @@
     <!-- Search and Filter Section -->
     <div class="search-filter-section">
         <div class="search-container">
-            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+            <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="24px">
                 <!-- Search Section -->
-                <div fxFlex fxLayout="row" fxLayoutGap="10px">
-                    <div class="filter-input right" fxFlex="350px">
+                <div fxLayout="row" fxLayoutGap="10px">
+                    <div class="filter-input right" fxFlex="300px">
                         <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
                             <mat-icon class="secondary">search</mat-icon>
                             <input matInput type="text" (keyup)="applyFilter($event)" placeholder="ค้นหาปัญหา"
-                                style="border: none; width: 100%; height: 100%" />
+                                style="border: none; width: 100%; height: 100%; font-family: 'LINE Seed Sans TH', sans-serif;" />
                         </div>
                     </div>
 
                     <!-- Status Filter -->
-                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                    <div fxLayout="row" fxLayoutGap="10px" fxFlex="220px">
                         <div fxFlex="50px" fxLayoutAlign="end center">
                             <span>สถานะ</span>
                         </div>
-                        <div class="filter-input left" fxFlex style="height: 100%">
+                        <div class="filter-input left" fxFlex>
                             <mat-select [(ngModel)]="selectedStatus" (selectionChange)="filterByStatus($event)">
                                 <mat-option *ngFor="let status of statuses" [value]="status.value">
                                     {{ status.label }}
@@ -46,11 +46,11 @@
                     </div>
 
                     <!-- Type Filter -->
-                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                    <div fxLayout="row" fxLayoutGap="10px" fxFlex="220px">
                         <div fxFlex="50px" fxLayoutAlign="end center">
                             <span>ประเภท</span>
                         </div>
-                        <div class="filter-input left" fxFlex style="height: 100%">
+                        <div class="filter-input left" fxFlex>
                             <mat-select [(ngModel)]="selectedType" (selectionChange)="filterByType($event)">
                                 <mat-option *ngFor="let type of types" [value]="type.value">
                                     {{ type.label }}
@@ -60,11 +60,11 @@
                     </div>
 
                     <!-- Priority Filter -->
-                    <div fxLayout="row" fxLayoutGap="10px" style="min-width: 250px">
+                    <div fxLayout="row" fxLayoutGap="10px" fxFlex="220px">
                         <div fxFlex="50px" fxLayoutAlign="end center">
                             <span>ความสำคัญ</span>
                         </div>
-                        <div class="filter-input left" fxFlex style="height: 100%">
+                        <div class="filter-input left" fxFlex>
                             <mat-select [(ngModel)]="selectedPriority" (selectionChange)="filterByPriority($event)">
                                 <mat-option *ngFor="let priority of priorities" [value]="priority.value">
                                     {{ priority.label }}
