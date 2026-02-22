@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { RestService } from '../../services/rest.service';
 import { AuthService } from '../../services/auth.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
+import { CsvExportService, CsvColumn } from '../../services/csv-export.service';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
@@ -115,7 +116,8 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   constructor(
     private restService: RestService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private csvExportService: CsvExportService
   ) { }
 
   ngOnInit(): void {
@@ -271,6 +273,18 @@ export class VistorManagementComponent implements OnInit, AfterViewInit {
   viewAttachmentDriverImg(item: EntryLog): void {
     if (!item.image_driver_url) return;
     window.open(item.image_driver_url, '_blank');
+  }
+
+  exportToCSV(): void {
+    const columns: CsvColumn[] = [
+      { header: 'ทะเบียน', key: 'plate_number' },
+      { header: 'ชื่อผู้มาเยือน', key: 'visitor_name' },
+      { header: 'บ้านเลขที่', key: 'unit_number' },
+      { header: 'เวลาเข้า', key: 'check_in_time', transform: (val) => this.formatDateTime(val) },
+      { header: 'เวลาออก', key: 'check_out_time', transform: (val) => this.formatDateTime(val) },
+      { header: 'สถานะ', key: 'status', transform: (val, row) => this.getStatusText(row) }
+    ];
+    this.csvExportService.exportToCSV(this.dataSource.filteredData, columns, 'ผู้มาเยี่ยม');
   }
 
   refreshData(): void {

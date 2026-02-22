@@ -8,12 +8,12 @@
   <app-page-header iconSrc="assets/icons/problem.svg" title="จัดการปัญหาส่วนบุคคล" subtitle="Issue Management"
     iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-      <!-- <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
+      <button mat-stroked-button class="export-btn" (click)="exportToCSV()">
         <div style="display: flex; align-items: center; gap: 5px">
-          <mat-icon>add</mat-icon>
-          <span>รายงานปัญหาใหม่</span>
+          <mat-icon>file_download</mat-icon>
+          <span>Export CSV</span>
         </div>
-      </button> -->
+      </button>
     </div>
   </app-page-header>
 

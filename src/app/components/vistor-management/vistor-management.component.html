@@ -1,6 +1,12 @@
 <app-page-header iconSrc="assets/icons/bxs--car-garage.svg" title="จัดการผู้มาเยี่ยม" subtitle="Visitor Management"
     iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+        <button mat-stroked-button class="export-btn" (click)="exportToCSV()">
+            <div style="display: flex; align-items: center; gap: 5px">
+                <mat-icon>file_download</mat-icon>
+                <span>Export CSV</span>
+            </div>
+        </button>
     </div>
 </app-page-header>
 

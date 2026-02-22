@@ -21,6 +21,7 @@ import { Router, RouterModule } from '@angular/router';
 import { RestService } from '../../services/rest.service';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { AuthService } from '../../services/auth.service';
+import { CsvExportService, CsvColumn } from '../../services/csv-export.service';
 
 type IssueStatus = 'pending' | 'in_progress' | 'completed' | 'rejected' | 'all';
 
@@ -158,7 +159,8 @@ export class IssueCommonComponent implements OnInit {
   constructor(
     private rest: RestService,
     private router: Router,
-    private authService: AuthService // Inject AuthService
+    private authService: AuthService,
+    private csvExportService: CsvExportService
   ) {
     this.dataSource = new MatTableDataSource<Issue>([]);
   }
@@ -310,6 +312,20 @@ export class IssueCommonComponent implements OnInit {
   viewDetails(issue: Issue): void {
     // TODO: Navigate to issue detail page
     this.router.navigate(['/issue-common/detail', issue.id]);
+  }
+
+  exportToCSV(): void {
+    const columns: CsvColumn[] = [
+      { header: 'หัวข้อปัญหา', key: 'title' },
+      { header: 'ประเภท', key: 'type', transform: (val) => this.getTypeLabel(val) },
+      { header: 'ความสำคัญ', key: 'priority', transform: (val) => this.getPriorityLabel(val) },
+      { header: 'สถานะ', key: 'status', transform: (val) => this.getStatusLabel(val) },
+      { header: 'ผู้รายงาน', key: 'reportedBy' },
+      { header: 'เบอร์โทร', key: 'reportedTel' },
+      { header: 'ผู้รับผิดชอบ', key: 'assignedTo' },
+      { header: 'วันที่รายงาน', key: 'createdAt', transform: (val) => val ? new Date(val).toLocaleDateString('th-TH') : '-' }
+    ];
+    this.csvExportService.exportToCSV(this.dataSource.filteredData, columns, 'ปัญหาส่วนกลาง');
   }
 
   viewAttachment(issue: Issue): void {

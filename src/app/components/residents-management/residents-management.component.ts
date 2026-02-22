@@ -26,6 +26,7 @@ import { AuthService } from '../../services/auth.service';
 
 // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
+import { CsvExportService, CsvColumn } from '../../services/csv-export.service';
 
 type ResidentStatus = StatusType | 'all';
 type StatusType = 'active' | 'inactive' | 'pending';
@@ -162,7 +163,8 @@ export class ResidentsManagementComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private restService: RestService,
-    private authService: AuthService
+    private authService: AuthService,
+    private csvExportService: CsvExportService
   ) {
     this.dataSource = new MatTableDataSource<Resident>([]);
   }
@@ -291,6 +293,23 @@ export class ResidentsManagementComponent implements OnInit {
     if (this.searchTerm) {
       this.onSearch();
     }
+  }
+
+  exportToCSV(): void {
+    const statusLabel = (status: string): string => {
+      const map: Record<string, string> = { active: 'อยู่อาศัย', inactive: 'ย้ายออก', pending: 'รอดำเนินการ' };
+      return map[status] || status;
+    };
+    const columns: CsvColumn[] = [
+      { header: 'ชื่อ', key: 'firstName' },
+      { header: 'นามสกุล', key: 'lastName' },
+      { header: 'บ้านเลขที่', key: 'houseNumber' },
+      { header: 'เบอร์โทรศัพท์', key: 'phone' },
+      { header: 'อีเมล', key: 'email' },
+      { header: 'วันที่เข้าอยู่', key: 'moveInDate', transform: (val) => val ? new Date(val).toLocaleDateString('th-TH') : '-' },
+      { header: 'สถานะ', key: 'status', transform: (val) => statusLabel(val) }
+    ];
+    this.csvExportService.exportToCSV(this.dataSource.filteredData, columns, 'ผู้อยู่อาศัย');
   }
 
   onCreateNew(): void {
