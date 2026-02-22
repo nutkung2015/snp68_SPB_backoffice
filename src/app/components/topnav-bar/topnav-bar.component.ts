@@ -37,7 +37,7 @@ export class TopnavBarComponent implements OnInit, OnDestroy {
     const userSub = this.authService.currentUser$.subscribe(user => {
       if (user) {
         this.userName = user.full_name;
-        this.userRole = user.role || 'Guest';
+        this.userRole = user.role === 'juristic' ? 'นิติบุคคล' : (user.role || 'Guest');
       } else {
         this.userName = null;
         this.userRole = null;

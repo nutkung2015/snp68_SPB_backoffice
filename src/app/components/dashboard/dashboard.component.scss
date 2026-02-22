@@ -345,25 +345,29 @@ $radius-xl: 20px;
       align-items: center;
       gap: 12px;
       padding: 16px;
-      border: 1px solid $border-color;
+      border: 1px solid transparent;
       border-radius: $radius-md;
-      background: #07354E;
+      background: #2A405E;
       cursor: pointer;
-      transition: all 0.2s;
-      font-size: 14px;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      font-family: 'Prompt', 'Kanit', 'LINE Seed Sans TH', sans-serif;
       color: white;
       font-weight: 500;
+      box-shadow: 0 2px 8px rgba(42, 64, 94, 0.15);
 
       mat-icon {
-        color: $text-secondary;
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        transition: color 0.3s ease;
       }
 
       &:hover {
-        background: rgb(10, 32, 53);
-        border-color: rgb(10, 32, 53);
+        background: lighten(#2A405E, 5%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(42, 64, 94, 0.25);
 
         mat-icon {
           color: white;
@@ -371,7 +375,7 @@ $radius-xl: 20px;
       }
 
       &.primary {
-        background: #1a5a7a;
+        background: #2A405E;
         color: white !important;
         border: none;
 
@@ -380,8 +384,9 @@ $radius-xl: 20px;
         }
 
         &:hover {
+          background: lighten(#2A405E, 5%);
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(rgb(10, 32, 53), 0.3);
+          box-shadow: 0 6px 16px rgba(42, 64, 94, 0.3);
         }
       }
     }

@@ -75,8 +75,8 @@ export class IssueCommonEditComponent implements OnInit {
   statusOptions = [
     { value: 'pending', label: 'รอดำเนินการ' },
     { value: 'in_progress', label: 'กำลังดำเนินการ' },
-    { value: 'completed', label: 'เสร็จสิ้น' },
-    { value: 'rejected', label: 'ปฏิเสธ' }
+    { value: 'resolved', label: 'เสร็จสิ้น' },
+    { value: 'canceled', label: 'ยกเลิก' }
     // { value: 'reopened', label: 'เปิดใหม่' }
   ];
 
