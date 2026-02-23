@@ -41,7 +41,7 @@ export class SidebarComponent implements OnInit {
     },
     // 4. จัดการลูกบ้าน — จัดการผู้ใช้หลัก
     {
-      title: 'จัดการลูกบ้าน',
+      title: 'จัดการผู้อยู่อาศัย',
       icon: 'assets/icons/residents.svg',
       route: '/residents-management',
       active: false
