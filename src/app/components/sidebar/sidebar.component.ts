@@ -18,48 +18,63 @@ export class SidebarComponent implements OnInit {
   projectName: string = 'ผู้ดูแลระบบนิติบุคคล';
 
   menuItems = [
+    // 1. ภาพรวม — แดชบอร์ดหลัก
     {
       title: 'ภาพรวม',
       icon: 'assets/icons/pajamas--overview.svg',
       route: '/dashboard',
       active: false
     },
+    // 2. ประกาศ — สื่อสารกับลูกบ้าน
     {
       title: 'ประกาศ',
       icon: 'assets/icons/announcement.svg',
       route: '/announcement',
       active: false
     },
-    {
-      title: 'ปัญหาส่วนบุคคล',
-      icon: 'assets/icons/problem.svg',
-      route: '/issue',
-      active: false
-    },
-    {
-      title: 'ปัญหาส่วนกลาง',
-      icon: 'assets/icons/common-problem.svg',
-      route: '/issue-common',
-      active: false
-    },
+    // 3. หมู่บ้านและบ้าน — ข้อมูลโครงสร้างพื้นฐาน
     {
       title: 'หมู่บ้านและบ้าน',
       icon: 'assets/icons/village.svg',
       route: '/village',
       active: false
     },
+    // 4. จัดการลูกบ้าน — จัดการผู้ใช้หลัก
+    {
+      title: 'จัดการลูกบ้าน',
+      icon: 'assets/icons/residents.svg',
+      route: '/residents-management',
+      active: false
+    },
+    // 5. ปัญหาส่วนบุคคล — แจ้งซ่อมรายบุคคล
+    {
+      title: 'ปัญหาส่วนบุคคล',
+      icon: 'assets/icons/problem.svg',
+      route: '/issue',
+      active: false
+    },
+    // 6. ปัญหาส่วนกลาง — แจ้งซ่อมพื้นที่ส่วนกลาง
+    {
+      title: 'ปัญหาส่วนกลาง',
+      icon: 'assets/icons/common-problem.svg',
+      route: '/issue-common',
+      active: false
+    },
+    // 7. ผู้มาเยี่ยม — ควบคุมการเข้า-ออก
     {
       title: 'ผู้มาเยี่ยม',
       icon: 'assets/icons/bxs--car-garage.svg',
       route: '/vistor-management',
       active: false
     },
+    // 8. จัดการยานพาหนะ — ทะเบียนรถในโครงการ
     {
       title: 'จัดการยานพาหนะ',
       icon: 'assets/icons/material-symbols--car-gear-rounded.svg',
       route: '/vehicle-management',
       active: false
     },
+    // 9. จัดการเบอร์โทรป้อมยาม — ข้อมูลติดต่อรปภ.
     {
       title: 'จัดการเบอร์โทรป้อมยาม',
       icon: 'assets/icons/mdi--security-home.svg',
@@ -78,10 +93,11 @@ export class SidebarComponent implements OnInit {
     //   route: '/phone-management',
     //   active: false
     // },
+    // 10. จัดการคำเชิญ — สิทธิ์เชิญลูกบ้านเข้าระบบ
     {
-      title: 'จัดการลูกบ้าน',
-      icon: 'assets/icons/residents.svg',
-      route: '/residents-management',
+      title: 'จัดการคำเชิญ',
+      icon: 'assets/icons/invite.svg',
+      route: '/invite-management',
       active: false
     },
     // {
@@ -90,28 +106,25 @@ export class SidebarComponent implements OnInit {
     //   route: '/unit-management',
     //   active: false
     // },
-    {
-      title: 'จัดการคำเชิญ',
-      icon: 'assets/icons/invite.svg',
-      route: '/invite-management',
-      active: false
-    },
-    {
-      title: 'ธีม',
-      icon: 'assets/icons/mdi--theme.svg',
-      route: '/custom-theme-app',
-      active: false
-    },
+    // 11. ข้อมูลแบบบ้าน — ข้อมูลโครงการและแบบแปลน
     {
       title: 'ข้อมูลแบบบ้าน',
-      icon: 'assets/icons/hugeicons--floor-plan.svg', // Using village icon temporarily or you can change to a new one
+      icon: 'assets/icons/hugeicons--floor-plan.svg',
       route: '/information-home-project',
       active: false
     },
+    // 12. จัดการสิทธิ์นิติ — ตั้งค่าสิทธิ์ผู้ดูแลระบบ
     {
       title: 'จัดการสิทธิ์นิติ',
       icon: 'assets/icons/icon-park-solid--permissions.svg',
       route: '/edit-permission',
+      active: false
+    },
+    // 13. ธีม — ปรับแต่งหน้าตาแอปพลิเคชัน
+    {
+      title: 'ธีม',
+      icon: 'assets/icons/mdi--theme.svg',
+      route: '/custom-theme-app',
       active: false
     }
   ];
