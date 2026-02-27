@@ -268,7 +268,7 @@ export class InfomationHomeProjectManagementComponent implements OnInit {
     else this.projectInfoData.isUploadingRules = true;
 
     const formData = new FormData();
-    // Service จะดึง project_id จาก localStorage อัตโนมัติแล้ว
+    formData.append('project_id', this.projectId);
 
     // เปลี่ยนชื่อ field ให้ตรงกับ backend
     if (fileType === 'project_detail') {
