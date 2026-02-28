@@ -9,7 +9,7 @@ export const environment = {
     appId: '1:340838499264:web:f2f4661ce2e9eface43e25',
     measurementId: 'G-PRHV2HW0PE',
   },
-  apiUrl: 'https://snp68-spb.onrender.com', /* Uses API_URL_PROD */
+  apiUrl: 'https://api.livlink-solution.com', /* Uses API_URL_PROD */
   auth: {
     tokenKey: 'auth_token',
     refreshTokenKey: 'refresh_token',
