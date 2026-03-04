@@ -113,6 +113,31 @@
             text-decoration: underline;
           }
         }
+
+        .notification-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .dismiss-all-read {
+          background: none;
+          border: 1px solid #e74c3c;
+          color: #e74c3c;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 500;
+          border-radius: 4px;
+          padding: 3px 8px;
+          display: flex;
+          align-items: center;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background-color: #e74c3c;
+            color: white;
+          }
+        }
       }
 
       .notification-list {
@@ -212,6 +237,34 @@
             border-radius: 50%;
             flex-shrink: 0;
             margin-top: 6px;
+          }
+
+          .notification-dismiss-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            color: #bbb;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0;
+
+            .material-icons {
+              font-size: 16px;
+            }
+
+            &:hover {
+              background-color: #fee2e2;
+              color: #e74c3c;
+            }
+          }
+
+          &:hover .notification-dismiss-btn {
+            opacity: 1;
           }
         }
       }

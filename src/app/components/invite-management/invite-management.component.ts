@@ -23,9 +23,10 @@ import { Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
 import { AuthService } from '../../services/auth.service';
-import { RestService } from '../../services/rest.service';
+import { RestService, ProjectInvitationItem } from '../../services/rest.service';
 import { ToastService } from '../../shared/toast/toast.service';
 
+type InvitationTab = 'unit' | 'project';
 type InvitationStatus = StatusType | 'all';
 type StatusType = 'pending' | 'sent' | 'accepted' | 'declined' | 'expired';
 
@@ -84,12 +85,14 @@ interface APIResponse {
   styleUrls: ['./invite-management.component.scss'],
 })
 export class InviteManagementComponent implements OnInit {
-  // private apiUrl = 'http://localhost:5000/api/units/unit-invitations'; // Removed as RestService handles it
-
   isLoading = new BehaviorSubject<boolean>(true);
   isLoading$: Observable<boolean> = this.isLoading.asObservable();
 
-  displayedColumns: string[] = [
+  // Tab state
+  activeTab: InvitationTab = 'unit';
+
+  // Columns for unit invitations
+  unitColumns: string[] = [
     'sequence',
     'unit_number',
     'invited_email',
@@ -100,7 +103,23 @@ export class InviteManagementComponent implements OnInit {
     'actions',
   ];
 
-  dataSource: MatTableDataSource<UnitInvitation>;
+  // Columns for project invitations (juristic/security)
+  projectColumns: string[] = [
+    'sequence',
+    'invitation_code',
+    'sender_name',
+    'sender_email',
+    'role',
+    'status',
+    'expires_at',
+    'actions',
+  ];
+
+  get displayedColumns(): string[] {
+    return this.activeTab === 'unit' ? this.unitColumns : this.projectColumns;
+  }
+
+  dataSource: MatTableDataSource<any>;
   searchTerm = '';
   pageEvent: PageEvent = {
     pageIndex: 0,
@@ -112,7 +131,7 @@ export class InviteManagementComponent implements OnInit {
   selectedUnitId: string | null = null;
   selectedUnitNumber: string | null = null;
 
-  private allInvitations: UnitInvitation[] = [];
+  private allInvitations: any[] = [];
   currentProjectName = '';
   currentProjectId = '';
 
@@ -120,23 +139,26 @@ export class InviteManagementComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   // Getter สำหรับข้อมูลที่แสดงในหน้าปัจจุบัน
-  get paginatedData(): UnitInvitation[] {
+  get paginatedData(): any[] {
     const startIndex = this.pageEvent.pageIndex * this.pageEvent.pageSize;
     const endIndex = startIndex + this.pageEvent.pageSize;
     return this.sortedData.slice(startIndex, endIndex);
   }
 
   // Getter สำหรับข้อมูลที่ sort แล้ว
-  get sortedData(): UnitInvitation[] {
+  get sortedData(): any[] {
     const data = this.dataSource.filteredData.slice();
     if (!this.sort || !this.sort.active || this.sort.direction === '') {
       return data;
     }
-    return data.sort((a, b) => {
+    return data.sort((a: any, b: any) => {
       const isAsc = this.sort.direction === 'asc';
       switch (this.sort.active) {
         case 'unit_number': return this.compare(a.unit_number, b.unit_number, isAsc);
         case 'invited_email': return this.compare(a.invited_email || '', b.invited_email || '', isAsc);
+        case 'invitation_code': return this.compare(a.invitation_code || '', b.invitation_code || '', isAsc);
+        case 'sender_name': return this.compare(a.sender_name || '', b.sender_name || '', isAsc);
+        case 'sender_email': return this.compare(a.sender_email || '', b.sender_email || '', isAsc);
         case 'role': return this.compare(a.role, b.role, isAsc);
         case 'status': return this.compare(a.status, b.status, isAsc);
         case 'invited_by_name': return this.compare(a.invited_by_name || '', b.invited_by_name || '', isAsc);
@@ -157,7 +179,7 @@ export class InviteManagementComponent implements OnInit {
     private restService: RestService,
     private toast: ToastService
   ) {
-    this.dataSource = new MatTableDataSource<UnitInvitation>([]);
+    this.dataSource = new MatTableDataSource<any>([]);
   }
 
   ngOnInit() {
@@ -176,15 +198,33 @@ export class InviteManagementComponent implements OnInit {
       }
     });
 
-    this.dataSource.filterPredicate = (data: UnitInvitation, filter: string) => {
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
       const searchLower = filter.toLowerCase();
-      return (
-        (data.unit_number || '').toLowerCase().includes(searchLower) ||
-        (data.invited_email || '').toLowerCase().includes(searchLower) ||
-        (data.invited_by_name || '').toLowerCase().includes(searchLower) ||
-        (data.code || '').toLowerCase().includes(searchLower)
-      );
+      if (this.activeTab === 'unit') {
+        return (
+          (data.unit_number || '').toLowerCase().includes(searchLower) ||
+          (data.invited_email || '').toLowerCase().includes(searchLower) ||
+          (data.invited_by_name || '').toLowerCase().includes(searchLower) ||
+          (data.code || '').toLowerCase().includes(searchLower)
+        );
+      } else {
+        return (
+          (data.invitation_code || '').toLowerCase().includes(searchLower) ||
+          (data.sender_name || '').toLowerCase().includes(searchLower) ||
+          (data.sender_email || '').toLowerCase().includes(searchLower) ||
+          (data.role || '').toLowerCase().includes(searchLower)
+        );
+      }
     };
+  }
+
+  switchTab(tab: InvitationTab) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+    this.selectedStatus = 'all';
+    this.dataSource.filter = '';
+    this.pageEvent.pageIndex = 0;
+    this.loadInvitations();
   }
 
   private parseDate(dateValue: any): Date | null {
@@ -215,15 +255,6 @@ export class InviteManagementComponent implements OnInit {
       .replace('mm', minutes);
   }
 
-  // private getHttpHeaders(): HttpHeaders {
-  //   // Token handling is now done via HttpOnly cookies and Interceptor
-  //   // const token = this.authService.getToken(); // getToken removed
-  //   return new HttpHeaders({
-  //     // Authorization: `Bearer ${token} `,
-  //     'Content-Type': 'application/json',
-  //   });
-  // }
-
   private buildParams(): URLSearchParams {
     const params = new URLSearchParams();
 
@@ -251,13 +282,18 @@ export class InviteManagementComponent implements OnInit {
     this.currentProjectId = firstProject.project_id;
     this.currentProjectName = firstProject.project_name || 'โครงการ';
 
-    // ใช้ RestService แทน direct http call
+    if (this.activeTab === 'unit') {
+      this.loadUnitInvitations();
+    } else {
+      this.loadProjectInvitations();
+    }
+  }
+
+  private loadUnitInvitations() {
     this.restService.getUnitInvitations(this.currentProjectId, this.selectedStatus !== 'all' ? this.selectedStatus : undefined)
       .pipe(
         map((invitations: any[]) => {
-          console.log('Invitations found:', invitations.length);
-
-          // Map และแปลง date
+          console.log('Unit invitations found:', invitations.length);
           return invitations.map((item) => ({
             ...item,
             expires_at: this.parseDate(item.expires_at),
@@ -275,17 +311,57 @@ export class InviteManagementComponent implements OnInit {
         finalize(() => this.isLoading.next(false))
       )
       .subscribe((invitations) => {
-        console.log('Final invitations:', invitations);
-        this.allInvitations = invitations;
-        this.dataSource.data = invitations;
-        this.pageEvent.length = invitations.length;
-        this.pageEvent.pageIndex = 0; // รีเซ็ตไปหน้าแรกเมื่อโหลดใหม่
-
-        // เชื่อมต่อ sort หลังจากโหลดข้อมูล
-        if (this.sort) {
-          this.dataSource.sort = this.sort;
-        }
+        this.setTableData(invitations);
       });
+  }
+
+  private loadProjectInvitations() {
+    this.restService.getProjectInvitations(this.currentProjectId, this.selectedStatus !== 'all' ? this.selectedStatus : undefined)
+      .pipe(
+        map((invitations: ProjectInvitationItem[]) => {
+          console.log('Project invitations found:', invitations.length);
+          return invitations.map((item) => ({
+            ...item,
+            expires_at: this.parseDate(item.expires_at),
+            created_at: this.parseDate(item.created_at),
+          }));
+        }),
+        catchError((error) => {
+          console.error('Error loading project invitations:', error);
+          if (error.error?.message) {
+            this.toast.error(`เกิดข้อผิดพลาด: ${error.error.message}`);
+          }
+          return of([] as ProjectInvitationItem[]);
+        }),
+        finalize(() => this.isLoading.next(false))
+      )
+      .subscribe((invitations) => {
+        this.setTableData(invitations);
+      });
+  }
+
+  private setTableData(invitations: any[]) {
+    console.log('Final invitations:', invitations);
+    this.allInvitations = invitations;
+    this.dataSource.data = invitations;
+    this.pageEvent.length = invitations.length;
+    this.pageEvent.pageIndex = 0;
+
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+  }
+
+  getRoleLabel(role: string): string {
+    const roleMap: Record<string, string> = {
+      'family': 'ครอบครัว',
+      'tenant': 'ผู้เช่า',
+      'owner': 'เจ้าของ',
+      'juristicMember': 'นิติบุคคล',
+      'juristicLeader': 'หัวหน้านิติบุคคล',
+      'security': 'รปภ.',
+    };
+    return roleMap[role] || role || '-';
   }
 
   onSearch(): void {
@@ -326,8 +402,14 @@ export class InviteManagementComponent implements OnInit {
     this.router.navigate(['/invite-management/create-unit']);
   }
 
-  viewDetails(invitation: UnitInvitation): void {
-    this.router.navigate(['/invite-management/detail', invitation.id]);
+  viewDetails(invitation: any): void {
+    if (this.activeTab === 'project') {
+      this.router.navigate(['/invite-management/detail', invitation.id], {
+        queryParams: { type: 'project' }
+      });
+    } else {
+      this.router.navigate(['/invite-management/detail', invitation.id]);
+    }
   }
 
   handlePageEvent(event: PageEvent) {

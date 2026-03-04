@@ -6,7 +6,7 @@
         </div>
         <div class="title-row" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
             <mat-icon (click)="onBack()">arrow_back</mat-icon>
-            <span class="sub-body">รายละเอียดคำเชิญ</span>
+            <span class="sub-body">รายละเอียดคำเชิญ{{ invitationType === 'project' ? 'นิติ/รปภ.' : 'ลูกบ้าน' }}</span>
         </div>
     </div>
 
@@ -16,12 +16,13 @@
         </div>
     </div>
 
-    <div class="content-container" *ngIf="!isLoading && invitation">
+    <!-- Unit Invitation Detail -->
+    <div class="content-container" *ngIf="!isLoading && invitation && invitationType === 'unit'">
         <mat-card class="detail-card">
             <div class="card-content">
                 <!-- Left Column: Info -->
                 <div class="info-column">
-                    <h2 class="section-title">ข้อมูลคำเชิญ</h2>
+                    <h2 class="section-title">ข้อมูลคำเชิญลูกบ้าน</h2>
 
                     <div class="info-grid">
                         <div class="info-item">
@@ -38,7 +39,7 @@
 
                         <div class="info-item">
                             <label>บทบาท (Role):</label>
-                            <span>{{ invitation.role | titlecase }}</span>
+                            <span>{{ getRoleLabel(invitation.role) }}</span>
                         </div>
 
                         <div class="info-item">
@@ -89,6 +90,83 @@
                         <label>Invitation Code:</label>
                         <div class="code-box">
                             {{ invitation.code }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Project Invitation Detail -->
+    <div class="content-container" *ngIf="!isLoading && projectInvitation && invitationType === 'project'">
+        <mat-card class="detail-card">
+            <div class="card-content">
+                <!-- Left Column: Info -->
+                <div class="info-column">
+                    <h2 class="section-title">ข้อมูลคำเชิญนิติ/รปภ.</h2>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>โครงการ (Project):</label>
+                            <span>{{ projectInvitation.project_name || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>สถานะ (Status):</label>
+                            <span [class]="'status-badge ' + projectInvitation.status">
+                                {{ getStatusLabel(projectInvitation.status) }}
+                            </span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>บทบาท (Role):</label>
+                            <span>{{ getRoleLabel(projectInvitation.role) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>ผู้ส่ง (Sender):</label>
+                            <span>{{ projectInvitation.sender_name || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>อีเมลผู้ส่ง (Sender Email):</label>
+                            <span>{{ projectInvitation.sender_email || '-' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>วันที่สร้าง (Created At):</label>
+                            <span>{{ formatDate(projectInvitation.created_at) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>วันหมดอายุ (Expires At):</label>
+                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+                                <span>{{ formatDate(projectInvitation.expires_at) }}</span>
+                                <span class="badge-remaining"
+                                    [class.expired]="getRemainingDays(projectInvitation.expires_at).includes('หมดอายุ')">
+                                    {{ getRemainingDays(projectInvitation.expires_at) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <mat-divider [vertical]="true" class="vertical-divider"></mat-divider>
+
+                <!-- Right Column: QR Code -->
+                <div class="qr-column">
+                    <h2 class="section-title center">QR Code & Code</h2>
+
+                    <div class="qr-wrapper" *ngIf="projectInvitation.invitation_code">
+                        <qrcode [qrdata]="projectInvitation.invitation_code" [width]="256" [errorCorrectionLevel]="'M'"
+                            [margin]="1">
+                        </qrcode>
+                    </div>
+
+                    <div class="code-display">
+                        <label>Invitation Code:</label>
+                        <div class="code-box">
+                            {{ projectInvitation.invitation_code }}
                         </div>
                     </div>
                 </div>

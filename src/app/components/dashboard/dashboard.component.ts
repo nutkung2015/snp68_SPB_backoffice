@@ -208,7 +208,9 @@ export class DashboardComponent implements OnInit {
   }
 
   getGreeting(): string {
-    const hour = new Date().getHours();
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const hour = new Date(utc + (7 * 3600000)).getHours();
     if (hour < 12) return 'สวัสดีตอนเช้า';
     if (hour < 18) return 'สวัสดีตอนบ่าย';
     return 'สวัสดีตอนเย็น';

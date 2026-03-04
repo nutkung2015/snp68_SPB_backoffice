@@ -120,9 +120,10 @@
                         เพิ่มยานพาหนะ
                     </button>
 
-                    <button mat-icon-button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading"
+                    <button mat-stroked-button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading"
                         matTooltip="รีเฟรชข้อมูล">
                         <mat-icon [class.spin]="isLoading">sync</mat-icon>
+                        รีเฟรช
                     </button>
                 </div>
             </div>

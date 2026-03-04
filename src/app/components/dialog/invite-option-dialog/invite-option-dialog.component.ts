@@ -5,15 +5,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-invite-option-dialog',
-    standalone: true,
-    imports: [
-        CommonModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatIconModule,
-    ],
-    template: `
+  selector: 'app-invite-option-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
+  template: `
     <div class="invite-option-dialog">
       <h2 mat-dialog-title>เลือกวิธีเพิ่มสมาชิก</h2>
       <mat-dialog-content>
@@ -39,32 +39,36 @@ import { MatIconModule } from '@angular/material/icon';
       </mat-dialog-actions>
     </div>
   `,
-    styles: [`
+  styles: [`
     .invite-option-dialog {
       padding: 8px;
+      font-family: 'LINE Seed Sans TH', sans-serif;
+      border-radius: 24px !important;
     }
     
     h2[mat-dialog-title] {
-      font-weight: 600;
-      margin-bottom: 16px;
+      font-weight: 600 !important;
+      margin-bottom: 16px !important;
+      font-family: 'LINE Seed Sans TH', sans-serif;
     }
     
     .options-container {
       display: flex;
       flex-direction: column;
       gap: 16px;
-      min-width: 300px;
+      min-width: 300px !important;
     }
     
     .option-btn {
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 20px;
+      padding: 20px !important;
       text-align: left;
       height: auto;
       border-radius: 12px;
       transition: all 0.2s ease;
+      font-family: 'LINE Seed Sans TH', sans-serif;
     }
     
     .option-btn:hover {
@@ -79,12 +83,12 @@ import { MatIconModule } from '@angular/material/icon';
     }
     
     .option-btn.create-account {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2A405E 0%, #217FFF 100%);
       color: white;
     }
     
     .option-btn.invite {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      background: linear-gradient(135deg, #2A405E 0%, #141e2cff 100%);
       color: white;
     }
     
@@ -105,18 +109,25 @@ import { MatIconModule } from '@angular/material/icon';
     }
     
     mat-dialog-actions {
-      padding-top: 16px;
+      padding-top: 16px !important;
+      
+      button {
+        font-family: 'LINE Seed Sans TH', sans-serif;
+        border: 2px solid #2A405E;
+        border-radius: 10px;
+        color: #2A405E;
+      }
     }
   `]
 })
 export class InviteOptionDialogComponent {
-    constructor(private dialogRef: MatDialogRef<InviteOptionDialogComponent>) { }
+  constructor(private dialogRef: MatDialogRef<InviteOptionDialogComponent>) { }
 
-    selectOption(option: 'create' | 'invite'): void {
-        this.dialogRef.close(option);
-    }
+  selectOption(option: 'create' | 'invite'): void {
+    this.dialogRef.close(option);
+  }
 
-    onCancel(): void {
-        this.dialogRef.close(null);
-    }
+  onCancel(): void {
+    this.dialogRef.close(null);
+  }
 }

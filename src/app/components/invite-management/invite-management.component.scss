@@ -76,6 +76,15 @@
   font-weight: 500;
 }
 
+.status-used {
+  color: #10b981;
+  background-color: #d1fae5;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .status-declined {
   color: #ef4444;
   background-color: #fee2e2;
@@ -107,6 +116,55 @@
   position: relative;
   background-color: #f8f9fa;
   min-height: 100vh;
+
+  // Pill Toggle Buttons (inline in header)
+  .pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 18px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Line Seed Sans TH', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #475569;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+
+    &:hover:not(.active) {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #1e293b;
+    }
+
+    &.active {
+      background: #1a6fb5;
+      color: white;
+      border-color: #1a6fb5;
+      box-shadow: 0 2px 8px rgba(26, 111, 181, 0.35);
+    }
+  }
+
+  .invitation-code {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #0ea75a;
+    background: #ecfdf5;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
 
   // Header styles
   div.header {

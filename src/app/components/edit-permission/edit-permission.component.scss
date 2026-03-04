@@ -206,6 +206,15 @@
     position: relative;
     background-color: #f8f9fa;
     min-height: 100vh;
+    font-family: 'LINE Seed Sans TH', sans-serif !important;
+
+    * {
+        font-family: 'LINE Seed Sans TH', sans-serif;
+    }
+
+    mat-icon {
+        font-family: 'Material Icons' !important;
+    }
 
     .search-filter-section {
         background: white;
@@ -242,6 +251,7 @@
             input {
                 font-size: 14px;
                 outline: none;
+                font-family: 'LINE Seed Sans TH', sans-serif !important;
 
                 &::placeholder {
                     color: #64748b;
@@ -268,6 +278,18 @@
 
 // Material Design Overrides
 ::ng-deep {
+
+    .mat-mdc-select-value-text,
+    .mat-mdc-option,
+    .mat-mdc-button,
+    .mat-mdc-flat-button,
+    .mat-mdc-unelevated-button,
+    .mat-mdc-outlined-button,
+    .mat-mdc-paginator,
+    .mat-mdc-paginator-page-size-label {
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
+    }
+
     .mat-mdc-table {
         background: white !important;
 
@@ -280,6 +302,7 @@
             letter-spacing: 0.025em;
             padding: 16px;
             border-bottom: 1px solid #e2e8f0;
+            font-family: 'LINE Seed Sans TH', sans-serif !important;
         }
 
         td.mat-mdc-cell {
@@ -287,6 +310,7 @@
             border-bottom: 1px solid #f1f5f9;
             font-size: 14px;
             color: #475569;
+            font-family: 'LINE Seed Sans TH', sans-serif !important;
         }
 
         tr.mat-mdc-row:hover {

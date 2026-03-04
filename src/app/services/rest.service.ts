@@ -174,6 +174,20 @@ export interface ProjectInvitationResponse {
   role: string;
 }
 
+export interface ProjectInvitationItem {
+  id: string;
+  project_id: string;
+  sender_id: string;
+  invitation_code: string;
+  role: string;
+  status: string;
+  expires_at: Date | null;
+  created_at: Date | null;
+  project_name: string;
+  sender_name: string;
+  sender_email: string;
+}
+
 export interface JoinProjectRequest {
   invitation_code: string;
 }
@@ -1025,6 +1039,38 @@ export class RestService {
   }
 
   /**
+   * Get list of project invitations (Juristic/Security) with optional filtering
+   * GET /api/project_invitations?project_id=...&status=...
+   */
+  getProjectInvitations(
+    projectId: string,
+    status?: string
+  ): Observable<ProjectInvitationItem[]> {
+    this.isLoadingSubject.next(true);
+    let params = new HttpParams();
+
+    params = params.append('project_id', projectId);
+
+    if (status && status !== 'all') {
+      params = params.append('status', status);
+    }
+
+    const url = `${this.apiUrl}/api/project_invitations`;
+    return this.http.get<any>(url, { ...this.getHttpOptions(), params }).pipe(
+      map((response) => {
+        this.isLoadingSubject.next(false);
+        const invitations = response.data || [];
+        return invitations.map((item: any) => ({
+          ...item,
+          expires_at: item.expires_at ? new Date(item.expires_at) : null,
+          created_at: item.created_at ? new Date(item.created_at) : null,
+        }));
+      }),
+      catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
    * Get residents/members in a unit
    * GET /api/resident-management/units/:unitId/members
    */
@@ -1521,6 +1567,20 @@ export class RestService {
     const url = `${this.apiUrl}/api/units/invitations/${id}`;
 
     return this.http.get<GenericApiResponse<UnitInvitation>>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  /**
+   * Get project invitation detail by ID
+   * GET /api/project_invitations/:id
+   */
+  getProjectInvitationById(id: string): Observable<GenericApiResponse<ProjectInvitationItem>> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/project_invitations/${id}`;
+
+    return this.http.get<GenericApiResponse<ProjectInvitationItem>>(url, this.getHttpOptions()).pipe(
       catchError((error) => this.handleError(error)),
       finalize(() => this.isLoadingSubject.next(false))
     );

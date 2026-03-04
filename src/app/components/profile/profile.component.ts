@@ -18,10 +18,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 // Shared Components
-import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
 // Services
-import { AuthService, UserProfile } from '../services/auth.service';
+import { AuthService, UserProfile } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile',

@@ -20,9 +20,15 @@
       <div class="notification-dropdown" *ngIf="showNotifications">
         <div class="notification-header">
           <h3>การแจ้งเตือน</h3>
-          <button class="mark-all-read" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
-            อ่านทั้งหมด
-          </button>
+          <div class="notification-header-actions">
+            <button class="mark-all-read" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+              อ่านทั้งหมด
+            </button>
+            <button class="dismiss-all-read" (click)="dismissAllRead()" *ngIf="hasReadNotifications">
+              <span class="material-icons" style="font-size: 14px; margin-right: 2px;">delete_sweep</span>
+              ลบที่อ่านแล้ว
+            </button>
+          </div>
         </div>
         <div class="notification-list">
           <!-- Empty State -->
@@ -43,6 +49,11 @@
               <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
             </div>
             <div class="notification-dot" *ngIf="!notification.is_read"></div>
+            <!-- Delete button for read notifications -->
+            <button class="notification-dismiss-btn" *ngIf="notification.is_read"
+              (click)="dismissNotification($event, notification)" title="ลบการแจ้งเตือนนี้">
+              <span class="material-icons">close</span>
+            </button>
           </div>
         </div>
       </div>

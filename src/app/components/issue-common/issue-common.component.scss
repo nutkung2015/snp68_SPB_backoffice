@@ -21,6 +21,17 @@
         z-index: 1000;
     }
 
+    font-family: 'LINE Seed Sans TH',
+    sans-serif !important;
+
+    * {
+        font-family: 'LINE Seed Sans TH', sans-serif;
+    }
+
+    mat-icon {
+        font-family: 'Material Icons' !important;
+    }
+
     .mat-mdc-header-cell {
         background-color: #002B3A !important;
         color: rgba(255, 255, 255) !important;
@@ -232,7 +243,7 @@
                             color: #ff8f00;
                         }
 
-                        &.status-completed {
+                        &.status-resolved {
                             background-color: #e8f5e9;
                             color: #2e7d32;
                         }
@@ -301,5 +312,22 @@
         #box-content {
             padding: 8px !important;
         }
+    }
+}
+
+// Material Design Overrides
+::ng-deep {
+
+    .mat-mdc-button,
+    .mat-mdc-unelevated-button,
+    .mat-mdc-outlined-button,
+    .mat-mdc-icon-button,
+    .mat-mdc-mini-fab,
+    .mat-mdc-fab,
+    .mat-mdc-select-value-text,
+    .mat-mdc-option,
+    .mat-mdc-paginator,
+    .mat-mdc-paginator-page-size-label {
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
     }
 }

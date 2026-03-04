@@ -29,6 +29,7 @@ import { ToastService } from '../../shared/toast/toast.service';
 // Shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { InviteOptionDialogComponent } from '../dialog/invite-option-dialog/invite-option-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 // import { EditPermissionDialogComponent } from './edit-permission-dialog.component';
 
 // Interface for Juristic Member
@@ -386,32 +387,43 @@ export class EditPermissionComponent implements OnInit, AfterViewInit {
       member.role_in_project !== 'juristicLeader';
   }
 
-  // Remove member from project
   removeMember(member: JuristicMember): void {
     if (!this.canRemoveMember(member)) {
-      this.toast.warning('คุณไม่มีสิทธิ์นำผู้ใช้รายนี้ออก');
+      this.toast.warning('คุณไม่มีสิทธิ์นำผู้ใช้รายนี้ออกจากโครงการ');
       return;
     }
 
-    // Confirm before removing
-    if (!confirm(`ต้องการนำ "${member.full_name}" ออกจากโปรเจคหรือไม่?`)) {
-      return;
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'ยืนยันการนำออก',
+        message: `ต้องการนำ "${member.full_name}" ออกจากโครงการหรือไม่?`,
+        confirmText: 'นำออก',
+        cancelText: 'ยกเลิก',
+        type: 'danger'
+      }
+    });
 
-    this.isLoading.next(true);
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) {
+        return;
+      }
 
-    this.restService.removeJuristicMember(member.user_id, this.projectId)
-      .pipe(finalize(() => this.isLoading.next(false)))
-      .subscribe({
-        next: (response) => {
-          this.toast.success('นำผู้ใช้ออกจากโปรเจคสำเร็จ');
-          this.loadMembers();
-        },
-        error: (err) => {
-          console.error('Error removing member:', err);
-          this.toast.error('เกิดข้อผิดพลาดในการนำผู้ใช้ออก');
-        }
-      });
+      this.isLoading.next(true);
+
+      this.restService.removeJuristicMember(member.user_id, this.projectId)
+        .pipe(finalize(() => this.isLoading.next(false)))
+        .subscribe({
+          next: (response) => {
+            this.toast.success('นำผู้ใช้ออกจากโครงการสำเร็จ');
+            this.loadMembers();
+          },
+          error: (err) => {
+            console.error('Error removing member:', err);
+            this.toast.error('เกิดข้อผิดพลาดในการนำผู้ใช้ออกจากโครงการ');
+          }
+        });
+    });
   }
 
   // Navigate to invite page

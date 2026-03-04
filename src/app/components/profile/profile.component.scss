@@ -45,14 +45,14 @@ mat-card {
         color: #1f2937;
 
         mat-icon {
-            color: #2084fc;
+            color: #2A405E;
         }
     }
 
     .edit-btn {
-        border: 1px solid #2084fc;
+        border: 1px solid #2A405E;
         border-radius: 8px;
-        color: #2084fc;
+        color: #2A405E;
 
         mat-icon {
             font-size: 18px;
@@ -79,11 +79,11 @@ mat-card {
                 width: 100px;
                 height: 100px;
                 border-radius: 50%;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #2A405E 0%, #3a567a 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                box-shadow: 0 4px 12px rgba(42, 64, 94, 0.35);
 
                 mat-icon {
                     font-size: 48px;
@@ -99,7 +99,7 @@ mat-card {
                 right: 0;
                 width: 32px;
                 height: 32px;
-                background: #2084fc !important;
+                background: #2A405E !important;
 
                 mat-icon {
                     font-size: 16px;
@@ -147,13 +147,13 @@ mat-card {
                 width: 44px;
                 height: 44px;
                 border-radius: 10px;
-                background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+                background: linear-gradient(135deg, #dce3ec 0%, #c5d0de 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
 
                 mat-icon {
-                    color: #4f46e5;
+                    color: #2A405E;
                 }
             }
 
@@ -345,14 +345,14 @@ mat-card {
             width: 50px;
             height: 50px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            background: linear-gradient(135deg, #dce3ec 0%, #c5d0de 100%);
             display: flex;
             align-items: center;
             justify-content: center;
 
             mat-icon {
                 font-size: 24px;
-                color: #4f46e5;
+                color: #2A405E;
             }
         }
 
@@ -423,11 +423,11 @@ mat-card {
 // Material Overrides
 ::ng-deep {
     .mat-mdc-slide-toggle.mat-primary {
-        --mdc-switch-selected-track-color: #2084fc;
+        --mdc-switch-selected-track-color: #2A405E;
         --mdc-switch-selected-handle-color: #ffffff;
-        --mdc-switch-selected-hover-track-color: #1a6fcc;
-        --mdc-switch-selected-focus-track-color: #2084fc;
-        --mdc-switch-selected-pressed-track-color: #2084fc;
+        --mdc-switch-selected-hover-track-color: #1f3048;
+        --mdc-switch-selected-focus-track-color: #2A405E;
+        --mdc-switch-selected-pressed-track-color: #2A405E;
     }
 }
 

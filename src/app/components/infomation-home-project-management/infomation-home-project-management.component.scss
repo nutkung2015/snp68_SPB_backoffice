@@ -2,7 +2,15 @@
     padding: 24px;
     background-color: #f3f6f9;
     min-height: calc(100vh - 64px);
-    font-family: 'Prompt', sans-serif;
+    font-family: 'LINE Seed Sans TH', sans-serif !important;
+
+    * {
+        font-family: 'LINE Seed Sans TH', sans-serif;
+    }
+
+    mat-icon {
+        font-family: 'Material Icons' !important;
+    }
 }
 
 .loading-container {
@@ -268,20 +276,52 @@
     }
 }
 
-// Styling for mat-button-toggle-group to match button height
-::ng-deep mat-button-toggle-group {
-    height: 36px;
-    border-radius: 4px;
-    overflow: hidden;
+// Pill Toggle Buttons (inline in header)
+.pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 18px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Line Seed Sans TH', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #475569;
+    white-space: nowrap;
 
-    mat-button-toggle {
-        height: 36px;
-        display: flex;
-        align-items: center;
+    mat-icon {
+        font-size: 17px;
+        width: 17px;
+        height: 17px;
+    }
 
-        .mat-button-toggle-label-content {
-            line-height: 36px;
-            padding: 0 16px;
-        }
+    &:hover:not(.active) {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        color: #1e293b;
+    }
+
+    &.active {
+        background: #1a6fb5;
+        color: white;
+        border-color: #1a6fb5;
+        box-shadow: 0 2px 8px rgba(26, 111, 181, 0.35);
+    }
+}
+
+// Material Design Overrides
+::ng-deep {
+
+    .mat-mdc-button,
+    .mat-mdc-unelevated-button,
+    .mat-mdc-outlined-button,
+    .mat-mdc-icon-button,
+    .mat-mdc-mini-fab,
+    .mat-mdc-fab {
+        font-family: 'LINE Seed Sans TH', sans-serif !important;
     }
 }

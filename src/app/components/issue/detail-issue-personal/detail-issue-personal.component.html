@@ -13,6 +13,40 @@
     </div>
   </div>
 
+  <!-- Odoo-style Status Bar -->
+  <div class="status-bar-container" *ngIf="issue">
+    <div class="status-bar">
+      <!-- Main flow: pending → in_progress → completed -->
+      <div class="status-bar-main">
+        <div *ngFor="let step of mainSteps; let i = index; let last = last" class="status-step"
+          [class.active]="step.value === issue.status" [class.completed]="isMainCompleted(issue.status, i)"
+          [class.clickable]="step.value !== issue.status" (click)="onStatusChange(step.value)">
+          <div class="step-pill">
+            <span class="step-number" *ngIf="!isMainCompleted(issue.status, i) && step.value !== issue.status">{{ i + 1
+              }}</span>
+            <mat-icon class="step-check" *ngIf="isMainCompleted(issue.status, i)">check</mat-icon>
+            <span class="step-label">{{ step.label }}</span>
+          </div>
+          <div class="step-connector" *ngIf="!last"></div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="status-bar-divider"></div>
+
+      <!-- Rejected section -->
+      <div class="status-bar-secondary">
+        <div class="status-step rejected-step" [class.active]="issue.status === 'rejected'"
+          [class.clickable]="issue.status !== 'rejected'" (click)="onStatusChange('rejected')">
+          <div class="step-pill">
+            <mat-icon class="step-reject-icon">block</mat-icon>
+            <span class="step-label">ปฏิเสธ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Content Section -->
   <div class="form-content" *ngIf="issue">
     <mat-card>
@@ -75,15 +109,9 @@
           </div>
         </div>
 
-        <div class="field-row">
-          <div class="half-width">
-            <mat-label class="field-label">สถานะ</mat-label>
-            <div class="field-value">{{ getStatusLabel(issue.status) }}</div>
-          </div>
-          <div class="half-width">
-            <mat-label class="field-label">หมายเหตุ</mat-label>
-            <div class="field-value">{{ issue.notes || '-' }}</div>
-          </div>
+        <div class="full-width">
+          <mat-label class="field-label">หมายเหตุ</mat-label>
+          <div class="field-value content-box">{{ issue.notes || '-' }}</div>
         </div>
 
         <div class="field-row">

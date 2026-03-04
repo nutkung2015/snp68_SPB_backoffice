@@ -93,13 +93,51 @@ export class DetailIssuePersonalComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
-      open: 'เปิด',
+      pending: 'รอดำเนินการ',
       in_progress: 'กำลังดำเนินการ',
-      resolved: 'แก้ไขแล้ว',
-      closed: 'ปิด',
-      reopened: 'เปิดใหม่'
+      completed: 'เสร็จสิ้น',
+      rejected: 'ปฏิเสธ'
     };
     return statusMap[status] || status;
+  }
+
+  // Odoo-style status steps — main flow only (rejected is separate)
+  mainSteps = [
+    { value: 'pending', label: 'รอดำเนินการ' },
+    { value: 'in_progress', label: 'กำลังดำเนินการ' },
+    { value: 'completed', label: 'เสร็จสิ้น' },
+  ];
+
+  /** Check if step at index i is completed (before current status in main flow) */
+  isMainCompleted(currentStatus: string, stepIndex: number): boolean {
+    const currentIdx = this.mainSteps.findIndex(s => s.value === currentStatus);
+    // If status is 'rejected' or not in mainSteps, no step is "completed"
+    if (currentIdx < 0) return false;
+    return stepIndex < currentIdx;
+  }
+
+  onStatusChange(newStatus: string): void {
+    if (!this.issue || this.issue.status === newStatus) return;
+
+    const previousStatus = this.issue.status;
+    // Optimistically update UI
+    this.issue.status = newStatus;
+
+    this.rest.updatePersonalRepairStatus(this.issue.id, { status: newStatus }).subscribe({
+      next: (response: any) => {
+        if (response?.status === 'success') {
+          this.toast.success(`เปลี่ยนสถานะเป็น "${this.getStatusLabel(newStatus)}" สำเร็จ`);
+        }
+      },
+      error: (error) => {
+        console.error('Error updating status:', error);
+        this.toast.error('ไม่สามารถเปลี่ยนสถานะได้');
+        // Revert on failure
+        if (this.issue) {
+          this.issue.status = previousStatus;
+        }
+      }
+    });
   }
 
   onBack(): void {

@@ -329,30 +329,39 @@ $gray-500: #6c757d;
 }
 
 .refresh-btn {
-    color: $primary !important;
-    background: rgba($primary, 0.08) !important;
-    border-radius: 10px !important;
-    width: 40px;
-    height: 40px;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    border: 1px solid rgba($primary, 0.1) !important;
+    gap: 8px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba($primary, 0.2) !important;
+    background: transparent !important;
+    color: $primary !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
 
-    &:hover:not(:disabled) {
-        background: $primary !important;
-        color: $white !important;
-        box-shadow: 0 4px 12px rgba($primary, 0.25);
-        transform: translateY(-2px);
+    mat-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        margin: 0 !important;
 
-        mat-icon:not(.spin) {
-            transform: rotate(180deg);
+        &.spin {
+            animation: spin 1s linear infinite;
         }
     }
 
+    &:hover:not(:disabled) {
+        background: rgba($primary, 0.05) !important;
+        border-color: $primary !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba($primary, 0.1);
+    }
+
     &:active:not(:disabled) {
-        transform: translateY(0) scale(0.95);
+        transform: translateY(0);
     }
 
     &[disabled] {
@@ -360,17 +369,6 @@ $gray-500: #6c757d;
         color: #9CA3AF !important;
         border-color: #E5E7EB !important;
         cursor: not-allowed;
-    }
-
-    mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        transition: transform 0.4s ease;
-
-        &.spin {
-            animation: spin 1s linear infinite;
-        }
     }
 }
 

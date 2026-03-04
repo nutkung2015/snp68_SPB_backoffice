@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NotificationService, Notification, NotificationType } from '../../services/notification.service';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-topnav-bar',
@@ -133,5 +133,30 @@ export class TopnavBarComponent implements OnInit, OnDestroy {
   onCreateNew(): void {
     // Implement create new announcement
     console.log('Creating new announcement');
+  }
+
+  // --- API-based notification deletion (persists server-side) ---
+
+  /** Check if there are any read notifications that can be deleted */
+  get hasReadNotifications(): boolean {
+    return this.notifications.some(n => n.is_read);
+  }
+
+  /** Delete a single read notification via API */
+  dismissNotification(event: Event, notification: Notification): void {
+    event.stopPropagation(); // Prevent triggering onNotificationClick
+    this.notificationService.deleteNotification(notification.id).subscribe();
+  }
+
+  /** Delete all read notifications via API (batch) */
+  dismissAllRead(): void {
+    const readNotifications = this.notifications.filter(n => n.is_read);
+    if (readNotifications.length === 0) return;
+
+    const deleteRequests = readNotifications.map(n =>
+      this.notificationService.deleteNotification(n.id)
+    );
+
+    forkJoin(deleteRequests).subscribe();
   }
 }

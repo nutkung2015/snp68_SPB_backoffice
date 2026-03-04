@@ -23,7 +23,7 @@ import { PageHeaderComponent } from '../../shared/page-header/page-header.compon
 import { AuthService } from '../../services/auth.service';
 import { CsvExportService, CsvColumn } from '../../services/csv-export.service';
 
-type IssueStatus = 'pending' | 'in_progress' | 'completed' | 'rejected' | 'all';
+type IssueStatus = 'pending' | 'in_progress' | 'resolved' | 'rejected' | 'all';
 
 interface Issue {
   id: string;
@@ -113,7 +113,7 @@ export class IssueCommonComponent implements OnInit {
     { value: 'all', label: 'ทั้งหมด' },
     { value: 'pending', label: 'รอดำเนินการ' },
     { value: 'in_progress', label: 'กำลังดำเนินการ' },
-    { value: 'completed', label: 'เสร็จสิ้น' },
+    { value: 'resolved', label: 'เสร็จสิ้น' },
     { value: 'rejected', label: 'ปฏิเสธ' },
   ];
 
@@ -343,7 +343,7 @@ export class IssueCommonComponent implements OnInit {
     const statusMap: Record<string, string> = {
       pending: 'status-pending',
       in_progress: 'status-in-progress',
-      completed: 'status-completed',
+      resolved: 'status-resolved',
       rejected: 'status-rejected'
     };
     return statusMap[status] || '';

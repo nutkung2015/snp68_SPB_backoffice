@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { QRCodeModule } from 'angularx-qrcode';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RestService, UnitInvitation } from '../../../services/rest.service';
+import { RestService, UnitInvitation, ProjectInvitationItem } from '../../../services/rest.service';
 import { PageHeaderComponent } from '../../../shared/page-header/page-header.component';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -31,8 +31,10 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 })
 export class InviteDetailComponent implements OnInit {
   invitation: UnitInvitation | null = null;
+  projectInvitation: ProjectInvitationItem | null = null;
   isLoading = false;
   invitationId: string | null = null;
+  invitationType: 'unit' | 'project' = 'unit';
 
   constructor(
     private route: ActivatedRoute,
@@ -43,8 +45,14 @@ export class InviteDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.invitationId = this.route.snapshot.paramMap.get('id');
+    this.invitationType = this.route.snapshot.queryParamMap.get('type') === 'project' ? 'project' : 'unit';
+
     if (this.invitationId) {
-      this.loadInvitation(this.invitationId);
+      if (this.invitationType === 'project') {
+        this.loadProjectInvitation(this.invitationId);
+      } else {
+        this.loadInvitation(this.invitationId);
+      }
     } else {
       this.toast.error('ไม่พบรหัสคำเชิญ');
       this.onBack();
@@ -64,6 +72,25 @@ export class InviteDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading invitation:', err);
+        this.toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadProjectInvitation(id: string): void {
+    this.isLoading = true;
+    this.restService.getProjectInvitationById(id).subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.projectInvitation = response.data;
+        } else {
+          this.toast.error('ไม่พบข้อมูลคำเชิญ');
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading project invitation:', err);
         this.toast.error('เกิดข้อผิดพลาดในการโหลดข้อมูล');
         this.isLoading = false;
       }
@@ -106,5 +133,17 @@ export class InviteDetailComponent implements OnInit {
       case 'expired': return 'หมดอายุ';
       default: return status;
     }
+  }
+
+  getRoleLabel(role: string): string {
+    const roleMap: Record<string, string> = {
+      'family': 'ครอบครัว',
+      'tenant': 'ผู้เช่า',
+      'owner': 'เจ้าของ',
+      'juristicMember': 'นิติบุคคล',
+      'juristicAdmin': 'แอดมินนิติ',
+      'security': 'รปภ.',
+    };
+    return roleMap[role] || role || '-';
   }
 }

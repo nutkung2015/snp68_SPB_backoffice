@@ -3,7 +3,7 @@
     <mat-spinner diameter="40"></mat-spinner>
   </div>
 
-  <app-page-header iconSrc="assets/icons/invite.svg" title="จัดการคำเชิญยูนิต" subtitle="Unit Invitation Management"
+  <app-page-header iconSrc="assets/icons/invite.svg" title="จัดการคำเชิญ" subtitle="Invitation Management"
     iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
       <div class="project-info" *ngIf="currentProjectName">
@@ -12,14 +12,21 @@
       <div class="unit-info" *ngIf="selectedUnitNumber">
         ยูนิต: <strong>{{ selectedUnitNumber }}</strong>
       </div>
-      <button mat-flat-button class="bt-primary" (click)="onCreateNew()">
+      <!-- Tab Pill Buttons -->
+      <button class="pill-btn" [class.active]="activeTab === 'unit'" (click)="switchTab('unit')">
+        <mat-icon>home</mat-icon>
+        คำเชิญลูกบ้าน
+      </button>
+      <button class="pill-btn" [class.active]="activeTab === 'project'" (click)="switchTab('project')">
+        <mat-icon>business</mat-icon>
+        คำเชิญนิติและ รปภ.
+      </button>
+
+      <button mat-flat-button class="bt-primary" (click)="onCreateNew()"
+        *ngIf="activeTab === 'unit' || activeTab === 'project'">
         <mat-icon>add</mat-icon>
         <span>ส่งคำเชิญใหม่</span>
       </button>
-      <!-- <button mat-flat-button class="bt-secondary" (click)="onCreateUnit()">
-        <mat-icon>apartment</mat-icon>
-        <span>สร้างยูนิต</span>
-      </button> -->
     </div>
   </app-page-header>
 
@@ -29,7 +36,8 @@
         <div fxFlex fxLayout="row" fxLayoutGap="10px">
           <div class="filter-input right" fxFlex="350px">
             <mat-icon class="secondary">search</mat-icon>
-            <input matInput type="text" (keyup)="applyFilter($event)" placeholder="ค้นหาอีเมล ผู้ส่ง หรือรหัสคำเชิญ" />
+            <input matInput type="text" (keyup)="applyFilter($event)"
+              [placeholder]="activeTab === 'unit' ? 'ค้นหาอีเมล ผู้ส่ง หรือรหัสคำเชิญ' : 'ค้นหาผู้ส่ง อีเมล หรือรหัสคำเชิญ'" />
           </div>
 
           <div class="filter-input left" fxFlex="250px">
@@ -56,45 +64,64 @@
 
   <div id="box-content" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px" style="padding: 24px;">
     <mat-card fxLayout="column" fxLayoutGap="20px">
-      <!-- <div fxLayout="row" fxLayoutAlign="space-between center">
-        <span>{{ dataSource.data.length }} คำเชิญ</span>
-      </div> -->
-      <!-- <mat-divider></mat-divider> -->
 
       <ng-container *ngIf="dataSource.data.length > 0; else noData">
         <div class="div-table">
           <table mat-table [dataSource]="paginatedData" matSort>
+            <!-- Shared: Sequence -->
             <ng-container matColumnDef="sequence">
               <th mat-header-cell *matHeaderCellDef>#</th>
               <td mat-cell *matCellDef="let element; let i = index">{{ pageEvent.pageIndex * pageEvent.pageSize + i + 1
                 }}</td>
             </ng-container>
 
+            <!-- Unit Tab: unit_number -->
             <ng-container matColumnDef="unit_number">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>ยูนิต</th>
               <td mat-cell *matCellDef="let element">{{ element.unit_number }}</td>
             </ng-container>
 
+            <!-- Unit Tab: invited_email -->
             <ng-container matColumnDef="invited_email">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>อีเมลที่เชิญ</th>
               <td mat-cell *matCellDef="let element">{{ element.invited_email || '-' }}</td>
             </ng-container>
 
-            <ng-container matColumnDef="role">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>บทบาท</th>
+            <!-- Unit Tab: invited_by_name -->
+            <ng-container matColumnDef="invited_by_name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>เชิญโดย</th>
+              <td mat-cell *matCellDef="let element">{{ element.invited_by_name || '-' }}</td>
+            </ng-container>
+
+            <!-- Project Tab: invitation_code -->
+            <ng-container matColumnDef="invitation_code">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>รหัสคำเชิญ</th>
               <td mat-cell *matCellDef="let element">
-                {{
-                element.role === 'family'
-                ? 'ครอบครัว'
-                : element.role === 'tenant'
-                ? 'ผู้เช่า'
-                : element.role === 'owner'
-                ? 'เจ้าของ'
-                : element.role || '-'
-                }}
+                <span class="invitation-code">{{ element.invitation_code || '-' }}</span>
               </td>
             </ng-container>
 
+            <!-- Project Tab: sender_name -->
+            <ng-container matColumnDef="sender_name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>ผู้ส่ง</th>
+              <td mat-cell *matCellDef="let element">{{ element.sender_name || '-' }}</td>
+            </ng-container>
+
+            <!-- Project Tab: sender_email -->
+            <ng-container matColumnDef="sender_email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>อีเมลผู้ส่ง</th>
+              <td mat-cell *matCellDef="let element">{{ element.sender_email || '-' }}</td>
+            </ng-container>
+
+            <!-- Shared: role -->
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>บทบาท</th>
+              <td mat-cell *matCellDef="let element">
+                {{ getRoleLabel(element.role) }}
+              </td>
+            </ng-container>
+
+            <!-- Shared: status -->
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>สถานะ</th>
               <td mat-cell *matCellDef="let element">
@@ -103,6 +130,8 @@
                   element.status === 'pending'
                   ? 'รอดำเนินการ'
                   : element.status === 'accepted'
+                  ? 'ตอบรับแล้ว'
+                  : element.status === 'used'
                   ? 'ตอบรับแล้ว'
                   : element.status === 'declined'
                   ? 'ปฏิเสธ'
@@ -114,16 +143,13 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="invited_by_name">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>เชิญโดย</th>
-              <td mat-cell *matCellDef="let element">{{ element.invited_by_name || '-' }}</td>
-            </ng-container>
-
+            <!-- Shared: expires_at -->
             <ng-container matColumnDef="expires_at">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>หมดอายุ</th>
               <td mat-cell *matCellDef="let element">{{ formatDate(element.expires_at) }}</td>
             </ng-container>
 
+            <!-- Shared: actions -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>การทำงาน</th>
               <td mat-cell *matCellDef="let element">
@@ -152,7 +178,9 @@
             <mat-icon>email</mat-icon>
           </div>
           <h3 class="no-data-title">ไม่มีคำเชิญ</h3>
-          <p class="no-data-hint">ยังไม่มีคำเชิญในยูนิตนี้</p>
+          <p class="no-data-hint">
+            {{ activeTab === 'unit' ? 'ยังไม่มีคำเชิญลูกบ้านในโครงการนี้' : 'ยังไม่มีคำเชิญนิติ/รปภ. ในโครงการนี้' }}
+          </p>
         </div>
       </ng-template>
     </mat-card>

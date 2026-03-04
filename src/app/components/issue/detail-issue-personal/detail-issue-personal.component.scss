@@ -1,6 +1,248 @@
 .detail-issue-container {
   padding: 24px;
 
+  // Odoo-style Status Bar
+  .status-bar-container {
+    margin-bottom: 24px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eef0f2;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .status-bar-main {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .status-bar-divider {
+    width: 1px;
+    height: 36px;
+    background: #e2e8f0;
+    margin: 0 20px;
+    flex-shrink: 0;
+  }
+
+  .status-bar-secondary {
+    flex-shrink: 0;
+  }
+
+  // Rejected step special styles
+  .rejected-step {
+    flex: 0 0 auto !important;
+
+    .step-pill {
+      border-color: #fecaca !important;
+      background: #fef2f2 !important;
+
+      .step-reject-icon {
+        font-size: 18px;
+        width: 22px;
+        height: 22px;
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        &.active-icon {
+          color: white;
+        }
+      }
+
+      .step-label {
+        color: #ef4444 !important;
+      }
+    }
+
+    &.active .step-pill {
+      background: #ef4444 !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+
+      .step-label {
+        color: white !important;
+        font-weight: 600;
+      }
+    }
+
+    &.clickable .step-pill:hover {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15) !important;
+
+      .step-label {
+        color: #dc2626 !important;
+      }
+    }
+  }
+
+  .status-step {
+    display: flex;
+    align-items: center;
+    flex: 1;
+
+    &:last-child {
+      flex: 0 0 auto;
+    }
+
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 24px;
+      background: #f1f5f9;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      cursor: default;
+
+      .step-number {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .step-check {
+        font-size: 18px;
+        width: 22px;
+        height: 22px;
+        color: white;
+        background: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .step-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #94a3b8;
+      }
+    }
+
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: #e2e8f0;
+      min-width: 20px;
+      transition: background 0.3s ease;
+    }
+
+    // Completed state
+    &.completed {
+      .step-pill {
+        background: #ecfdf5;
+        border-color: #a7f3d0;
+
+        .step-label {
+          color: #059669;
+        }
+      }
+
+      .step-connector {
+        background: #10b981;
+      }
+    }
+
+    // Active (current) state
+    &.active {
+      .step-pill {
+        background: #2A405E;
+        border-color: #2A405E;
+        box-shadow: 0 4px 12px rgba(42, 64, 94, 0.3);
+
+        .step-number {
+          background: white;
+          color: #2A405E;
+        }
+
+        .step-label {
+          color: white;
+          font-weight: 600;
+        }
+      }
+    }
+
+    // Clickable (interactive) state
+    &.clickable {
+      .step-pill {
+        cursor: pointer;
+
+        &:hover {
+          background: #e8ecf1;
+          border-color: #2A405E;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(42, 64, 94, 0.15);
+
+          .step-label {
+            color: #2A405E;
+          }
+
+          .step-number {
+            background: #2A405E;
+            color: white;
+          }
+        }
+      }
+    }
+
+    // Completed + clickable
+    &.completed.clickable {
+      .step-pill:hover {
+        background: #d1fae5;
+        border-color: #059669;
+
+        .step-label {
+          color: #047857;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .status-bar {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .status-step {
+      flex: 0 0 auto;
+
+      .step-connector {
+        display: none;
+      }
+
+      .step-pill {
+        padding: 6px 12px;
+
+        .step-label {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
   .header {
     margin-bottom: 24px;
 

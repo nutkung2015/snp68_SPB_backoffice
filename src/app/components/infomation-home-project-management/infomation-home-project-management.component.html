@@ -1,10 +1,15 @@
 <app-page-header iconSrc="assets/icons/hugeicons--floor-plan.svg" title="จัดการข้อมูลแบบบ้าน"
     subtitle="จัดการไฟล์แปลนบ้านและรายละเอียดสำหรับแต่ละแบบบ้าน" iconColor="invert(100%)">
     <div class="detail-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-        <mat-button-toggle-group #group="matButtonToggleGroup" [value]="viewMode" (change)="setViewMode(group.value)">
-            <mat-button-toggle value="house_models">จัดการแบบบ้าน</mat-button-toggle>
-            <mat-button-toggle value="project_info">จัดการข้อมูลหมู่บ้าน</mat-button-toggle>
-        </mat-button-toggle-group>
+        <button class="pill-btn" [class.active]="viewMode === 'house_models'" (click)="setViewMode('house_models')"
+            style="margin-right: 10px;">
+            <mat-icon>home_work</mat-icon>
+            จัดการแบบบ้าน
+        </button>
+        <button class="pill-btn" [class.active]="viewMode === 'project_info'" (click)="setViewMode('project_info')">
+            <mat-icon>info</mat-icon>
+            จัดการข้อมูลหมู่บ้าน
+        </button>
 
         <button *ngIf="viewMode === 'house_models' && canEdit" mat-stroked-button color="primary" (click)="addNewCard()"
             style="margin-left: 10px;">
@@ -152,7 +157,7 @@
             <div class="card-content">
                 <!-- Project Detail Section -->
                 <div class="file-section">
-                    <div class="section-label">ข้อมูลรายละเอียดโครงการ</div>
+                    <div class="section-label">รายละเอียดโครงการ</div>
                     <div class="file-box" [class.has-file]="projectInfoData.project_detail_file_url">
                         <!-- View State -->
                         <div class="file-display">
