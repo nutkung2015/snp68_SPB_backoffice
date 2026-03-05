@@ -49,7 +49,7 @@ export class GuardPostDialogComponent {
     if (this.form.valid) {
       const result = {
         ...this.form.value,
-        // project_id: this.data.projectId
+        project_id: this.data.projectId
       };
       this.dialogRef.close(result);
     }
