@@ -170,23 +170,7 @@
       }
     }
 
-    .reset-button {
-      border: 1px solid #23272d;
-      border-radius: 8px;
-      color: #23272d;
-    }
 
-    .search-button {
-      border: 1px solid #2084fc;
-      border-radius: 8px;
-      color: #2084fc;
-
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-      }
-    }
 
     mat-icon.secondary {
       color: #64748b;
@@ -238,8 +222,25 @@
 
     .mat-mdc-table {
       .mat-column-status {
-        min-width: 100px;
-        max-width: 100px;
+        min-width: 120px;
+        max-width: 150px;
+        white-space: nowrap;
+      }
+
+      .title-cell {
+        display: -webkit-box;
+        display: box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 300px;
+        max-height: 3.2em; // ประมาณ 2 บรรทัด (1.6em x 2)
+        line-height: 1.6em;
+        word-wrap: break-word;
+        white-space: normal;
       }
 
       // Content cell styling for 2-line limit with ellipsis
@@ -252,7 +253,7 @@
         box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 600px;
+        max-width: 500px;
         max-height: 3.2em; // ประมาณ 2 บรรทัด (1.6em x 2)
         line-height: 1.6em;
         word-wrap: break-word;

@@ -5,6 +5,7 @@
 
 // Variables
 $primary: #2A405E;
+$secondary: #2084fc;
 $white: #ffffff;
 $black: #1a1a1a;
 $gray-100: #f8f9fa;
@@ -263,6 +264,18 @@ $gray-600: #495057;
             color: #dc3545;
             background: rgba(220, 53, 69, 0.08);
         }
+
+        &.edit-btn {
+            color: $primary;
+
+            mat-icon {
+                color: $primary;
+            }
+
+            &:hover {
+                background: rgba($primary, 0.08);
+            }
+        }
     }
 }
 
@@ -297,10 +310,11 @@ $gray-600: #495057;
 
 // Add Button Style
 .btn-add {
-    background: $primary !important;
+    background: $secondary !important;
     color: $white !important;
     border-radius: 8px !important;
     font-weight: 500 !important;
+    font-family: 'LINE Seed Sans TH', sans-serif;
 
     mat-icon {
         margin-right: 6px;

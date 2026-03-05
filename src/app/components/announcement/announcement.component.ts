@@ -19,6 +19,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { RestService, Announcement as ApiAnnouncement, AnnouncementResponse } from '../../services/rest.service';
+import { SearchBtnDirective } from '../../directive/search-btn.directive';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
 
 // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
@@ -90,6 +92,8 @@ interface AttachmentUrl {
     MatProgressSpinnerModule,
     HttpClientModule,
     PageHeaderComponent,
+    SearchBtnDirective,
+    ResetBtnDirective,
   ],
   templateUrl: './announcement.component.html',
   styleUrls: ['./announcement.component.scss'],

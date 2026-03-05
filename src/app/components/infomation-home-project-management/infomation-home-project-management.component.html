@@ -11,7 +11,7 @@
             จัดการข้อมูลหมู่บ้าน
         </button>
 
-        <button *ngIf="viewMode === 'house_models' && canEdit" mat-stroked-button color="primary" (click)="addNewCard()"
+        <button *ngIf="viewMode === 'house_models' && canEdit" mat-flat-button class="btn-add" (click)="addNewCard()"
             style="margin-left: 10px;">
             <mat-icon>add</mat-icon>
             เพิ่มแบบบ้าน

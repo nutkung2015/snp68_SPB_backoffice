@@ -28,6 +28,8 @@ import { PageHeaderComponent } from '../../shared/page-header/page-header.compon
 import { ZoneDialogComponent } from './zone-dialog/zone-dialog.component';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../shared/toast/toast.service';
+import { SearchBtnDirective } from '../../directive/search-btn.directive';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
 
 @Component({
   selector: 'app-vilage-unit-management',
@@ -54,7 +56,9 @@ import { ToastService } from '../../shared/toast/toast.service';
     MatDialogModule,
     MatMenuModule,
     RouterLink,
-    ZoneDialogComponent
+    ZoneDialogComponent,
+    SearchBtnDirective,
+    ResetBtnDirective,
   ],
   templateUrl: './vilage-unit-management.component.html',
   styleUrl: './vilage-unit-management.component.scss'

@@ -1,3 +1,68 @@
+// ::ng-deep {
+//   // Override MDC Typography Variables
+//   --mdc-typography-font-family: 'LINE Seed Sans TH', sans-serif;
+//   --mdc-typography-body1-font-family: 'LINE Seed Sans TH', sans-serif;
+//   --mdc-typography-subtitle1-font-family: 'LINE Seed Sans TH', sans-serif;
+//   --mdc-typography-button-font-family: 'LINE Seed Sans TH', sans-serif;
+
+//   * {
+//     font-family: 'LINE Seed Sans TH', sans-serif !important;
+//   }
+
+//   mat-icon,
+//   .material-icons {
+//     font-family: 'Material Icons' !important;
+//   }
+
+//   // Fallback for direct elements
+//   .mat-mdc-form-field-type-mat-select .mat-mdc-select-value,
+//   .mat-mdc-select-placeholder,
+//   .mat-mdc-select-value-text,
+//   .mdc-text-field__input,
+//   input.mat-input-element,
+//   .mdc-text-field--outlined.mdc-text-field,
+//   .mdc-text-field,
+//   .mat-select,
+//   .mat-mdc-text-field-wrapper,
+//   .mat-error {
+//     font-family: 'LINE Seed Sans TH', sans-serif !important;
+//   }
+// }
+
+::ng-deep .mat-mdc-text-field-wrapper,
+.mat-select,
+.mat-option {
+  font-family: 'LINE Seed Sans TH', sans-serif !important;
+}
+
+.mat-select-custom {
+  font-family: 'LINE Seed Sans TH', sans-serif !important;
+}
+
+// mat-option renders in CDK Overlay outside this component,
+// so ::ng-deep is required to pierce View Encapsulation
+::ng-deep .mat-option-custom,
+::ng-deep .mat-option-custom .mdc-list-item__primary-text {
+  font-family: 'LINE Seed Sans TH', sans-serif !important;
+}
+
+// Global scope for overlays (Select dropdowns render outside :host)
+// ::ng-deep {
+
+//   .mat-mdc-select-panel-above,
+//   .mat-mdc-select-panel,
+//   .cdk-overlay-pane {
+//     --mdc-typography-font-family: 'LINE Seed Sans TH', sans-serif;
+//     --mdc-typography-body1-font-family: 'LINE Seed Sans TH', sans-serif;
+//     --mdc-typography-subtitle1-font-family: 'LINE Seed Sans TH', sans-serif;
+//   }
+
+//   .mat-mdc-option,
+//   .mdc-list-item__primary-text {
+//     font-family: 'LINE Seed Sans TH', sans-serif !important;
+//   }
+// }
+
 .header {
   font-style: normal;
   background-color: #ffffff;

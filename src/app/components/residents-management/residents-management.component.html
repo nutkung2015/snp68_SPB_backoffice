@@ -50,15 +50,8 @@
 
         <!-- Buttons Section -->
         <div fxLayout="row" fxLayoutGap="10px">
-          <button mat-stroked-button class="reset-btn" (click)="onReset()">
-            ล้างค่า
-          </button>
-          <button mat-stroked-button class="search-btn" (click)="onSearch()">
-            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
-              <mat-icon style="width: 14px; height: 14px; font-size: 14px">search</mat-icon>
-              <span>ค้นหา</span>
-            </div>
-          </button>
+          <button mat-stroked-button appResetBtn (click)="onReset()"></button>
+          <button mat-stroked-button appSearchBtn (click)="onSearch()"></button>
         </div>
       </div>
     </div>

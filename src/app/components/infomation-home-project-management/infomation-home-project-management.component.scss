@@ -325,3 +325,16 @@
         font-family: 'LINE Seed Sans TH', sans-serif !important;
     }
 }
+
+// Add Button Style
+.btn-add {
+    background: #2084fc !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-family: 'LINE Seed Sans TH', sans-serif;
+
+    mat-icon {
+        margin-right: 6px;
+    }
+}

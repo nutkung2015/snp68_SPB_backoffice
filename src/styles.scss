@@ -49,6 +49,17 @@ body {
 
 // Color
 
+$primary: #2A405E;
+$secondary: #2084fc;
+$white: #ffffff;
+$black: #1a1a1a;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #6c757d;
+$gray-600: #495057;
+
 .primary {
   color: #2084fc !important;
 }
@@ -262,4 +273,14 @@ $primary-color: #2A405E;
     background: $primary-color !important;
     color: white !important;
   }
+}
+
+// ============================================
+// Global Font Override for Angular Material CDK Overlays
+// (mat-option renders outside component scope in <body>)
+// ============================================
+.mat-option-custom,
+.mat-option-custom .mdc-list-item__primary-text,
+.mat-mdc-option .mdc-list-item__primary-text {
+  font-family: 'LINE Seed Sans TH', sans-serif !important;
 }

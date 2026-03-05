@@ -128,12 +128,12 @@
       <!-- Issue Status Distribution -->
       <div class="grid-item chart-card issue-status-chart">
         <div class="card-header">
-          <h3>สถานะการแจ้งซ่อม</h3>
+          <h3>สถานะปัญหาส่วนกลาง</h3>
         </div>
         <div class="chart-container donut">
           <ngx-charts-pie-chart *ngIf="issueStatusChartData.length > 0" [results]="issueStatusChartData"
-            [scheme]="pieColorScheme" [doughnut]="true" [arcWidth]="0.4" [labels]="true" [trimLabels]="true"
-            [legend]="false">
+            [scheme]="pieColorScheme" [customColors]="statusColors" [doughnut]="true" [arcWidth]="0.4" [labels]="true"
+            [trimLabels]="true" [legend]="false">
           </ngx-charts-pie-chart>
           <div *ngIf="issueStatusChartData.length === 0" class="no-data">
             <mat-icon>donut_small</mat-icon>

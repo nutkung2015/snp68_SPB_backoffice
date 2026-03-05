@@ -19,6 +19,8 @@ import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
+// import { SearchBtnDirective } from '../../directive/search-btn.directive';
 
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
@@ -80,6 +82,8 @@ interface APIResponse {
     HttpClientModule,
     PageHeaderComponent,
     MatTooltipModule,
+    ResetBtnDirective,
+    // SearchBtnDirective
   ],
   templateUrl: './invite-management.component.html',
   styleUrls: ['./invite-management.component.scss'],
@@ -371,10 +375,11 @@ export class InviteManagementComponent implements OnInit {
   onReset(): void {
     this.searchTerm = '';
     this.selectedStatus = 'all';
-    this.dataSource.data = this.allInvitations;
+    this.selectedUnitId = null;
+    this.selectedUnitNumber = null;
     this.dataSource.filter = '';
-    this.pageEvent.length = this.allInvitations.length;
     this.pageEvent.pageIndex = 0;
+    this.loadInvitations();
   }
 
   applyFilter(event: Event) {

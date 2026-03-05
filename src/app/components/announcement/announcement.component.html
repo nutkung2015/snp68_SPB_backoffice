@@ -44,7 +44,7 @@
             <!-- Status Section -->
             <div fxLayout="row" fxLayoutGap="10px" style="min-width: 300px">
               <div fxFlex="50px" fxLayoutAlign="end center">
-                <span>Active</span>
+                <span>สถานะ</span>
               </div>
               <div class="filter-input left" fxFlex style="height: 100%">
                 <mat-select [(ngModel)]="selectedStatus" (selectionChange)="filterByStatus($event.value)">
@@ -58,7 +58,7 @@
             <!-- Type Section -->
             <div fxLayout="row" fxLayoutGap="10px" style="min-width: 300px">
               <div fxFlex="50px" fxLayoutAlign="end center">
-                <span>Type</span>
+                <span>ประเภท</span>
               </div>
               <div class="filter-input left" fxFlex style="height: 100%">
                 <mat-select [(ngModel)]="selectedType" (selectionChange)="filterByType($event.value)">
@@ -73,15 +73,8 @@
 
         <!-- Buttons Section -->
         <div fxLayout="row" fxLayoutGap="10px">
-          <button mat-stroked-button class="reset-btn" (click)="onReset()">
-            ล้างค่า
-          </button>
-          <button mat-stroked-button class="search-btn" (click)="onSearch()">
-            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
-              <mat-icon style="width: 14px; height: 14px; font-size: 14px">search</mat-icon>
-              <span>ค้นหา</span>
-            </div>
-          </button>
+          <button mat-stroked-button appResetBtn (click)="onReset()"></button>
+          <button mat-stroked-button appSearchBtn (click)="onSearch()"></button>
         </div>
       </div>
     </div>
@@ -117,7 +110,9 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 หัวข้อประกาศ
               </th>
-              <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+              <td mat-cell *matCellDef="let element">
+                <div class="title-cell">{{ element.title }}</div>
+              </td>
             </ng-container>
 
             <!-- Content Column -->
@@ -184,7 +179,7 @@
                   : element.status === "draft"
                   ? "แบบร่าง"
                   : element.status === "unpublished"
-                  ? "ยกเลิกเผยแพร่"
+                  ? "เลิกเผยแพร่"
                   : element.status
                   }}
                 </span>

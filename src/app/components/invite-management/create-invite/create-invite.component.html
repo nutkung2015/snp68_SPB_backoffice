@@ -28,11 +28,11 @@
                         </div>
                         <div fxLayout="row" fxLayoutGap="20px">
                             <mat-checkbox [checked]="inviteType === 'resident'"
-                                (change)="onInviteTypeChange('resident')">
+                                (change)="onInviteTypeChange('resident')" class="check-box">
                                 ส่งคำเชิญให้ผู้อยู่อาศัย (Resident)
                             </mat-checkbox>
                             <mat-checkbox [checked]="inviteType === 'juristic'"
-                                (change)="onInviteTypeChange('juristic')">
+                                (change)="onInviteTypeChange('juristic')" class="check-box">
                                 ส่งคำเชิญให้นิติบุคคล/รปภ. (Juristic/Security)
                             </mat-checkbox>
                         </div>
@@ -147,7 +147,7 @@
                         </div>
 
                     </div>
-                    
+
                     <!-- Action Buttons -->
                     <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px" style="margin-top: 24px;">
                         <button class="btn-cancel" (click)="onCancel()">

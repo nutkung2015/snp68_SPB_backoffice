@@ -27,6 +27,8 @@ import { AuthService } from '../../services/auth.service';
 // shared component
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { CsvExportService, CsvColumn } from '../../services/csv-export.service';
+import { SearchBtnDirective } from '../../directive/search-btn.directive';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
 
 type ResidentStatus = StatusType | 'all';
 type StatusType = 'active' | 'inactive' | 'pending';
@@ -90,6 +92,8 @@ interface ResidentAPI {
     MatProgressSpinnerModule,
     HttpClientModule,
     PageHeaderComponent,
+    SearchBtnDirective,
+    ResetBtnDirective,
   ],
   templateUrl: './residents-management.component.html',
   styleUrls: ['./residents-management.component.scss'],

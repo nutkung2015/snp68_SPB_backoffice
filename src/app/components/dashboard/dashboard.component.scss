@@ -85,7 +85,7 @@ $radius-xl: 20px;
       background: linear-gradient(135deg, $primary-color, $primary-light);
       color: white;
       padding: 10px 20px;
-      border-radius: $radius-lg;
+      border-radius: 10px;
       font-size: 14px;
       font-weight: 500;
     }
@@ -502,7 +502,7 @@ $radius-xl: 20px;
             background: $blue;
           }
 
-          &.completed {
+          &.resolved {
             background: $green;
           }
         }

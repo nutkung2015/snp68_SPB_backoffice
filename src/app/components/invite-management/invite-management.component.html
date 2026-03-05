@@ -22,7 +22,7 @@
         คำเชิญนิติและ รปภ.
       </button>
 
-      <button mat-flat-button class="bt-primary" (click)="onCreateNew()"
+      <button mat-flat-button class="btn-add" (click)="onCreateNew()"
         *ngIf="activeTab === 'unit' || activeTab === 'project'">
         <mat-icon>add</mat-icon>
         <span>ส่งคำเชิญใหม่</span>
@@ -52,11 +52,8 @@
         </div>
 
         <div fxLayout="row" fxLayoutGap="10px">
-          <button mat-stroked-button class="reset-btn" (click)="onReset()">รีเซ็ต</button>
-          <button mat-flat-button class="search-btn" (click)="onSearch()">
-            <mat-icon>refresh</mat-icon>
-            โหลดใหม่
-          </button>
+          <button mat-stroked-button appResetBtn (click)="onReset()"></button>
+
         </div>
       </div>
     </div>

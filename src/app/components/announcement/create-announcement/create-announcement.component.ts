@@ -70,6 +70,7 @@ interface Announcement {
 })
 export class CreateAnnouncementComponent {
   uploadProgress = 0;
+  imagePreviewUrl: string | null = null;
 
   // เพิ่มตัวแปร isLoading
   isLoading = new BehaviorSubject<boolean>(false);
@@ -142,6 +143,13 @@ export class CreateAnnouncementComponent {
 
       console.log('Selected file:', file);
       this.selectedFile = file;
+
+      // สร้าง preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagePreviewUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -228,6 +236,7 @@ export class CreateAnnouncementComponent {
 
   removeFile(): void {
     this.selectedFile = null;
+    this.imagePreviewUrl = null;
     this.uploadProgress = 0;
   }
 }

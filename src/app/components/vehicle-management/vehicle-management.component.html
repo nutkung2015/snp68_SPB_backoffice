@@ -120,11 +120,7 @@
                         เพิ่มยานพาหนะ
                     </button>
 
-                    <button mat-stroked-button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading"
-                        matTooltip="รีเฟรชข้อมูล">
-                        <mat-icon [class.spin]="isLoading">sync</mat-icon>
-                        รีเฟรช
-                    </button>
+                    <button mat-stroked-button appResetBtn (click)="refreshData()"></button>
                 </div>
             </div>
         </div>
@@ -223,12 +219,12 @@
 
                         <!-- Actions Column -->
                         <ng-container matColumnDef="actions">
-                            <th mat-header-cell *matHeaderCellDef>จัดการ</th>
+                            <th mat-header-cell *matHeaderCellDef></th>
                             <td mat-cell *matCellDef="let element">
-                                <button mat-icon-button color="primary" (click)="openEditDialog(element)"
-                                    matTooltip="แก้ไข">
+                                <!-- <button mat-icon-button style="color: #2A405E !important;"
+                                    (click)="openEditDialog(element)" matTooltip="แก้ไข">
                                     <mat-icon>edit</mat-icon>
-                                </button>
+                                </button> -->
                                 <button mat-icon-button color="warn" (click)="deleteVehicle(element)" matTooltip="ลบ">
                                     <mat-icon>delete</mat-icon>
                                 </button>

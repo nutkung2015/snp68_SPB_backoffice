@@ -29,6 +29,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SelectionModel } from '@angular/cdk/collections';
 import { VehicleDialogComponent } from './vehicle-dialog/vehicle-dialog.component';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
+import { SearchBtnDirective } from '../../directive/search-btn.directive';
+import { ConfirmDeleteVehicleComponent } from '../dialog/confirm-delete-vehicle/confirm-delete-vehicle.component';
 
 @Component({
     selector: 'app-vehicle-management',
@@ -52,6 +55,8 @@ import { VehicleDialogComponent } from './vehicle-dialog/vehicle-dialog.componen
         MatTooltipModule,
         MatMenuModule,
         FlexLayoutModule,
+        ResetBtnDirective,
+        SearchBtnDirective
     ],
     templateUrl: './vehicle-management.component.html',
     styleUrls: ['./vehicle-management.component.scss'],
@@ -326,24 +331,33 @@ export class VehicleManagementComponent implements OnInit {
     }
 
     deleteVehicle(vehicle: Vehicle): void {
-        if (!confirm(`ต้องการลบยานพาหนะ "${vehicle.plate_number}" หรือไม่?`)) {
-            return;
-        }
+        const dialogRef = this.dialog.open(ConfirmDeleteVehicleComponent, {
+            width: '380px',
+            data: {
+                toppic: `ต้องการลบยานพาหนะ "${vehicle.plate_number}" หรือไม่?`,
+                cancel: 'ยกเลิก',
+                confirm: 'ลบข้อมูล',
+            },
+        });
 
-        this.restService.deleteVehicle(vehicle.id, this.projectId).subscribe({
-            next: (res) => {
-                if (res.status === 'success') {
-                    this.toast.success('ลบยานพาหนะสำเร็จ');
-                    this.loadVehicles();
-                    this.loadStats();
-                } else {
-                    this.toast.error(res.message || 'ไม่สามารถลบยานพาหนะได้');
-                }
-            },
-            error: (err) => {
-                console.error('Delete vehicle error:', err);
-                this.toast.error('เกิดข้อผิดพลาดในการลบยานพาหนะ');
-            },
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.restService.deleteVehicle(vehicle.id, this.projectId).subscribe({
+                    next: (res) => {
+                        if (res.status === 'success') {
+                            this.toast.success('ลบยานพาหนะสำเร็จ');
+                            this.loadVehicles();
+                            this.loadStats();
+                        } else {
+                            this.toast.error(res.message || 'ไม่สามารถลบยานพาหนะได้');
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Delete vehicle error:', err);
+                        this.toast.error('เกิดข้อผิดพลาดในการลบยานพาหนะ');
+                    },
+                });
+            }
         });
     }
 

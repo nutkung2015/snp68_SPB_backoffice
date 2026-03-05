@@ -22,6 +22,8 @@ import { RestService, PersonalRepairResponse, PersonalRepair } from '../../servi
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 import { AuthService } from '../../services/auth.service';
 import { CsvExportService, CsvColumn } from '../../services/csv-export.service';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
+import { SearchBtnDirective } from '../../directive/search-btn.directive';
 
 type IssueStatus = 'pending' | 'in_progress' | 'completed' | 'rejected' | 'all';
 
@@ -60,6 +62,8 @@ interface Issue {
     HttpClientModule,
     RouterModule,
     PageHeaderComponent,
+    ResetBtnDirective,
+    SearchBtnDirective
   ],
   templateUrl: './issue.component.html',
   styleUrls: ['./issue.component.scss'],
@@ -307,6 +311,7 @@ export class IssueComponent implements OnInit {
 
   onReset(): void {
     this.searchTerm = '';
+    this.dataSource.filter = '';
     this.selectedStatus = 'all';
     this.selectedType = 'all';
     this.selectedPriority = 'all';

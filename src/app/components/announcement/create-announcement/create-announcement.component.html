@@ -35,21 +35,20 @@
                         <span>คลิกหรือลากไฟล์มาที่นี่เพื่ออัพโหลด</span>
                       </div>
 
-                      <!-- ส่วนที่แสดงเมื่อมีไฟล์ -->
-                      <div *ngIf="selectedFile" fxLayout="row" fxLayoutAlign="space-between center"
-                        style="width: 100%; padding: 10px">
-                        <div class="file-preview" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-                          <mat-icon>insert_drive_file</mat-icon>
-                          <span>{{ selectedFile.name }}</span>
-                        </div>
-                        <div class="file-actions" fxLayout="row" fxLayoutGap="10px">
-                          <button mat-icon-button color="primary" (click)="fileInput.click()">
+                      <!-- ส่วนที่แสดงเมื่อมีไฟล์ (Image Preview) -->
+                      <div *ngIf="selectedFile" class="image-preview-wrapper">
+                        <img [src]="imagePreviewUrl" alt="preview" class="image-preview" />
+                        <div class="image-overlay">
+                          <button mat-icon-button class="overlay-btn" (click)="fileInput.click()"
+                            matTooltip="เปลี่ยนรูป">
                             <mat-icon>edit</mat-icon>
                           </button>
-                          <button mat-icon-button color="warn" (click)="removeFile()">
+                          <button mat-icon-button class="overlay-btn delete-btn" (click)="removeFile()"
+                            matTooltip="ลบรูป">
                             <mat-icon>delete</mat-icon>
                           </button>
                         </div>
+                        <span class="preview-filename">{{ selectedFile.name }}</span>
                       </div>
 
                       <!-- Progress Bar -->

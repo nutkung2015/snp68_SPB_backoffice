@@ -60,6 +60,14 @@ export class DashboardComponent implements OnInit {
     domain: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4']
   };
 
+  statusColors: any[] = [
+    { name: 'รอดำเนินการ', value: '#f59e0b' },     // สีส้ม/เหลือง
+    { name: 'กำลังดำเนินการ', value: '#3b82f6' },  // สีน้ำเงิน
+    { name: 'เสร็จสิ้น', value: '#10b981' },        // สีเขียว
+    { name: 'ไม่ผ่าน', value: '#ef4444' },         // สีแดง
+    { name: 'ไม่ระบุ', value: '#9ca3af' }           // สีเทา
+  ];
+
   constructor(
     private restService: RestService,
     private router: Router,
@@ -195,7 +203,7 @@ export class DashboardComponent implements OnInit {
     const map: { [key: string]: string } = {
       'pending': 'รอดำเนินการ',
       'in_progress': 'กำลังดำเนินการ',
-      'completed': 'เสร็จสิ้น',
+      'resolved': 'เสร็จสิ้น',
       'rejected': 'ไม่ผ่าน',
       'unknown': 'ไม่ระบุ'
     };

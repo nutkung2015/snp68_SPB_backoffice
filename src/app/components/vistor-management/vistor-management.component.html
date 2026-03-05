@@ -83,11 +83,7 @@
                     </button>
                 </div>
 
-                <button mat-raised-button color="primary" class="refresh-btn" (click)="refreshData()"
-                    [disabled]="isLoading">
-                    <mat-icon [class.spin]="isLoading">sync</mat-icon>
-                    รีเฟรช
-                </button>
+                <button mat-stroked-button appResetBtn (click)="refreshData()"></button>
             </div>
         </div>
 

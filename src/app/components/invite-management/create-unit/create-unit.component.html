@@ -72,7 +72,7 @@
                                 </span>
                                 <mat-form-field appearance="outline">
                                     <input matInput formControlName="unit_number" placeholder="เช่น 101, 205"
-                                        required />
+                                        class="mat-select-custom" required />
                                     <mat-error *ngIf="getFieldError('unit_number')">
                                         {{ getFieldError('unit_number') }}
                                     </mat-error>
@@ -85,8 +85,10 @@
                                     <span class="required">*</span>โซน
                                 </span>
                                 <mat-form-field appearance="outline">
-                                    <mat-select formControlName="zone" required>
-                                        <mat-option *ngFor="let zone of zones" [value]="zone.value">
+                                    <mat-select formControlName="zone" required placeholder="เลือกโซน"
+                                        class="mat-select-custom">
+                                        <mat-option *ngFor="let zone of zones" [value]="zone.value"
+                                            class="mat-option-custom">
                                             {{ zone.label }}
                                         </mat-option>
                                     </mat-select>
@@ -102,8 +104,10 @@
                                     <span class="required">*</span>บ้าน
                                 </span>
                                 <mat-form-field appearance="outline">
-                                    <mat-select formControlName="building" required>
-                                        <mat-option *ngFor="let building of buildings" [value]="building.value">
+                                    <mat-select formControlName="building" required placeholder="เลือกรูปแบบบ้าน"
+                                        class="mat-select-custom">
+                                        <mat-option *ngFor="let building of buildings" [value]="building.value"
+                                            class="mat-option-custom">
                                             {{ building.label }}
                                         </mat-option>
                                     </mat-select>

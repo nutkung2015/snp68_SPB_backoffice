@@ -26,7 +26,8 @@
           <div class="filter-input right" fxFlex="300px">
             <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" style="height: 100%">
               <mat-icon class="secondary">search</mat-icon>
-              <input matInput type="text" (keyup)="applyFilter($event)" placeholder="ค้นหาปัญหา"
+              <input matInput type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter($event)"
+                placeholder="ค้นหาปัญหา"
                 style="border: none; width: 100%; height: 100%; font-family: 'LINE Seed Sans TH', sans-serif;" />
             </div>
           </div>
@@ -76,15 +77,8 @@
 
         <!-- Buttons Section -->
         <div fxLayout="row" fxLayoutGap="10px">
-          <button mat-stroked-button class="reset-btn" (click)="onReset()">
-            รีเซ็ต
-          </button>
-          <button mat-stroked-button class="search-btn" (click)="onSearch()">
-            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="5px">
-              <mat-icon style="width: 14px; height: 14px; font-size: 14px">search</mat-icon>
-              <span>ค้นหา</span>
-            </div>
-          </button>
+          <button mat-stroked-button appResetBtn (click)="onReset()"></button>
+          <button mat-stroked-button appSearchBtn (click)="onSearch()"></button>
         </div>
       </div>
     </div>

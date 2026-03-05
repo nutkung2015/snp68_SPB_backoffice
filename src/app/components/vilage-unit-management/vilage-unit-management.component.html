@@ -13,7 +13,8 @@
                     <mat-icon>add</mat-icon>
                     <span>เพิ่ม Unit</span>
                 </button>
-                <mat-button-toggle-group [(ngModel)]="viewMode" (change)="onViewModeChange($event.value)">
+                <mat-button-toggle-group class="rounded-toggle" [(ngModel)]="viewMode"
+                    (change)="onViewModeChange($event.value)">
                     <mat-button-toggle value="units">ข้อมูลบ้าน</mat-button-toggle>
                     <mat-button-toggle value="zones">ข้อมูลโซน</mat-button-toggle>
                 </mat-button-toggle-group>
@@ -140,10 +141,7 @@
                         </button>
                     </ng-container>
 
-                    <button mat-raised-button color="primary" class="refresh-btn" (click)="applyFilter()">
-                        <mat-icon>sync</mat-icon>
-                        รีเฟรช
-                    </button>
+                    <button mat-stroked-button appResetBtn (click)="onReset()"></button>
                 </div>
             </div>
 

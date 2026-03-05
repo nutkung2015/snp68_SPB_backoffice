@@ -67,6 +67,7 @@
         height: 40px !important;
         border-radius: 8px !important;
         border: 1px solid #e2e8f0;
+        overflow: hidden; // Ensures the child buttons don't spill over the rounded corners
 
         .mat-button-toggle {
             height: 40px !important;
@@ -248,16 +249,35 @@ $gray-500: #6c757d;
 
 // Search Field
 .search-field {
-    width: 220px;
+    width: 400px;
+
 
     ::ng-deep {
+        --mdc-outlined-text-field-container-shape: 8px;
+        --mdc-shape-small: 8px;
+
         .mat-mdc-form-field-subscript-wrapper {
             display: none;
         }
 
         .mat-mdc-text-field-wrapper {
-            padding: 0 12px !important;
+            padding-left: 10px !important; // ชิดซ้าย 10px จากขอบ input
+            padding-right: 10px !important;
             height: 40px;
+        }
+
+        .mat-mdc-form-field-icon-prefix {
+            padding: 0 10px 0 0 !important; // ช่องว่างระหว่างแว่นขยายกับข้อความ (10px)
+            color: #000000; // ปรับสีแว่นขยายให้กลืนกับกรอบ
+            display: flex;
+            align-items: center;
+
+            mat-icon {
+                font-size: 20px; // ย่อขนาดไอคอนนิดหน่อยให้พอดี
+                width: 20px;
+                height: 20px;
+                padding: 0px !important;
+            }
         }
 
         .mat-mdc-form-field-infix {
@@ -269,7 +289,7 @@ $gray-500: #6c757d;
         .mdc-notched-outline__leading,
         .mdc-notched-outline__notch,
         .mdc-notched-outline__trailing {
-            border-color: #E5E7EB !important;
+            // border-color: #E5E7EB !important;
         }
 
         input::placeholder {
@@ -283,6 +303,9 @@ $gray-500: #6c757d;
     width: 130px;
 
     ::ng-deep {
+        --mdc-outlined-text-field-container-shape: 8px;
+        --mdc-shape-small: 8px;
+
         .mat-mdc-form-field-subscript-wrapper {
             display: none;
         }
@@ -299,6 +322,10 @@ $gray-500: #6c757d;
     }
 }
 
+.rounded-toggle {
+    border-radius: 8px !important;
+}
+
 // Filter Buttons
 .filter-buttons {
     display: flex;
@@ -306,7 +333,7 @@ $gray-500: #6c757d;
     flex-wrap: wrap;
 
     button {
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         font-weight: 500;
 
         mat-icon {
@@ -343,52 +370,7 @@ $gray-500: #6c757d;
     font-weight: 500;
 }
 
-// Refresh Button
-.refresh-btn {
-    background: rgba($primary, 0.08) !important;
-    color: $primary !important;
-    border-radius: 12px !important;
-    height: 40px !important;
-    padding: 0 16px !important;
-    font-weight: 600 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 1px solid rgba($primary, 0.1) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: none !important;
 
-    mat-icon {
-        margin-right: 8px !important;
-        transition: transform 0.4s ease !important;
-
-        &.spin {
-            animation: spin 1s linear infinite !important;
-        }
-    }
-
-    &:hover:not(:disabled) {
-        background: $primary !important;
-        color: white !important;
-        box-shadow: 0 4px 12px rgba($primary, 0.25) !important;
-        transform: translateY(-2px);
-
-        mat-icon:not(.spin) {
-            transform: rotate(180deg);
-        }
-    }
-
-    &:active:not(:disabled) {
-        transform: translateY(0) scale(0.95);
-    }
-
-    &:disabled {
-        background: #F3F4F6 !important;
-        color: #9CA3AF !important;
-        border-color: #E5E7EB !important;
-        cursor: not-allowed;
-    }
-}
 
 @keyframes spin {
     from {
@@ -568,7 +550,7 @@ $gray-500: #6c757d;
 
     .btn-action {
         flex: 1;
-        border-radius: 10px;
+        border-radius: 8px;
         font-size: 13px;
 
         mat-icon {
@@ -623,7 +605,7 @@ $gray-500: #6c757d;
     }
 
     button {
-        border-radius: 10px;
+        border-radius: 8px;
 
         mat-icon {
             margin-right: 6px;
@@ -1071,7 +1053,8 @@ $white: #ffffff;
 
     .search-field {
         flex: 1;
-        min-width: 200px;
+        width: 250px;
+        // min-width: 200px;
     }
 }
 

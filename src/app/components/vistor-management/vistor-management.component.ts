@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ResetBtnDirective } from '../../directive/reset-btn.directive';
 
 interface DashboardStats {
   totalEntryToday: number;
@@ -48,7 +49,8 @@ interface EntryLog {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    ResetBtnDirective
   ],
   templateUrl: './vistor-management.component.html',
   styleUrl: './vistor-management.component.scss'
