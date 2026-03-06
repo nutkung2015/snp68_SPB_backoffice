@@ -101,7 +101,7 @@ export class CreateJuristicComponent implements OnInit {
                 email: formValue.email.trim().toLowerCase(),
                 phone: formValue.phone.trim(),
                 password: formValue.password,
-                role: 'juristic',
+                role: 'juristicLeader',
                 project_id: formValue.project_id
             };
 
