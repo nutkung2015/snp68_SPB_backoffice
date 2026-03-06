@@ -12,6 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { Router } from '@angular/router';
 import { RestService } from '../../../services/rest.service';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -63,7 +64,7 @@ export class SuperAdminUsersComponent implements OnInit {
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
 
-    constructor(private restService: RestService) {
+    constructor(private restService: RestService, private router: Router) {
         this.dataSource = new MatTableDataSource();
     }
 
@@ -148,8 +149,7 @@ export class SuperAdminUsersComponent implements OnInit {
 
     // Action methods
     onCreateUser(): void {
-        // TODO: Implement create user logic
-        console.log('Create user clicked');
+        this.router.navigate(['/super-admin/users/create-juristic']);
     }
 
     onEditUser(user: any): void {

@@ -1,0 +1,110 @@
+.create-juristic-page {
+    position: relative;
+    padding: 24px;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 64px);
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .header-section {
+        margin-bottom: 24px;
+
+        .back-btn {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+
+            &:hover {
+                background-color: #f1f5f9;
+            }
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .page-subtitle {
+            margin: 4px 0 0;
+            font-size: 14px;
+            color: #64748b;
+        }
+    }
+
+    .form-container {
+        width: 100%;
+
+        .form-card {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+
+            .form-section-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            mat-form-field {
+                width: 100%;
+
+                ::ng-deep .mat-mdc-text-field-wrapper {
+                    background-color: white;
+                }
+            }
+
+            .secondary {
+                color: #64748b;
+                margin-right: 8px;
+            }
+
+            .generate-btn {
+                height: 56px;
+                border-radius: 8px;
+                border-color: #cbd5e1;
+                color: #475569;
+
+                &:hover {
+                    background-color: #f8fafc;
+                    border-color: #94a3b8;
+                }
+            }
+
+            .form-actions {
+                .cancel-btn {
+                    padding: 8px 24px;
+                    border-radius: 8px;
+                    color: #64748b;
+
+                    &:hover {
+                        background-color: #f1f5f9;
+                    }
+                }
+
+                .submit-btn {
+                    padding: 8px 32px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+}

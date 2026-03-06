@@ -407,10 +407,22 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        loadComponent: () =>
-          import('./components/super-admin/users-super-admin/users-super-admin.component').then(
-            (m) => m.SuperAdminUsersComponent
-          ),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/super-admin/users-super-admin/users-super-admin.component').then(
+                (m) => m.SuperAdminUsersComponent
+              ),
+          },
+          {
+            path: 'create-juristic',
+            loadComponent: () =>
+              import('./components/super-admin/users-super-admin/create-juristic/create-juristic.component').then(
+                (m) => m.CreateJuristicComponent
+              ),
+          }
+        ]
       },
       {
         path: 'announcements',

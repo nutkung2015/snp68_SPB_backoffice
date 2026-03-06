@@ -1683,6 +1683,15 @@ export class RestService {
     );
   }
 
+  createJuristicUser(data: any): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/super-admin/users/create-juristic`;
+    return this.http.post<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
   /**
    * Get all projects (Super Admin only)
    * GET /api/projects

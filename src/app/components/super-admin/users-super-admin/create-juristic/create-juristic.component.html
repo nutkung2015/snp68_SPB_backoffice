@@ -1,0 +1,111 @@
+<div class="create-juristic-page">
+    <div class="loading-overlay" *ngIf="isLoading$ | async">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Page Header -->
+    <div class="header-section" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <button mat-icon-button (click)="onCancel()" class="back-btn">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div>
+                <h1 class="page-title">สร้างผู้ใช้นิติบุคคล (Juristic)</h1>
+                <p class="page-subtitle">เพิ่มบัญชีผู้ดูแลโครงการใหม่</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-container" fxLayout="column" fxLayoutAlign="start center">
+        <mat-card class="form-card">
+            <mat-card-content>
+                <form [formGroup]="juristicForm" (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="20px">
+                    <div class="form-section-title">ข้อมูลผู้ใช้งาน</div>
+
+                    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="20px">
+                        <mat-form-field appearance="outline" fxFlex>
+                            <mat-label>ชื่อ-นามสกุล</mat-label>
+                            <input matInput formControlName="full_name" placeholder="ระบุชื่อ-นามสกุล">
+                            <mat-icon matPrefix class="secondary">person</mat-icon>
+                            <mat-error
+                                *ngIf="juristicForm.get('full_name')?.hasError('required')">กรุณาระบุชื่อ-นามสกุล</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="20px">
+                        <mat-form-field appearance="outline" fxFlex>
+                            <mat-label>อีเมล</mat-label>
+                            <input matInput formControlName="email" type="email" placeholder="example@domain.com">
+                            <mat-icon matPrefix class="secondary">mail</mat-icon>
+                            <mat-error
+                                *ngIf="juristicForm.get('email')?.hasError('required')">กรุณาระบุอีเมล</mat-error>
+                            <mat-error
+                                *ngIf="juristicForm.get('email')?.hasError('email')">รูปแบบอีเมลไม่ถูกต้อง</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" fxFlex>
+                            <mat-label>เบอร์โทรศัพท์</mat-label>
+                            <input matInput formControlName="phone" placeholder="08xxxxxxxx" maxlength="10">
+                            <mat-icon matPrefix class="secondary">phone</mat-icon>
+                            <mat-error
+                                *ngIf="juristicForm.get('phone')?.hasError('required')">กรุณาระบุเบอร์โทรศัพท์</mat-error>
+                            <mat-error
+                                *ngIf="juristicForm.get('phone')?.hasError('pattern')">เบอร์โทรศัพท์ไม่ถูกต้อง</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="20px">
+                        <mat-form-field appearance="outline" fxFlex>
+                            <mat-label>โครงการที่ดูแล</mat-label>
+                            <mat-select formControlName="project_id" placeholder="เลือกโครงการ">
+                                <mat-option *ngIf="isLoadingProjects" disabled>
+                                    <mat-spinner diameter="20"
+                                        style="display:inline-block; margin-right: 10px;"></mat-spinner>กำลังโหลด...
+                                </mat-option>
+                                <mat-option *ngFor="let p of projects" [value]="p.id">
+                                    {{ p.name }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-icon matPrefix class="secondary">domain</mat-icon>
+                            <mat-error
+                                *ngIf="juristicForm.get('project_id')?.hasError('required')">กรุณาเลือกโครงการ</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="20px" fxLayoutAlign="start center">
+                        <mat-form-field appearance="outline" fxFlex>
+                            <mat-label>รหัสผ่าน</mat-label>
+                            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                                placeholder="กำหนดรหัสผ่าน">
+                            <mat-icon matPrefix class="secondary">lock</mat-icon>
+                            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword"
+                                [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+                                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                            <mat-error
+                                *ngIf="juristicForm.get('password')?.hasError('required')">กรุณาระบุรหัสผ่าน</mat-error>
+                            <mat-error
+                                *ngIf="juristicForm.get('password')?.hasError('minlength')">รหัสผ่านต้องมีอย่างน้อย 6
+                                ตัวอักษร</mat-error>
+                        </mat-form-field>
+
+                        <button mat-stroked-button type="button" class="generate-btn" (click)="generatePassword()"
+                            style="margin-bottom: 22px;">
+                            <mat-icon>casino</mat-icon> สุ่มรหัสผ่าน
+                        </button>
+                    </div>
+
+                    <div class="form-actions" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="center center"
+                        style="margin-top: 20px;">
+                        <button mat-button type="button" (click)="onCancel()" class="cancel-btn">ยกเลิก</button>
+                        <button mat-flat-button class="bt-primary submit-btn" type="submit"
+                            [disabled]="isSaving || isLoadingProjects">
+                            บันทึกข้อมูล
+                        </button>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
