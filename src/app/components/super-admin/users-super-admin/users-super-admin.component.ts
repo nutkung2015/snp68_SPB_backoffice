@@ -12,8 +12,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { RestService } from '../../../services/rest.service';
+import { EditUserDialogComponent } from './edit-user-dialog/edit-user-dialog.component';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { PageHeaderComponent } from '../../../shared/page-header/page-header.component';
@@ -35,6 +37,7 @@ import { PageHeaderComponent } from '../../../shared/page-header/page-header.com
         MatProgressSpinnerModule,
         MatSelectModule,
         MatCardModule,
+        MatDialogModule,
         FormsModule,
         FlexLayoutModule,
         PageHeaderComponent
@@ -64,7 +67,11 @@ export class SuperAdminUsersComponent implements OnInit {
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
 
-    constructor(private restService: RestService, private router: Router) {
+    constructor(
+        private restService: RestService, 
+        private router: Router,
+        private dialog: MatDialog
+    ) {
         this.dataSource = new MatTableDataSource();
     }
 
@@ -153,17 +160,55 @@ export class SuperAdminUsersComponent implements OnInit {
     }
 
     onEditUser(user: any): void {
-        // TODO: Implement edit user logic
-        console.log('Edit user:', user);
+        const dialogRef = this.dialog.open(EditUserDialogComponent, {
+            width: '500px',
+            data: { id: user.id }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.success) {
+                // Refresh list when user is successfully updated
+                this.loadUsers();
+            }
+        });
     }
 
     onResetPassword(user: any): void {
-        // TODO: Implement reset password logic
-        console.log('Reset password for:', user);
+        if (confirm(`คุณต้องการส่งลิงก์รีเซ็ตรหัสผ่านไปยัง "${user.email}" หรือไม่?`)) {
+            this.restService.sendUserPasswordResetLink(user.id).subscribe({
+                next: (res: any) => {
+                    if (res.status === 'success') {
+                        alert(res.message || 'ส่งลิงก์รีเซ็ตรหัสผ่านสำเร็จ');
+                    } else {
+                        alert(`เกิดข้อผิดพลาด: ${res.message}`);
+                    }
+                },
+                error: (err) => {
+                    console.error('Error sending reset password link:', err);
+                    alert('เกิดข้อผิดพลาดในการส่งลิงก์รีเซ็ตรหัสผ่าน');
+                }
+            });
+        }
     }
 
     onBanUser(user: any): void {
-        // TODO: Implement ban user logic
-        console.log('Ban user:', user);
+        if (confirm(`คุณต้องการลบผู้ใช้ "${user.full_name}" (และสิทธิ์เข้าถึงทั้งหมด) หรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) {
+            this.restService.deleteSuperAdminUser(user.id).subscribe({
+                next: (res: any) => {
+                    if (res.status === 'success') {
+                        alert(res.message || 'ลบผู้ใช้งานสำเร็จ');
+                        // Refresh data and keep current page if possible
+                        this.loadUsers();
+                    } else {
+                        alert(`เกิดข้อผิดพลาด: ${res.message}`);
+                    }
+                },
+                error: (err) => {
+                    console.error('Error deleting user:', err);
+                    const msg = err.error?.message || 'เกิดข้อผิดพลาดในการลบผู้ใช้งาน';
+                    alert(`เกิดข้อผิดพลาด: ${msg}`);
+                }
+            });
+        }
     }
 }

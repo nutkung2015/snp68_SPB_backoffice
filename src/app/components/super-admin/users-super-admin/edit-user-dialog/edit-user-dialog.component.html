@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>แก้ไขข้อมูลผู้ใช้งาน</h2>
+
+<mat-dialog-content>
+    <div *ngIf="isLoading" class="loading-container" fxLayout="column" fxLayoutAlign="center center">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>กำลังโหลดข้อมูล...</p>
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="editForm" fxLayout="column" fxLayoutGap="16px" class="edit-user-form">
+        <!-- Email (Read Only) -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>อีเมล</mat-label>
+            <input matInput formControlName="email">
+            <mat-icon matSuffix class="secondary">lock</mat-icon>
+        </mat-form-field>
+
+        <!-- Full Name -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ชื่อ-นามสกุล</mat-label>
+            <input matInput formControlName="full_name" placeholder="ระบุชื่อ-นามสกุล">
+            <mat-error *ngIf="editForm.get('full_name')?.hasError('required')">
+                กรุณาระบุชื่อ-นามสกุล
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Phone -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>เบอร์โทรศัพท์</mat-label>
+            <input matInput formControlName="phone" placeholder="ระบุเบอร์โทรศัพท์ (ตัวเลข 10 หลัก)">
+            <mat-error *ngIf="editForm.get('phone')?.hasError('pattern')">
+                ข้อมูลต้องเป็นตัวเลขเท่านั้น
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Role -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>บทบาท</mat-label>
+            <mat-select formControlName="role">
+                <mat-option *ngFor="let role of roles" [value]="role">
+                    {{ role | titlecase }}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="editForm.get('role')?.hasError('required')">
+                กรุณาเลือกบทบาท
+            </mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" *ngIf="!isLoading">
+    <button mat-stroked-button color="warn" (click)="onCancel()" [disabled]="isSaving">
+        ยกเลิก
+    </button>
+    <button mat-flat-button color="primary" class="bt-primary" (click)="onSubmit()" [disabled]="editForm.invalid || isSaving">
+        <mat-icon *ngIf="!isSaving">save</mat-icon>
+        <mat-spinner *ngIf="isSaving" diameter="20" class="btn-spinner"></mat-spinner>
+        <span *ngIf="!isSaving">บันทึกข้อมูล</span>
+        <span *ngIf="isSaving">กำลังบันทึก...</span>
+    </button>
+</mat-dialog-actions>

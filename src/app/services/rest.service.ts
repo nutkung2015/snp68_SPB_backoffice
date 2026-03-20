@@ -1692,6 +1692,40 @@ export class RestService {
     );
   }
 
+  getSuperAdminUserById(id: string): Observable<any> {
+    const url = `${this.apiUrl}/api/super-admin/users/${id}`;
+    return this.http.get<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  updateSuperAdminUser(id: string, data: any): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/super-admin/users/${id}`;
+    return this.http.put<any>(url, data, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  deleteSuperAdminUser(id: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/super-admin/users/${id}`;
+    return this.http.delete<any>(url, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  sendUserPasswordResetLink(id: string): Observable<any> {
+    this.isLoadingSubject.next(true);
+    const url = `${this.apiUrl}/api/super-admin/users/${id}/send-reset-link`;
+    return this.http.post<any>(url, {}, this.getHttpOptions()).pipe(
+      catchError((error) => this.handleError(error)),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
   /**
    * Get all projects (Super Admin only)
    * GET /api/projects
