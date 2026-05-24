@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { Auth, RecaptchaVerifier } from '@angular/fire/auth';
@@ -26,6 +27,7 @@ import { PageHeaderComponent } from '../../shared/page-header/page-header.compon
         MatStepperModule,
         MatIconModule,
         MatCardModule,
+        MatDividerModule,
         MatSnackBarModule,
         PageHeaderComponent
     ],

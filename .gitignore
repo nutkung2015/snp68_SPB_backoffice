@@ -28,6 +28,9 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# AI
+.antigravity/*
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
@@ -43,4 +46,6 @@ Thumbs.db
 
 # Environment variables
 .env
+/src/environments/environment.ts
+
 

@@ -1,12 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { Auth, RecaptchaVerifier } from '@angular/fire/auth';
@@ -16,6 +18,7 @@ import { Auth, RecaptchaVerifier } from '@angular/fire/auth';
     standalone: true,
     imports: [
         CommonModule,
+        RouterModule,
         FormsModule,
         ReactiveFormsModule,
         MatFormFieldModule,
@@ -23,12 +26,14 @@ import { Auth, RecaptchaVerifier } from '@angular/fire/auth';
         MatButtonModule,
         MatStepperModule,
         MatIconModule,
+        MatCardModule,
+        MatDividerModule,
         MatSnackBarModule
     ],
     templateUrl: './forgot-password.component.html',
     styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent implements OnInit, OnDestroy {
+export class ForgotPasswordComponent implements OnInit, OnDestroy, AfterViewInit {
     phoneForm: FormGroup;
     otpForm: FormGroup;
     isLinear = true;
@@ -37,6 +42,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     confirmationResult: any;
 
     isLoading = false;
+    currentStep = 0;
 
     constructor(
         private fb: FormBuilder,
@@ -128,7 +134,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
                         this.confirmationResult = await this.authService.sendOTP(formattedPhone, this.recaptchaVerifier);
                         this.snackBar.open('ส่ง OTP สำเร็จ!', 'ปิด', { duration: 3000 });
                         this.isLoading = false;
-                        // Move to next step (handled by mat-stepper)
+                        this.currentStep = 1;
                     } catch (error: any) {
                         console.error('Error sending OTP', error);
 
@@ -178,6 +184,14 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
             console.error('Error verifying OTP', error);
             this.snackBar.open('Invalid OTP. Please try again.', 'Close', { duration: 3000 });
             this.isLoading = false;
+        }
+    }
+
+    goBack() {
+        if (this.currentStep > 0) {
+            this.currentStep--;
+        } else {
+            this.router.navigate(['/login']);
         }
     }
 }
